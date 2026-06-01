@@ -2,6 +2,8 @@
 
 A browser-based stock market simulation game. Start with **$10,000**, trade 300+ real stocks and ETFs, grow your portfolio, and compete on the leaderboard — all in a single HTML file with no install required.
 
+![NASDAQ Shooter screenshot](screenshot.jpg)
+
 ## Play
 
 Open `stock-game.html` in any modern browser. No server, no dependencies, no build step.
