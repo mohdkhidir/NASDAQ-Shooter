@@ -829,20 +829,71 @@ html[data-theme="light"] .forex-chip.active{background:var(--bl);color:#fff;}
 .btn-restart{background:#238636;border:none;color:#fff;padding:10px 28px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin:4px;}
 .btn-restart:hover{background:#2ea043;}
 
+/* ── Sidebar resize handle ── */
+.sidebar-resize-handle{
+  width:5px;flex-shrink:0;cursor:col-resize;background:transparent;
+  transition:background .15s;position:relative;z-index:10;
+}
+.sidebar-resize-handle:hover,.sidebar-resize-handle.dragging{background:#58a6ff66;}
+.sidebar-resize-handle::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:3px;height:40px;background:#30363d;border-radius:2px;
+}
+
+/* ── Sidebar SVG icons ── */
+.sb-tab-icon{display:flex;align-items:center;justify-content:center;}
+.sb-tab-icon svg{width:20px;height:20px;fill:currentColor;}
+.sb-tab{font-size:11px;}
+.sb-tab-label{font-size:10px;font-weight:600;letter-spacing:.03em;}
+
+/* ── Sidebar bigger fonts ── */
+.section-title{font-size:12px;font-weight:800;letter-spacing:.1em;}
+.order-form label{font-size:12px;color:#8b949e;}
+.position-ticker{font-size:14px;}
+.position-detail{font-size:11px;}
+.fund-key{font-size:12px;}
+.fund-val{font-size:13px;}
+.mini-stat-label{font-size:10px;}
+.mini-stat-val{font-size:13px;font-weight:700;}
+
+/* ── Competitor cards in Portfolio pane ── */
+.comp-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.comp-card{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s;}
+.comp-card:hover{border-color:#58a6ff;}
+.comp-hdr{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;}
+.comp-info{flex:1;min-width:0;}
+.comp-name{font-size:13px;font-weight:700;}
+.comp-meta{font-size:10px;color:#8b949e;margin-top:1px;}
+.comp-nature{font-size:10px;color:#8b949e;line-height:1.4;margin-bottom:6px;border-left:2px solid #30363d;padding-left:6px;}
+.comp-agg-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.comp-agg-lbl{font-size:9px;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;width:66px;flex-shrink:0;}
+.comp-agg-bar{display:flex;gap:2px;flex:1;}
+.agg-pip{height:6px;flex:1;border-radius:2px;background:#21262d;transition:background .2s;}
+.agg-pip.on{background:#f0883e;}
+.comp-agg-num{font-size:9px;color:#8b949e;width:24px;text-align:right;}
+.comp-top{font-size:10px;color:#8b949e;}
+.comp-top b{color:#58a6ff;}
+
 /* ── Players bar ── */
-.players-bar{background:#0a0d12;border-bottom:1px solid #1a2030;padding:5px 12px;overflow:hidden;flex-shrink:0;}
-.players-bar-inner{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.players-bar{background:#0a0d12;border-bottom:1px solid #1a2030;padding:6px 14px;overflow:hidden;flex-shrink:0;}
+.players-bar-inner{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .players-bar-inner::-webkit-scrollbar{display:none;}
-.player-card{flex-shrink:0;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:6px 10px;cursor:pointer;min-width:110px;max-width:140px;transition:border-color .15s;}
-.player-card:hover{border-color:#58a6ff;}
+.player-card{flex-shrink:0;background:#161b22;border:1px solid #30363d;border-radius:9px;padding:8px 12px;cursor:pointer;min-width:135px;max-width:170px;transition:border-color .2s,background .2s;}
+.player-card:hover{border-color:#58a6ff;background:#0d1825;}
 .player-card.pc-me{border-color:#6e40c9;background:#1a1030;}
-.pc-name{font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#8b949e;margin-bottom:2px;}
-.pc-nw{font-size:12px;font-weight:700;font-family:monospace;}
-.pc-ret{font-size:9px;font-family:monospace;margin-top:1px;}
-.pc-strategy{font-size:8px;color:#8b949e;text-transform:uppercase;letter-spacing:.04em;}
+.pc-row-top{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.pc-emoji{font-size:15px;line-height:1;}
+.pc-name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c9d1d9;}
+.pc-nw{font-size:15px;font-weight:800;font-family:monospace;margin-bottom:1px;}
+.pc-ret{font-size:11px;font-family:monospace;margin-bottom:4px;}
+.pc-aggr-bar{display:flex;gap:2px;margin-bottom:3px;}
+.pc-pip{height:4px;flex:1;border-radius:2px;background:#21262d;}
+.pc-pip.on{background:#f0883e;}
+.pc-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8b949e;}
 html[data-theme="light"] .players-bar{background:var(--bg3);border-color:var(--bdr);}
 html[data-theme="light"] .player-card{background:var(--bg2);border-color:var(--bdr);}
 html[data-theme="light"] .player-card.pc-me{background:#f3eeff;border-color:var(--pu);}
+html[data-theme="light"] .pc-name{color:var(--txt1);}
 
 /* ── Sidebar height fix ── */
 .sidebar{max-height:calc(100vh - 60px);}
@@ -1206,26 +1257,33 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
       <button data-speed="30">25×</button>
     </div>
   </div>
-  <div class="sidebar">
+  <div class="sidebar-resize-handle" id="sidebar-resize-handle" title="Drag to resize"></div>
+  <div class="sidebar" id="sidebar">
     <!-- Tab bar -->
     <div class="sb-tabs">
       <button class="sb-tab active" data-pane="home">
-        <span class="sb-tab-icon">🏠</span><span class="sb-tab-label">Home</span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
+        <span class="sb-tab-label">Home</span>
       </button>
       <button class="sb-tab" data-pane="portfolio">
-        <span class="sb-tab-icon">📊</span><span class="sb-tab-label">Portfolio</span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18v-2H5V3H3zm4 10h2v5H7v-5zm4-5h2v10h-2V8zm4 2h2v8h-2v-8z"/></svg></span>
+        <span class="sb-tab-label">Portfolio</span>
       </button>
       <button class="sb-tab" data-pane="bank">
-        <span class="sb-tab-icon">🏦</span><span class="sb-tab-label">Bank</span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M11.5 1L2 6v2h19V6l-9.5-5zM2 22h19v-2H2v2zm0-4h19v-2H2v2zm2-4h2v-6H4v6zm5 0h2v-6H9v6zm5 0h2v-6h-2v6zm5 0h2v-6h-2v6z"/></svg></span>
+        <span class="sb-tab-label">Bank</span>
       </button>
       <button class="sb-tab" data-pane="fundamental">
-        <span class="sb-tab-icon">📋</span><span class="sb-tab-label">Fundmntls</span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></span>
+        <span class="sb-tab-label">Fundmntls</span>
       </button>
       <button class="sb-tab" data-pane="settings">
-        <span class="sb-tab-icon">⚙️</span><span class="sb-tab-label">Settings</span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span>
+        <span class="sb-tab-label">Settings</span>
       </button>
       <button class="sb-tab" data-pane="news">
-        <span class="sb-tab-icon">📰</span><span class="sb-tab-label">News <span class="news-count" id="news-badge">0</span></span>
+        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M22 3l-1.67 1.67L18.67 3 17 4.67 15.33 3l-1.66 1.67L12 3l-1.67 1.67L8.67 3 7 4.67 5.33 3 3.67 4.67 2 3v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V3zM11 17H5v-2h6v2zm8 0h-6v-2h6v2zm0-4H5v-2h14v2zm0-4H5V7h14v2z"/></svg></span>
+        <span class="sb-tab-label">News <span class="news-count" id="news-badge">0</span></span>
       </button>
     </div>
 
@@ -2103,11 +2161,16 @@ const ETF_WATCHLIST_DEFAULT=['SPY','QQQ','GLD','SLV','TLT','AGG','XLK','XLF','SM
 
 // ── Virtual AI Competitors ────────────────────────────────────
 const AI_CONFIGS=[
-  {id:'ai0',name:'Warren Bot',  emoji:'🎩',strategy:'value',    risk:0.25,color:'#3fb950'},
-  {id:'ai1',name:'Quant Alpha', emoji:'🤖',strategy:'momentum', risk:0.55,color:'#58a6ff'},
-  {id:'ai2',name:'Divi Queen',  emoji:'💰',strategy:'dividend', risk:0.20,color:'#ffd700'},
-  {id:'ai3',name:'Tech Bull',   emoji:'💻',strategy:'tech',     risk:0.70,color:'#8957e5'},
-  {id:'ai4',name:'YOLO Trader', emoji:'🚀',strategy:'random',   risk:0.95,color:'#f85149'},
+  {id:'ai0',name:'Warren Bot',  emoji:'🎩',strategy:'value',    risk:0.25,color:'#3fb950',
+   age:93, country:'🇺🇸 USA',    aggression:2, nature:'Blue-chip stocks, consumer staples, long-term value holds'},
+  {id:'ai1',name:'Quant Alpha', emoji:'🤖',strategy:'momentum', risk:0.55,color:'#58a6ff',
+   age:35, country:'🇬🇧 UK',     aggression:6, nature:'High-momentum tech & growth, algorithmic swing trades'},
+  {id:'ai2',name:'Divi Queen',  emoji:'💰',strategy:'dividend', risk:0.20,color:'#ffd700',
+   age:58, country:'🇨🇦 Canada', aggression:2, nature:'High-yield dividend stocks, REITs, Bond ETFs, income focus'},
+  {id:'ai3',name:'Tech Bull',   emoji:'💻',strategy:'tech',     risk:0.70,color:'#8957e5',
+   age:28, country:'🇸🇬 Singapore', aggression:7, nature:'Semiconductors, AI, SaaS, concentrated tech sector bets'},
+  {id:'ai4',name:'YOLO Trader', emoji:'🚀',strategy:'random',   risk:0.95,color:'#f85149',
+   age:22, country:'🇺🇸 USA',    aggression:10, nature:'Crypto, meme stocks, speculative small-caps, options plays'},
 ];
 
 // ── ETF Components (top-10 holdings, risk 1-5, replication type) ─
@@ -3855,7 +3918,10 @@ function playSound(type){
 }
 
 // ── Filter helpers ────────────────────────────────────────────
+// Category filter pills (curated — no ETF clutter)
 const SECTOR_ORDER=['Tech','Finance','Health','Energy','Consumer','Industrl','Comms','Utility','Realty','Materls','Crypto'];
+// Full sector list used in search dropdown (includes ETFs/Forex/Commodity)
+const SEARCH_SECTOR_ORDER=['Tech','Finance','Health','Energy','Consumer','Industrl','Comms','Utility','Realty','Materls','Crypto','Commodity','Forex','Index','SectETF','Bond','Other'];
 const CATALOG={};
 for(const [t,s] of Object.entries(STOCKS)){
   const sec=s.sector||'Other';
@@ -4045,7 +4111,7 @@ function openDropdownGrouped(){
   const bySecMap={};
   pool.forEach(t=>{const sec=STOCKS[t].sector||'Other';if(!bySecMap[sec])bySecMap[sec]=[];bySecMap[sec].push(t);});
   let html='';
-  for(const sec of [...SECTOR_ORDER,'Other']){
+  for(const sec of SEARCH_SECTOR_ORDER){
     const tickers=bySecMap[sec];if(!tickers||!tickers.length)continue;
     const col=SECTOR_COLORS[sec]||'#8b949e';
     html+=`<div class="dd-sector-header" style="color:${col}">${SECTOR_LABELS[sec]||sec} <span style="color:#8b949e;font-weight:400">(${tickers.length})</span></div>`;
@@ -4066,7 +4132,7 @@ function triggerSearch(q){
   const bySecMap={};
   results.forEach(t=>{const sec=STOCKS[t].sector||'Other';if(!bySecMap[sec])bySecMap[sec]=[];bySecMap[sec].push(t);});
   let html='';
-  for(const sec of [...SECTOR_ORDER,'Other']){
+  for(const sec of SEARCH_SECTOR_ORDER){
     const group=bySecMap[sec];if(!group)continue;
     const col=SECTOR_COLORS[sec]||'#8b949e';
     html+=`<div class="dd-sector-header" style="color:${col}">${SECTOR_LABELS[sec]||sec}</div>`;
@@ -4291,8 +4357,39 @@ function renderSbPortfolio(){
       <div class="fund-row"><span class="fund-key">LB Rank</span><span class="fund-val" style="color:#ffd700">${rank==='—'?'—':'#'+rank}</span></div>
     </div>
 
+    <!-- ── Competitor Traders ── -->
+    <div class="section-title">Competitor Traders</div>
+    <div class="comp-grid">
+      ${(state.aiPlayers||[]).map(ai=>{
+        const ainw=aiNetWorth(ai),aipct=((ainw-ai.startCash)/ai.startCash*100);
+        const topPos=Object.entries(ai.positions||{}).filter(([,p])=>p.shares>0.0001)
+          .map(([t,p])=>({t,val:p.shares*(state.prices[t]||p.avgCost)}))
+          .sort((a,b)=>b.val-a.val).slice(0,2).map(x=>x.t).join(', ')||'—';
+        const aggPips=Array.from({length:10},(_,i)=>`<span class="agg-pip${i<(ai.aggression||5)?' on':''}" style="${i<(ai.aggression||5)?'background:'+ai.color:''}"></span>`).join('');
+        return`<div class="comp-card" style="border-color:${ai.color}44" onclick="openPlayerPortfolio('${ai.id}')">
+          <div class="comp-hdr"><span style="font-size:16px">${ai.emoji}</span>
+            <div class="comp-info">
+              <div class="comp-name" style="color:${ai.color}">${ai.name}</div>
+              <div class="comp-meta">${ai.country||'—'} · Age ${ai.age||'—'}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;font-weight:700;color:${ainw>=(ai.startCash||INITIAL_CASH)?'#3fb950':'#f85149'}">${fmt(ainw)}</div>
+              <div style="font-size:10px;color:${aipct>=0?'#3fb950':'#f85149'}">${aipct>=0?'+':''}${aipct.toFixed(1)}%</div>
+            </div>
+          </div>
+          <div class="comp-nature">${ai.nature||ai.strategy}</div>
+          <div class="comp-agg-row">
+            <span class="comp-agg-lbl">Aggression</span>
+            <div class="comp-agg-bar">${aggPips}</div>
+            <span class="comp-agg-num">${ai.aggression||5}/10</span>
+          </div>
+          <div class="comp-top">Top: <b>${topPos}</b></div>
+        </div>`;
+      }).join('')}
+    </div>
+
     <!-- ── Positions ── -->
-    <div class="section-title">Positions (${positions.length})</div>
+    <div class="section-title">My Positions (${positions.length})</div>
     ${positions.length===0?'<div style="font-size:11px;color:#8b949e;padding:4px 0">No open positions</div>':
       positions.map(({t,p,cur,ppnl,ppct,val})=>`
       <div class="position-row" onclick="switchTicker('${t}')" style="cursor:pointer">
@@ -5581,18 +5678,20 @@ function renderPlayersBar(){
   if(!bar||!playerName)return;
   const sc=state.startCash||INITIAL_CASH;
   const nw=netWorth(),pct=((nw-sc)/sc*100);
+  const aggrBar=n=>{const pips=Math.round(n/2);return'<div class="pc-aggr-bar">'+Array.from({length:5},(_,i)=>`<div class="pc-pip${i<pips?' on':''}"></div>`).join('')+'</div>';};
   let html=`<div class="player-card pc-me" onclick="openPlayerPortfolio('me')">
-    <div class="pc-name">👤 ${esc(playerName)}</div>
+    <div class="pc-row-top"><span class="pc-emoji">👤</span><span class="pc-name">${esc(playerName)}</span></div>
     <div class="pc-nw" style="color:${nw>=sc?'#3fb950':'#f85149'}">${fmt(nw)}</div>
-    <div class="pc-ret" style="color:${pct>=0?'#3fb950':'#f85149'}">${pct>=0?'+':''}${pct.toFixed(1)}%</div>
-    <div class="pc-strategy">Human</div></div>`;
+    <div class="pc-ret" style="color:${pct>=0?'#3fb950':'#f85149'}">${pct>=0?'+':''}${pct.toFixed(2)}%</div>
+    <div class="pc-tag">Human</div></div>`;
   (state.aiPlayers||[]).forEach(ai=>{
     const ainw=aiNetWorth(ai),aipct=((ainw-ai.startCash)/ai.startCash*100);
-    html+=`<div class="player-card" style="border-color:${ai.color}55" onclick="openPlayerPortfolio('${ai.id}')">
-      <div class="pc-name">${ai.emoji} ${esc(ai.name)}</div>
+    html+=`<div class="player-card" style="border-color:${ai.color}66" onclick="openPlayerPortfolio('${ai.id}')">
+      <div class="pc-row-top"><span class="pc-emoji">${ai.emoji}</span><span class="pc-name">${esc(ai.name)}</span></div>
       <div class="pc-nw" style="color:${ainw>=ai.startCash?'#3fb950':'#f85149'}">${fmt(ainw)}</div>
-      <div class="pc-ret" style="color:${aipct>=0?'#3fb950':'#f85149'}">${aipct>=0?'+':''}${aipct.toFixed(1)}%</div>
-      <div class="pc-strategy" style="color:${ai.color}">${ai.strategy}</div></div>`;
+      <div class="pc-ret" style="color:${aipct>=0?'#3fb950':'#f85149'}">${aipct>=0?'+':''}${aipct.toFixed(2)}%</div>
+      ${aggrBar(ai.aggression||5)}
+      <div class="pc-tag" style="color:${ai.color}">${ai.strategy.toUpperCase()}</div></div>`;
   });
   bar.innerHTML=html;
 }
@@ -5884,6 +5983,47 @@ function fmtPrice(n){
 }
 function fmtDate(ts){return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});}
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// ── Sidebar resize ────────────────────────────────────────────
+(function(){
+  const handle=document.getElementById('sidebar-resize-handle');
+  const sidebar=document.getElementById('sidebar');
+  if(!handle||!sidebar)return;
+  let dragging=false,startX=0,startW=0;
+  handle.addEventListener('mousedown',e=>{
+    dragging=true;startX=e.clientX;startW=sidebar.offsetWidth;
+    handle.classList.add('dragging');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const delta=startX-e.clientX;
+    const nw=Math.min(Math.max(startW+delta,220),700);
+    sidebar.style.width=nw+'px';
+    sidebar.style.minWidth=nw+'px';
+  });
+  document.addEventListener('mouseup',()=>{
+    if(!dragging)return;
+    dragging=false;handle.classList.remove('dragging');
+    document.body.style.cursor='';document.body.style.userSelect='';
+  });
+  // Touch support
+  handle.addEventListener('touchstart',e=>{
+    dragging=true;startX=e.touches[0].clientX;startW=sidebar.offsetWidth;
+    handle.classList.add('dragging');e.preventDefault();
+  },{passive:false});
+  document.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const delta=startX-e.touches[0].clientX;
+    const nw=Math.min(Math.max(startW+delta,220),700);
+    sidebar.style.width=nw+'px';sidebar.style.minWidth=nw+'px';
+  },{passive:false});
+  document.addEventListener('touchend',()=>{
+    dragging=false;handle.classList.remove('dragging');
+  });
+})();
 
 // ── PWA: register service worker ──────────────────────────────
 if('serviceWorker' in navigator){
