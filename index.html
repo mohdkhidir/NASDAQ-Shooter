@@ -521,8 +521,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .search-icon{left:8px;font-size:12px;}
   .watchlist{gap:3px;padding:2px 0;}
   .watch-chip{padding:2px 7px;font-size:10px;}
-  /* Hide sector filter, commodity row, forex row — search bar is enough */
-  #filter-area,.filter-panel,.sp-row-commod,.sp-row-forex{display:none !important;}
+  /* Hide sector filter, commodity/forex/etf rows on phone — search bar is enough */
+  #filter-area,.filter-panel,.sp-row-commod,.sp-row-forex,.sp-row-etf{display:none !important;}
 
   /* Chart header */
   .chart-header{flex-wrap:nowrap;gap:6px;align-items:center;}
@@ -825,6 +825,48 @@ html[data-theme="light"] .forex-chip.active{background:var(--bl);color:#fff;}
 .btn-restart{background:#238636;border:none;color:#fff;padding:10px 28px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin:4px;}
 .btn-restart:hover{background:#2ea043;}
 
+/* ── Sidebar expand animation ── */
+.sidebar{transition:width .25s cubic-bezier(.4,0,.2,1);}
+.sidebar.sb-open{width:360px;}
+@media(max-width:860px){.sidebar.sb-open{width:100%;}}
+
+/* ── ETF watchlist row ── */
+.etf-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;}
+.etf-watchlist::-webkit-scrollbar{display:none;}
+.etf-chip{flex-shrink:0;border:1px solid #0f6b5e44;color:#3fb950;background:#0f6b5e22;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;}
+.etf-chip:hover,.etf-chip.active{background:#0f6b5e;color:#fff;border-color:#0f6b5e;}
+html[data-theme="light"] .etf-watchlist{border-color:var(--bdr);}
+html[data-theme="light"] .etf-chip{border-color:var(--tl);color:var(--tl);background:transparent;}
+html[data-theme="light"] .etf-chip:hover,.etf-chip.active{background:var(--tl);color:#fff;}
+.sp-row .etf-watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;}
+.sp-row-etf{border-bottom:1px solid #21262d;}
+html[data-theme="light"] .sp-row-etf{border-color:var(--bdr);}
+
+/* ── Bank pane ── */
+.bank-pane-wrap{display:flex;flex-direction:column;gap:10px;}
+.bank-summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.bank-sum-card{background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:8px 10px;text-align:center;}
+.bank-sum-label{font-size:9px;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.bank-sum-val{font-size:14px;font-weight:700;}
+.bank-sum-val.red{color:#f85149;}.bank-sum-val.green{color:#3fb950;}.bank-sum-val.blue{color:#58a6ff;}
+.bank-section-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8b949e;padding:4px 0;}
+.bank-app-note{font-size:10px;color:#8b949e;line-height:1.5;background:#21262d;border-radius:5px;padding:6px 8px;margin-bottom:4px;}
+.bank-card{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
+.bank-card-hdr{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.bank-card-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.bank-card-name{font-size:13px;font-weight:700;flex:1;}
+.bank-card-rates{font-size:10px;color:#8b949e;white-space:nowrap;}
+.bank-apply-form{display:flex;flex-direction:column;gap:5px;}
+.bank-form-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.bank-form-lbl{font-size:10px;color:#8b949e;font-weight:600;width:44px;flex-shrink:0;}
+.bank-form-hint{font-size:9px;color:#8b949e;}
+.bank-select{background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:5px 8px;border-radius:5px;font-size:12px;outline:none;flex:1;}
+.bank-monthly-preview{font-size:10px;color:#58a6ff;padding:3px 0;}
+.btn-bk-apply{background:#238636;border:none;color:#fff;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;width:100%;}
+.btn-bk-apply:hover{background:#2ea043;}
+.bank-loan-active{background:#f8514911;border:1px solid #f8514933;border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;gap:4px;}
+.bank-sav-section{border-top:1px solid #21262d;padding-top:6px;display:flex;flex-direction:column;gap:5px;}
+
 /* ── Touch / PWA global fixes ── */
 *{-webkit-tap-highlight-color:transparent;}
 button,[role="button"],.watch-chip,.fpill,.ftt,.sb-tab,.stock-opt,.diff-card{touch-action:manipulation;}
@@ -996,6 +1038,11 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         <span class="sp-sect-icon">💱</span>
         <div class="forex-watchlist" id="forex-watchlist"></div>
       </div>
+      <!-- Row 4: ETFs (teal accent) -->
+      <div class="sp-row sp-row-etf">
+        <span class="sp-sect-icon">📊</span>
+        <div class="etf-watchlist" id="etf-watchlist"></div>
+      </div>
       <!-- Row 4: Filter tabs (full-width, tabs only) -->
       <div class="sp-row" id="filter-area" style="padding:3px 0;border-bottom:none;">
         <div class="filter-type-tabs" style="flex:1">
@@ -1087,6 +1134,9 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
       <button class="sb-tab" data-pane="portfolio">
         <span class="sb-tab-icon">📊</span><span class="sb-tab-label">Portfolio</span>
       </button>
+      <button class="sb-tab" data-pane="bank">
+        <span class="sb-tab-icon">🏦</span><span class="sb-tab-label">Bank</span>
+      </button>
       <button class="sb-tab" data-pane="fundamental">
         <span class="sb-tab-icon">📋</span><span class="sb-tab-label">Fundmntls</span>
       </button>
@@ -1129,6 +1179,11 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         <div id="sb-portfolio-content">
           <div style="font-size:12px;color:#8b949e;text-align:center;padding:20px 0">Start trading to see your portfolio.</div>
         </div>
+      </div>
+
+      <!-- ── BANK ── -->
+      <div class="sb-pane" id="pane-bank">
+        <div style="font-size:12px;color:#8b949e;text-align:center;padding:20px 0">Loading bank data…</div>
       </div>
 
       <!-- ── FUNDAMENTALS ── -->
@@ -1894,20 +1949,31 @@ const MARKETS_DEF=[
 
 // ── Banks (rates float with OPR) ──────────────────────────────
 const BANKS={
-  fnb:{id:'fnb',name:'First National Bank',color:'#3fb950',loanSpread:2.0,savingsSpread:-0.5},
-  ccb:{id:'ccb',name:'City Capital Bank',  color:'#58a6ff',loanSpread:4.0,savingsSpread:0.5},
-  mtb:{id:'mtb',name:'Metro Trust Bank',   color:'#ffd700',loanSpread:6.0,savingsSpread:1.8},
+  jpm: {id:'jpm', name:'JPMorgan Chase',      abbr:'JPMorgan',  color:'#1a6fc4', loanSpread:1.75, savingsSpread:-1.25, maxYears:11},
+  bac: {id:'bac', name:'Bank of America',     abbr:'BofA',      color:'#e31837', loanSpread:2.25, savingsSpread:-0.75, maxYears:10},
+  wfc: {id:'wfc', name:'Wells Fargo',         abbr:'Wells Fargo',color:'#d71e28', loanSpread:2.75, savingsSpread:-0.25, maxYears:10},
+  citi:{id:'citi',name:'Citibank',            abbr:'Citi',      color:'#003b8e', loanSpread:3.25, savingsSpread: 0.25, maxYears:9},
+  gs:  {id:'gs',  name:'Goldman Sachs Marcus',abbr:'Goldman',   color:'#6e9dc8', loanSpread:5.00, savingsSpread: 1.75, maxYears:7},
 };
 function getBankLoanRate(bankId){return Math.max(0.01,(state.opr+BANKS[bankId].loanSpread)/100);}
 function getBankSavingsRate(bankId){return Math.max(0,(state.opr+BANKS[bankId].savingsSpread)/100);}
+function getLoanMonthlyPayment(principal,annualRate,years){
+  const r=annualRate/12, n=years*12;
+  if(r===0)return principal/n;
+  return principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+}
+function getMaxLoanAmount(){
+  const nw=calcNetWorth();
+  return Math.max(1000,Math.floor(nw*10/1000)*1000);
+}
 
 // ── Difficulty Levels ─────────────────────────────────────────
 const DIFFICULTY_LEVELS={
   1:{level:1,name:'Millionaire',emoji:'💰',cash:100000,loans:[]},
   2:{level:2,name:'Standard',   emoji:'📈',cash:10000, loans:[]},
   3:{level:3,name:'Bootstrap',  emoji:'🧰',cash:5000,  loans:[]},
-  4:{level:4,name:'Leveraged',  emoji:'🏦',cash:10000, loans:[{bankId:'fnb',amount:10000,rate:0.05}]},
-  5:{level:5,name:'Max Leverage',emoji:'🚀',cash:50000,loans:[{bankId:'fnb',amount:20000,rate:0.05},{bankId:'ccb',amount:30000,rate:0.07}]},
+  4:{level:4,name:'Leveraged',  emoji:'🏦',cash:10000, loans:[{bankId:'jpm',amount:10000,rate:0.05}]},
+  5:{level:5,name:'Max Leverage',emoji:'🚀',cash:50000,loans:[{bankId:'jpm',amount:20000,rate:0.05},{bankId:'bac',amount:30000,rate:0.07}]},
 };
 
 const STOCKS={};
@@ -1963,6 +2029,7 @@ for(const [sym,[name,base,vol,trend,meta]] of Object.entries(FOREX_RAW)){
   FOREX_INFO[sym]=meta;
 }
 const FOREX_WATCHLIST_DEFAULT=['EURUSD','GBPUSD','USDJPY','USDCHF','AUDUSD','USDCAD','NZDUSD','USDMXN','USDCNY'];
+const ETF_WATCHLIST_DEFAULT=['SPY','QQQ','GLD','SLV','TLT','AGG','XLK','XLF','SMH','ARKK','IWM','USO'];
 
 // ── ETF Components (top-10 holdings, risk 1-5, replication type) ─
 // Columns: [ticker, name, sector, weight%, risk1-5, mechanism]
@@ -3693,7 +3760,7 @@ function playSound(type){
 }
 
 // ── Filter helpers ────────────────────────────────────────────
-const SECTOR_ORDER=['Tech','Finance','Health','Energy','Consumer','Industrl','Comms','Utility','Realty','Materls','Crypto','Commodity','Forex','Index','SectETF','Bond'];
+const SECTOR_ORDER=['Tech','Finance','Health','Energy','Consumer','Industrl','Comms','Utility','Realty','Materls','Crypto'];
 const CATALOG={};
 for(const [t,s] of Object.entries(STOCKS)){
   const sec=s.sector||'Other';
@@ -3981,13 +4048,26 @@ function buildWatchlist(){
       fw.appendChild(chip);
     });
   }
+  // ETF watchlist
+  const ew=document.getElementById('etf-watchlist');
+  if(ew){ew.innerHTML='';
+    ETF_WATCHLIST_DEFAULT.forEach(t=>{
+      if(!STOCKS[t])return;
+      const chip=document.createElement('button');
+      chip.className='etf-chip'+(t===state.ticker?' active':'');
+      chip.textContent=t;
+      chip.title=STOCKS[t]?.name||t;
+      chip.dataset.t=t;chip.onclick=()=>switchTicker(t);
+      ew.appendChild(chip);
+    });
+  }
 }
 
 function switchTicker(t){
   if(!STOCKS[t])return;
   state.ticker=t;
   fundChartPeriod='1M';
-  document.querySelectorAll('.watch-chip,.commod-chip,.forex-chip').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.querySelectorAll('.watch-chip,.commod-chip,.forex-chip,.etf-chip').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
   set('sb-ticker-label',t);
   // if sidebar is on fundamentals tab, re-render it
   if(activeSbPane==='fundamental') renderSbFundamental();
@@ -4001,9 +4081,12 @@ document.querySelectorAll('.sb-tab').forEach(btn=>{
     activeSbPane=btn.dataset.pane;
     document.querySelectorAll('.sb-tab').forEach(b=>b.classList.toggle('active',b===btn));
     document.querySelectorAll('.sb-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+activeSbPane));
+    // Expand sidebar when any tab is selected
+    document.querySelector('.sidebar').classList.add('sb-open');
     if(activeSbPane==='portfolio') renderSbPortfolio();
     if(activeSbPane==='fundamental') renderSbFundamental();
     if(activeSbPane==='settings') renderSbSettings();
+    if(activeSbPane==='bank') renderBankPane();
     if(activeSbPane==='news'){
       state.unreadNews=0;
       const badge=document.getElementById('news-badge');
@@ -4124,6 +4207,7 @@ function payLoan(bankId){
   if(input)input.value='';
   render();
   if(activeSbPane==='portfolio')renderSbPortfolio();
+  if(activeSbPane==='bank')renderBankPane();
 }
 
 function depositSavings(bankId){
@@ -4138,6 +4222,7 @@ function depositSavings(bankId){
   if(input)input.value='';
   render();
   if(activeSbPane==='portfolio')renderSbPortfolio();
+  if(activeSbPane==='bank')renderBankPane();
 }
 
 function withdrawSavings(bankId){
@@ -4151,6 +4236,150 @@ function withdrawSavings(bankId){
   if(input)input.value='';
   render();
   if(activeSbPane==='portfolio')renderSbPortfolio();
+  if(activeSbPane==='bank')renderBankPane();
+}
+
+// ── Bank pane renderer ────────────────────────────────────────
+function renderBankPane(){
+  const el=document.getElementById('pane-bank');
+  if(!el)return;
+  const nw=calcNetWorth();
+  const maxLoan=getMaxLoanAmount();
+  const totalOwed=state.loans.reduce((s,l)=>s+l.balance,0);
+  const totalSav=state.savings.reduce((s,sv)=>s+sv.balance,0);
+
+  let html=`<div class="bank-pane-wrap">`;
+
+  // ── Summary cards ──
+  html+=`<div class="bank-summary-row">
+    <div class="bank-sum-card">
+      <div class="bank-sum-label">Total Loans</div>
+      <div class="bank-sum-val red">${fmt(totalOwed)}</div>
+    </div>
+    <div class="bank-sum-card">
+      <div class="bank-sum-label">Total Savings</div>
+      <div class="bank-sum-val green">${fmt(totalSav)}</div>
+    </div>
+    <div class="bank-sum-card">
+      <div class="bank-sum-label">Max Loan Limit</div>
+      <div class="bank-sum-val blue">${fmt(maxLoan)}</div>
+    </div>
+  </div>`;
+
+  // ── Loan Application ──
+  html+=`<div class="bank-section-hdr">📋 Loan Application</div>`;
+  html+=`<div class="bank-app-note">Max loan = 10× Net Worth (${fmt(nw)}). Rate = OPR (${state.opr.toFixed(2)}%) + bank spread. Max 11 years.</div>`;
+
+  Object.values(BANKS).forEach(bank=>{
+    const existingLoan=state.loans.find(l=>l.bankId===bank.id);
+    const loanRate=(state.opr+bank.loanSpread)/100;
+    const savRate=Math.max(0,(state.opr+bank.savingsSpread)/100);
+    const loan=state.loans.find(l=>l.bankId===bank.id);
+    const sav=state.savings.find(s=>s.bankId===bank.id);
+    const maxYears=bank.maxYears||11;
+
+    html+=`<div class="bank-card" id="bcard-${bank.id}">
+      <div class="bank-card-hdr">
+        <div class="bank-card-dot" style="background:${bank.color}"></div>
+        <span class="bank-card-name" style="color:${bank.color}">${bank.name}</span>
+        <span class="bank-card-rates">Loan ${loanRate.toFixed(2)}% · Savings ${savRate.toFixed(2)}%</span>
+      </div>`;
+
+    // Existing loan
+    if(loan&&loan.balance>0){
+      const monthlyPay=getLoanMonthlyPayment(loan.balance,getBankLoanRate(bank.id),1);
+      html+=`<div class="bank-loan-active">
+        <div class="bank-data-row"><span class="bank-key">Balance Owed</span><span class="bank-val red">${fmt(loan.balance)}</span></div>
+        <div class="bank-data-row"><span class="bank-key">Daily Interest</span><span class="bank-val red">$${(loan.balance*getBankLoanRate(bank.id)/365).toFixed(2)}</span></div>
+        <div class="bank-data-row"><span class="bank-key">Interest Paid</span><span class="bank-val">${fmt(loan.interestPaid||0)}</span></div>
+        <div class="bank-action-row">
+          <input class="bank-amt-input" id="pay-${bank.id}" type="number" min="1" step="1" placeholder="Payment amount…">
+          <button class="btn-bk-pay" onclick="payLoan('${bank.id}')">Pay Loan</button>
+        </div>
+      </div>`;
+    } else {
+      // Loan application form
+      html+=`<div class="bank-apply-form">
+        <div class="bank-form-row">
+          <label class="bank-form-lbl">Amount</label>
+          <input class="bank-amt-input" id="lapply-amt-${bank.id}" type="number" min="1000" max="${maxLoan}" step="1000" placeholder="e.g. 10,000" value="10000">
+          <span class="bank-form-hint">max ${fmt(maxLoan)}</span>
+        </div>
+        <div class="bank-form-row">
+          <label class="bank-form-lbl">Years</label>
+          <select class="bank-select" id="lapply-yrs-${bank.id}">
+            ${Array.from({length:maxYears},(_,i)=>`<option value="${i+1}">${i+1} yr${i>0?'s':''}</option>`).join('')}
+          </select>
+        </div>
+        <div class="bank-monthly-preview" id="lprev-${bank.id}">Monthly payment: —</div>
+        <button class="btn-bk-apply" onclick="applyLoan('${bank.id}')">Apply for Loan</button>
+      </div>`;
+    }
+
+    // Savings
+    html+=`<div class="bank-sav-section">
+      <div class="bank-section-lbl">💰 Savings — ${(savRate*100).toFixed(2)}% p.a.</div>
+      <div class="bank-data-row"><span class="bank-key">Balance</span><span class="bank-val green">${sav&&sav.balance>0?fmt(sav.balance):'$0.00'}</span></div>
+      ${sav&&sav.balance>0?`<div class="bank-data-row"><span class="bank-key">Annual Return</span><span class="bank-val green">+${fmt(sav.balance*savRate)}</span></div>`:''}
+      <div class="bank-action-row">
+        <input class="bank-amt-input" id="dep-${bank.id}" type="number" min="0.01" step="0.01" placeholder="Amount…">
+        <button class="btn-bk-dep" onclick="depositSavings('${bank.id}')">Deposit</button>
+        <button class="btn-bk-wdw" onclick="withdrawSavings('${bank.id}')">Withdraw</button>
+      </div>
+    </div>`;
+
+    html+=`</div>`; // /bank-card
+  });
+
+  html+=`</div>`; // /bank-pane-wrap
+  el.innerHTML=html;
+
+  // Wire up live monthly payment preview
+  Object.values(BANKS).forEach(bank=>{
+    const amtEl=document.getElementById('lapply-amt-'+bank.id);
+    const yrsEl=document.getElementById('lapply-yrs-'+bank.id);
+    const prevEl=document.getElementById('lprev-'+bank.id);
+    if(!amtEl||!yrsEl||!prevEl)return;
+    const update=()=>{
+      const amt=parseFloat(amtEl.value)||0;
+      const yrs=parseInt(yrsEl.value)||1;
+      const rate=getBankLoanRate(bank.id);
+      if(amt>0){
+        const mp=getLoanMonthlyPayment(amt,rate,yrs);
+        const total=mp*yrs*12;
+        prevEl.textContent=`Monthly: ${fmt(mp)} · Total: ${fmt(total)} · Interest: ${fmt(total-amt)}`;
+        prevEl.style.color='#58a6ff';
+      } else {prevEl.textContent='Enter amount above';}
+    };
+    amtEl.oninput=update;yrsEl.onchange=update;
+    update();
+  });
+}
+
+function applyLoan(bankId){
+  const bank=BANKS[bankId];
+  if(!bank){addLog('Bank not found','err');return;}
+  if(state.loans.find(l=>l.bankId===bankId&&l.balance>0)){
+    addLog(`${bank.name}: repay existing loan first`,'err');
+    showToast('🏦','Loan Denied','You already have an active loan with '+bank.abbr);
+    return;
+  }
+  const amtEl=document.getElementById('lapply-amt-'+bankId);
+  const yrsEl=document.getElementById('lapply-yrs-'+bankId);
+  const amount=parseFloat(amtEl?.value)||0;
+  const years=parseInt(yrsEl?.value)||1;
+  const maxLoan=getMaxLoanAmount();
+  if(amount<1000){addLog('Minimum loan is $1,000','err');return;}
+  if(amount>maxLoan){addLog(`Max loan is ${fmt(maxLoan)} (10× net worth)`,'err');return;}
+  if(years<1||years>11){addLog('Loan term must be 1–11 years','err');return;}
+  const rate=getBankLoanRate(bankId);
+  state.loans.push({bankId,amount,balance:amount,rate,years,interestPaid:0,startDay:state.day});
+  state.cash+=amount;
+  const mp=getLoanMonthlyPayment(amount,rate,years);
+  addLog(`Loan approved: ${bank.name} ${fmt(amount)} @ ${(rate*100).toFixed(2)}%`,'buy');
+  showToast('🏦','Loan Approved!',`${fmt(amount)} from ${bank.abbr} · ${fmt(mp)}/mo`);
+  render();
+  renderBankPane();
 }
 
 // ── Weekend-specific news categories ─────────────────────────
