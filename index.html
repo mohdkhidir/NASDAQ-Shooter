@@ -53,6 +53,16 @@ header h1{font-size:17px;font-weight:700;color:#58a6ff;white-space:nowrap;}
 /* ── Main layout ── */
 .main{display:flex;flex:1;flex-wrap:wrap;overflow:hidden;min-height:0;}
 .chart-panel{flex:1 1 580px;padding:8px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;overflow:hidden;}
+/* ── Heatmap ── */
+#heatmap-panel{display:none;flex-direction:column;gap:5px;overflow-y:auto;flex:1;min-height:0;}
+#heatmap-panel.visible{display:flex;}
+.hm-theme{border:1px solid #30363d;border-radius:6px;overflow:hidden;flex-shrink:0;}
+.hm-theme-header{background:#161b22;padding:3px 8px;font-size:10px;font-weight:700;color:#8b949e;letter-spacing:.06em;text-transform:uppercase;}
+.hm-theme-body{display:flex;flex-wrap:wrap;gap:2px;padding:4px;}
+.hm-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;transition:filter .12s;padding:3px 4px;min-width:46px;min-height:42px;}
+.hm-cell:hover{filter:brightness(1.25);outline:1px solid rgba(255,255,255,.35);}
+.hm-cell-ticker{font-size:10px;font-weight:800;color:#fff;line-height:1.2;}
+.hm-cell-pct{font-size:9px;color:rgba(255,255,255,.88);line-height:1.2;}
 
 /* ── Stock search ── */
 .stock-search-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
@@ -1196,7 +1206,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
       <!-- Row 1: Search+Stocks (left) | Forex (right) -->
       <div class="sp2-row sp2-row1">
         <div class="sp2-sec sp2-stocks">
-          <div class="search-input-wrap" style="flex:0 0 clamp(120px,22%,220px);position:relative;">
+          <div class="search-input-wrap" style="flex:1;min-width:160px;max-width:520px;position:relative;">
             <span class="search-icon">🔍</span>
             <input class="search-input" id="stock-search" placeholder="Search ticker or name…" autocomplete="off">
             <button class="search-clear" id="search-clear">✕</button>
@@ -1273,6 +1283,9 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
           <button class="ind-btn" data-ind="macd">MACD</button>
           <button class="ind-btn" data-ind="volume">Vol</button>
         </div>
+        <div class="ct-sep"></div>
+        <button class="ct-btn" id="heatmap-toggle" title="Toggle live browser heatmap">🗺 Heatmap</button>
+        <button class="ct-btn" id="py-heatmap-export" title="Export prices → run python heatmap.py" style="color:#f0883e;border-color:#f0883e;">🐍 Python HM</button>
         <div class="zoom-controls">
           <button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
           <span class="zoom-info" id="zoom-info">80c</span>
@@ -1285,6 +1298,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
     </div>
     <canvas id="chart" height="300" style="cursor:crosshair"></canvas>
     <div id="info-panel" class="info-panel"></div>
+    <div id="heatmap-panel"></div>
     <div class="speed-bar">
       <span>TF:</span>
       <button class="tf-btn active" data-tf="5m">5m</button>
@@ -1694,6 +1708,69 @@ const STOCK_DATA={
   ANGL:['VanEck Fallen Angel Bond',22,0.007,0.0000],
   EMB: ['iShares JP Morgan EM Bond',87,0.008,0.0000],
   BNDX:['Vanguard Total Intl Bond',48,0.004,0.0000],
+  // ── Additional NASDAQ stocks ──────────────────────────────────
+  // Mega-cap Internet / Platform
+  BKNG:['Booking Holdings',3800,0.015,0.0003],EXPE:['Expedia Group',145,0.018,0.0002],
+  TTD:['The Trade Desk',80,0.030,0.0004],APP:['AppLovin Corp.',75,0.035,0.0005],
+  RDDT:['Reddit Inc.',60,0.040,0.0003],DUOL:['Duolingo Inc.',175,0.030,0.0004],
+  MNDY:['Monday.com',220,0.025,0.0003],WIX:['Wix.com',145,0.025,0.0003],
+  ZI:['ZoomInfo Technologies',12,0.030,-0.0002],BRZE:['Braze Inc.',38,0.030,0.0002],
+  CVNA:['Carvana Co.',100,0.045,0.0003],CHWY:['Chewy Inc.',16,0.030,-0.0001],
+  DKNG:['DraftKings Inc.',42,0.030,0.0003],FOUR:['Shift4 Payments',75,0.028,0.0003],
+  ZG:['Zillow Group',50,0.030,0.0002],MTCH:['Match Group',10,0.030,-0.0002],
+  IAC:['IAC Inc.',52,0.025,0.0001],
+  // Consumer / Retail NASDAQ
+  ULTA:['Ulta Beauty',380,0.018,0.0001],FIVE:['Five Below',100,0.020,0.0001],
+  CELH:['Celsius Holdings',40,0.035,0.0002],BROS:['Dutch Bros',30,0.030,0.0002],
+  LOPE:['Grand Canyon Education',150,0.015,0.0002],KHC:['Kraft Heinz',34,0.012,-0.0001],
+  // Media / Comms NASDAQ
+  PARA:['Paramount Global',12,0.025,-0.0003],SIRI:['SiriusXM Holdings',3,0.025,-0.0002],
+  FOXA:['Fox Corp A',33,0.018,0.0001],NWSA:['News Corp A',26,0.018,0.0001],
+  // Biotech / Gene Editing
+  MRNA:['Moderna Inc.',60,0.035,-0.0002],BNTX:['BioNTech SE',100,0.025,-0.0001],
+  NBIX:['Neurocrine Biosciences',120,0.018,0.0002],SRPT:['Sarepta Therapeutics',140,0.025,0.0002],
+  ALNY:['Alnylam Pharmaceuticals',230,0.020,0.0003],INCY:['Incyte Corp.',55,0.018,0.0001],
+  BMRN:['BioMarin Pharmaceutical',80,0.018,0.0002],HALO:['Halozyme Therapeutics',52,0.022,0.0003],
+  JAZZ:['Jazz Pharmaceuticals',90,0.020,0.0001],RARE:['Ultragenyx Pharmaceutical',42,0.025,0.0002],
+  CRSP:['CRISPR Therapeutics',48,0.035,0.0002],NTLA:['Intellia Therapeutics',20,0.040,0.0002],
+  BEAM:['Beam Therapeutics',22,0.040,0.0002],ARVN:['Arvinas Inc.',30,0.035,0.0002],
+  KYMR:['Kymera Therapeutics',32,0.035,0.0003],IOVA:['Iovance Biotherapeutics',9,0.040,0.0002],
+  EXEL:['Exelixis Inc.',23,0.025,0.0002],ACAD:['Acadia Pharmaceuticals',20,0.030,0.0002],
+  ARWR:['Arrowhead Pharmaceuticals',18,0.035,0.0002],FOLD:['Amicus Therapeutics',8,0.040,0.0002],
+  DNLI:['Denali Therapeutics',25,0.035,0.0002],SDGR:['Schrodinger Inc.',19,0.035,0.0002],
+  EXAS:['Exact Sciences',48,0.028,0.0001],CERT:['Certara Inc.',14,0.025,0.0001],
+  // Digital Health
+  HIMS:['Hims & Hers Health',16,0.040,0.0003],DOCS:['Doximity Inc.',36,0.025,0.0002],
+  TDOC:['Teladoc Health',12,0.030,-0.0003],
+  // Semiconductors (additional)
+  SWKS:['Skyworks Solutions',90,0.018,0.0001],QRVO:['Qorvo Inc.',80,0.020,0.0001],
+  WOLF:['Wolfspeed Inc.',5,0.045,-0.0004],ACLS:['Axcelis Technologies',90,0.025,0.0003],
+  ONTO:['Onto Innovation',165,0.022,0.0003],AMBA:['Ambarella Inc.',60,0.028,0.0002],
+  POWI:['Power Integrations',55,0.020,0.0001],ALGM:['Allegro MicroSystems',25,0.025,0.0002],
+  SLAB:['Silicon Laboratories',120,0.020,0.0002],MKSI:['MKS Instruments',100,0.022,0.0002],
+  SITM:['SiTime Corp.',85,0.030,0.0003],DIOD:['Diodes Inc.',48,0.022,0.0001],
+  FORM:['FormFactor Inc.',38,0.025,0.0002],COHU:['Cohu Inc.',22,0.030,0.0002],
+  LFUS:['Littelfuse Inc.',250,0.018,0.0002],
+  // Crypto Mining
+  RIOT:['Riot Platforms',12,0.045,0.0003],MARA:['MARA Holdings',17,0.050,0.0004],
+  HUT:['Hut 8 Corp.',10,0.050,0.0003],CLSK:['CleanSpark Inc.',12,0.050,0.0003],
+  CIFR:['Cipher Mining',4,0.060,0.0003],IREN:['Iris Energy',10,0.050,0.0003],
+  // Clean Energy (additional)
+  SEDG:['SolarEdge Technologies',20,0.040,-0.0004],ARRY:['Array Technologies',14,0.035,-0.0002],
+  STEM:['Stem Inc.',2,0.055,-0.0004],NOVA:['Sunnova Energy',3,0.055,-0.0004],
+  CSIQ:['Canadian Solar',16,0.030,-0.0002],MAXN:['Maxeon Solar',2,0.060,-0.0005],
+  // Insurance / Finance (NASDAQ)
+  LMND:['Lemonade Inc.',15,0.040,-0.0001],ROOT:['Root Inc.',65,0.045,0.0002],
+  OSCR:['Oscar Health',18,0.030,0.0002],NDAQ:['Nasdaq Inc.',75,0.013,0.0002],
+  CBOE:['Cboe Global Markets',205,0.011,0.0002],MKTX:['MarketAxess Holdings',195,0.014,0.0001],
+  SSNC:['SS&C Technologies',62,0.014,0.0002],
+  // Autonomous / LiDAR / Robotics
+  LAZR:['Luminar Technologies',2,0.055,-0.0004],OUST:['Ouster Inc.',8,0.045,-0.0002],
+  TEM:['Tempus AI',50,0.040,0.0004],MVST:['Microvast Holdings',1,0.060,-0.0004],
+  // Analytics / Data
+  NICE:['NICE Systems',220,0.018,0.0002],VRNT:['Verint Systems',26,0.022,0.0001],
+  IDCC:['InterDigital Inc.',120,0.018,0.0002],QTWO:['Q2 Holdings',52,0.022,0.0002],
+  ALKT:['Alkami Technology',24,0.028,0.0002],
 };
 
 // ── Sector map ────────────────────────────────────────────────
@@ -1765,6 +1842,35 @@ const SECTOR_MAP={
   LIN:'Materls',APD:'Materls',ECL:'Materls',SHW:'Materls',FCX:'Materls',
   NEM:'Materls',NUE:'Materls',DOW:'Materls',DD:'Materls',PPG:'Materls',
   VMC:'Materls',MLM:'Materls',
+  // Additional NASDAQ – Tech/Internet
+  BKNG:'Consumer',EXPE:'Consumer',TTD:'Tech',APP:'Tech',RDDT:'Tech',
+  DUOL:'Tech',MNDY:'Tech',WIX:'Tech',ZI:'Tech',BRZE:'Tech',
+  CVNA:'Consumer',CHWY:'Consumer',DKNG:'Consumer',FOUR:'Finance',
+  ZG:'Realty',MTCH:'Tech',IAC:'Tech',
+  ULTA:'Consumer',FIVE:'Consumer',CELH:'Consumer',BROS:'Consumer',
+  LOPE:'Consumer',KHC:'Consumer',
+  PARA:'Comms',SIRI:'Comms',FOXA:'Comms',NWSA:'Comms',
+  // Additional NASDAQ – Biotech
+  MRNA:'Health',BNTX:'Health',NBIX:'Health',SRPT:'Health',ALNY:'Health',
+  INCY:'Health',BMRN:'Health',HALO:'Health',JAZZ:'Health',RARE:'Health',
+  CRSP:'Health',NTLA:'Health',BEAM:'Health',ARVN:'Health',KYMR:'Health',
+  IOVA:'Health',EXEL:'Health',ACAD:'Health',ARWR:'Health',FOLD:'Health',
+  DNLI:'Health',SDGR:'Health',EXAS:'Health',CERT:'Health',
+  HIMS:'Health',DOCS:'Health',TDOC:'Health',
+  // Additional NASDAQ – Semis
+  SWKS:'Tech',QRVO:'Tech',WOLF:'Tech',ACLS:'Tech',ONTO:'Tech',
+  AMBA:'Tech',POWI:'Tech',ALGM:'Tech',SLAB:'Tech',MKSI:'Tech',
+  SITM:'Tech',DIOD:'Tech',FORM:'Tech',COHU:'Tech',LFUS:'Tech',
+  // Crypto Mining
+  RIOT:'Crypto',MARA:'Crypto',HUT:'Crypto',CLSK:'Crypto',CIFR:'Crypto',IREN:'Crypto',
+  // Clean Energy
+  SEDG:'Energy',ARRY:'Energy',STEM:'Energy',NOVA:'Energy',CSIQ:'Energy',MAXN:'Energy',
+  // Finance / Insurance
+  LMND:'Finance',ROOT:'Finance',OSCR:'Health',NDAQ:'Finance',
+  CBOE:'Finance',MKTX:'Finance',SSNC:'Tech',
+  // Autonomous / AI / Data
+  LAZR:'Tech',OUST:'Tech',TEM:'Health',MVST:'Tech',
+  NICE:'Tech',VRNT:'Tech',IDCC:'Tech',QTWO:'Finance',ALKT:'Tech',
   // Crypto-adjacent
   RIVN:'Crypto',LCID:'Crypto',NIO:'Crypto',XPEV:'Crypto',ACHR:'Crypto',
   JOBY:'Crypto',SOUN:'Crypto',PLTR:'Crypto',OPEN:'Crypto',SMCI:'Crypto',
@@ -2724,7 +2830,7 @@ const canvas=document.getElementById('chart');
 const ctx=canvas.getContext('2d');
 
 function render(){
-  renderHUD();renderChart();renderPositions();renderOrderCost();renderInfoPanel();
+  renderHUD();renderChart();renderPositions();renderOrderCost();renderInfoPanel();renderHeatmap();
   set('sb-ticker-label',state.ticker);
   // Don't clobber bank inputs while user is typing in them
   const bankFocused=document.activeElement&&document.activeElement.classList.contains('bank-amt-input');
@@ -5879,6 +5985,99 @@ document.querySelectorAll('.ind-btn').forEach(btn=>{
     renderChart();
   };
 });
+
+// ── Heatmap ───────────────────────────────────────────────────
+const HEATMAP_THEMES=[
+  {id:'ai',      label:'🤖 AI / LLM',          tickers:['NVDA','AMD','ARM','PLTR','AI','SOUN','BBAI','IONQ','SMCI','MRVL','MSFT','GOOGL','META','INTC']},
+  {id:'dram',    label:'💾 DRAM / Memory',       tickers:['MU','WDC','STX','NTAP','PSTG']},
+  {id:'wafer',   label:'🔬 Wafer / Semi Equip',  tickers:['AMAT','LRCX','KLAC','ASML','SNPS','CDNS','ANSS','NXPI','QCOM','AVGO','MCHP','ON','TXN','ADI']},
+  {id:'hardware',label:'🖥️ Hardware',             tickers:['AAPL','DELL','HPQ','HPE','GLW','SMCI','IBM','ACN']},
+  {id:'obesity', label:'💉 Obesity / GLP-1',      tickers:['LLY','AMGN','VRTX','REGN','BIIB','ISRG','IDXX','DXCM']},
+  {id:'goldmine',label:'⛏️ Gold Mining',           tickers:['NEM','FCX','GDX','GDXJ','GLD','XAU']},
+  {id:'rareearth',label:'🌍 Rare Earth / Metals', tickers:['FCX','LIN','APD','NUE','ECL','SHW','COPP','ALUM']},
+  {id:'oil',     label:'🛢️ Oil / Energy',          tickers:['XOM','CVX','COP','EOG','SLB','OXY','PSX','VLO','MPC','HES','WTI','BRNT','NGAS']},
+  {id:'cyber',   label:'🔐 Cybersecurity',         tickers:['PANW','CRWD','FTNT','S','ZS','OKTA','NET','VRNS']},
+  {id:'cloud',   label:'☁️ Cloud / SaaS',          tickers:['CRM','NOW','ORCL','SNOW','DDOG','MDB','CFLT','HUBS','WDAY','TEAM']},
+  {id:'finance', label:'💳 Finance / Fintech',     tickers:['JPM','GS','BAC','V','MA','COIN','MSTR','SQ','PYPL','AFRM']},
+  {id:'consumer',label:'🛒 Consumer',              tickers:['AMZN','WMT','COST','MCD','SBUX','NKE','HD','TSLA','NFLX','UBER','DASH','ABNB']},
+];
+
+let heatmapVisible=false;
+
+function hmColor(pct){
+  if(pct>=3)  return'#0d5c1e';
+  if(pct>=1)  return'#1a7f37';
+  if(pct>=0)  return'#2ea043';
+  if(pct>=-1) return'#b62323';
+  if(pct>=-3) return'#cf222e';
+  return'#8a1a1a';
+}
+
+function renderHeatmap(){
+  const panel=document.getElementById('heatmap-panel');
+  if(!panel||!heatmapVisible)return;
+  const html=HEATMAP_THEMES.map(theme=>{
+    const cells=theme.tickers.filter(t=>STOCKS[t]||COMMOD_RAW[t]).map(t=>{
+      const base=STOCKS[t]?STOCKS[t].base:0;
+      const cur=state.prices[t]||base;
+      const pct=base>0?((cur-base)/base)*100:0;
+      const sign=pct>=0?'+':'';
+      const bg=hmColor(pct);
+      const name=STOCKS[t]?STOCKS[t].name.split(' ')[0]:t;
+      return `<div class="hm-cell" style="background:${bg}" onclick="switchTicker('${t}')" title="${STOCKS[t]?STOCKS[t].name:t} ${sign}${pct.toFixed(2)}%">
+        <span class="hm-cell-ticker">${t}</span>
+        <span class="hm-cell-pct">${sign}${pct.toFixed(1)}%</span>
+      </div>`;
+    }).join('');
+    return `<div class="hm-theme">
+      <div class="hm-theme-header">${theme.label}</div>
+      <div class="hm-theme-body">${cells}</div>
+    </div>`;
+  }).join('');
+  panel.innerHTML=html;
+}
+
+function switchTicker(t){
+  if(!STOCKS[t])return;
+  state.ticker=t;
+  const el=document.getElementById('chart-ticker');
+  if(el)el.textContent=t;
+  renderChart();
+  render();
+}
+
+(function(){
+  const btn=document.getElementById('heatmap-toggle');
+  const canvas=document.getElementById('chart');
+  const infoPanel=document.getElementById('info-panel');
+  const hmPanel=document.getElementById('heatmap-panel');
+  if(!btn||!hmPanel)return;
+  btn.onclick=()=>{
+    heatmapVisible=!heatmapVisible;
+    btn.classList.toggle('active',heatmapVisible);
+    hmPanel.classList.toggle('visible',heatmapVisible);
+    canvas.style.display=heatmapVisible?'none':'';
+    infoPanel.style.display=heatmapVisible?'none':'';
+    if(heatmapVisible)renderHeatmap();
+  };
+})();
+
+// ── Python heatmap export ─────────────────────────────────────
+(function(){
+  const btn=document.getElementById('py-heatmap-export');
+  if(!btn)return;
+  btn.onclick=()=>{
+    const out={};
+    Object.keys(STOCKS).forEach(t=>{if(state.prices[t])out[t]=state.prices[t];});
+    const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='prices.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('🐍','prices.json exported — run: python heatmap.py prices.json','market');
+  };
+})();
 
 // ── Game over buttons ─────────────────────────────────────────
 document.getElementById('btn-restart-game').onclick=()=>{
