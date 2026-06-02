@@ -521,8 +521,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .search-icon{left:8px;font-size:12px;}
   .watchlist{gap:3px;padding:2px 0;flex-wrap:nowrap;overflow-x:auto;}
   .watch-chip{padding:2px 7px;font-size:10px;flex-shrink:0;}
-  /* Hide commodity/forex/etf rows on phone — search bar is enough */
-  .sp-row-cf,.sp-row-etf-filter,.filter-panel{display:none !important;}
+  /* On phone: hide row 2, forex half of row 1 */
+  .sp2-row2,.filter-panel,.sp2-divider,.sp2-forex{display:none !important;} .sp2-stocks{flex:1 !important;}
 
   /* Chart header */
   .chart-header{flex-wrap:nowrap;gap:6px;align-items:center;}
@@ -667,41 +667,37 @@ html[data-theme="light"] .diff-card.selected{border-color:var(--up);background:#
 .search-panel{display:flex;flex-direction:column;gap:0;}
 .sp-row{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #21262d;min-height:32px;overflow:visible;}
 .sp-row:last-child{border-bottom:none;}
-/* IMPORTANT: stocks row must NOT have overflow:hidden — it clips the dropdown */
-.sp-row-stocks{flex-wrap:nowrap;overflow:visible;position:relative;}
-/* Row 2: Commod + Forex merged */
-.sp-row-cf{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;background:linear-gradient(90deg,#f0883e07 0%,#58a6ff07 60%);}
-.sp-row-cf::-webkit-scrollbar{display:none;}
-/* Row 3: ETF + filter merged */
-.sp-row-etf-filter{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;background:#0f6b5e07;}
-.sp-row-etf-filter::-webkit-scrollbar{display:none;}
-/* Vertical separator between sections within a row */
-.sp-row-vsep{width:1px;min-width:1px;height:18px;background:#30363d;margin:0 6px;flex-shrink:0;align-self:center;}
-/* Inline filter tabs */
-.sp-filter-inline{display:flex;flex-shrink:0;gap:0;border-radius:5px;overflow:hidden;border:1px solid #30363d;}
-.sp-filter-inline .ftt{border-right:1px solid #30363d;padding:4px 10px;font-size:11px;flex:none;}
-.sp-filter-inline .ftt:last-child{border-right:none;}
-.sp-sect-icon{font-size:13px;flex-shrink:0;opacity:.8;}
-/* override watchlist defaults inside sp-rows — no internal scroll, parent row scrolls */
-.sp-row .watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;overflow-x:auto;}
-.sp-row-cf .commod-watchlist,
-.sp-row-cf .forex-watchlist{
-  border-top:none !important;margin:0 !important;padding:0 !important;
-  overflow-x:visible;flex-wrap:nowrap;flex-shrink:0;
+/* ── 2-Row search panel ──────────────────────────────────────── */
+/* Row 1: stocks(left) + forex(right) | Row 2: etf+commod+filter */
+.sp2-row{display:flex;align-items:stretch;height:30px;border-bottom:1px solid #21262d;overflow:hidden;}
+.sp2-row1{overflow:visible !important;z-index:10;position:relative;}
+.sp2-row2{}
+.sp2-sec{display:flex;align-items:center;gap:4px;padding:0 5px;overflow:hidden;min-width:0;}
+.sp2-divider{width:1px;background:#30363d;flex-shrink:0;align-self:stretch;}
+.sp2-icon{font-size:11px;flex-shrink:0;opacity:.7;}
+.sp2-stocks{flex:3;overflow:visible !important;position:relative;}
+.sp2-forex  {flex:2;}
+.sp2-etf    {flex:2;}
+.sp2-commod {flex:2.5;}
+.sp2-filter {flex:1.4;flex-wrap:nowrap;gap:2px;}
+/* Watchlists scroll within their section */
+.sp2-sec .watchlist,
+.sp2-sec .forex-watchlist,
+.sp2-sec .etf-watchlist,
+.sp2-sec .commod-watchlist{
+  flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;
+  border-top:none !important;margin:0 !important;padding:1px 0 !important;flex-wrap:nowrap;
 }
-.sp-row-etf-filter .etf-watchlist{
-  border-top:none !important;margin:0 !important;padding:0 !important;
-  overflow-x:visible;flex-wrap:nowrap;flex-shrink:0;
-}
-/* Compact filter tabs — half width so they fit on one row with ETFs */
-.sp-filter-inline{display:flex;flex-shrink:0;gap:0;border-radius:5px;overflow:hidden;border:1px solid #30363d;}
-.sp-filter-inline .ftt{border-right:1px solid #30363d;padding:4px 7px;font-size:10px;flex:none;white-space:nowrap;}
-.sp-filter-inline .ftt:last-child{border-right:none;}
-html[data-theme="light"] .sp-row-cf{background:linear-gradient(90deg,#bf870008 0%,#0969da08 60%);}
-html[data-theme="light"] .sp-row-etf-filter{background:#0f5c5208;}
-html[data-theme="light"] .sp-filter-inline{border-color:var(--bdr);}
-html[data-theme="light"] .sp-filter-inline .ftt{border-right-color:var(--bdr);}
-html[data-theme="light"] .sp-row-vsep{background:var(--bdr);}
+.sp2-sec .watchlist::-webkit-scrollbar,
+.sp2-sec .forex-watchlist::-webkit-scrollbar,
+.sp2-sec .etf-watchlist::-webkit-scrollbar,
+.sp2-sec .commod-watchlist::-webkit-scrollbar{display:none;}
+/* Filter buttons in row 2 */
+.sp2-filter .ftt{padding:2px 5px;font-size:9px;flex:1;white-space:nowrap;border-radius:3px;border:1px solid #30363d;background:none;min-width:0;}
+.sp2-filter .ftt.active{background:#1f6feb;border-color:#1f6feb;color:#fff;}
+html[data-theme='light'] .sp2-row{border-color:var(--bdr);}
+html[data-theme='light'] .sp2-divider{background:var(--bdr);}
+html[data-theme='light'] .sp2-filter .ftt{border-color:var(--bdr);}
 
 /* ── Chart Toolbar ── */
 .chart-toolbar{display:flex;flex-direction:column;gap:3px;margin-bottom:5px;}
@@ -1178,36 +1174,42 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
     <!-- Search panel — 4-row layout matching UI spec -->
     <div class="search-panel">
       <!-- Row 1: Search input + Stock watchlist -->
-      <div class="sp-row sp-row-stocks">
-        <div class="search-input-wrap" style="flex:0 0 clamp(140px,28%,260px);position:relative;">
-          <span class="search-icon">🔍</span>
-          <input class="search-input" id="stock-search" placeholder="Search ticker or name…" autocomplete="off">
-          <button class="search-clear" id="search-clear">✕</button>
-          <div class="stock-dropdown" id="stock-dropdown"></div>
+      <!-- Row 1: Search+Stocks (left) | Forex (right) -->
+      <div class="sp2-row sp2-row1">
+        <div class="sp2-sec sp2-stocks">
+          <div class="search-input-wrap" style="flex:0 0 clamp(120px,22%,220px);position:relative;">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" id="stock-search" placeholder="Search ticker or name…" autocomplete="off">
+            <button class="search-clear" id="search-clear">✕</button>
+            <div class="stock-dropdown" id="stock-dropdown"></div>
+          </div>
+          <div class="watchlist" id="watchlist"></div>
         </div>
-        <div class="watchlist" id="watchlist"></div>
+        <div class="sp2-divider"></div>
+        <div class="sp2-sec sp2-forex">
+          <span class="sp2-icon">💱</span>
+          <div class="forex-watchlist" id="forex-watchlist"></div>
+        </div>
       </div>
-      <!-- Row 2: Commodities + Forex (merged single row) -->
-      <div class="sp-row sp-row-cf">
-        <span class="sp-sect-icon">🥇</span>
-        <div class="commod-watchlist" id="commod-watchlist"></div>
-        <span class="sp-row-vsep"></span>
-        <span class="sp-sect-icon">💱</span>
-        <div class="forex-watchlist" id="forex-watchlist"></div>
-      </div>
-      <!-- Row 3: ETFs + Filter tabs -->
-      <div class="sp-row sp-row-etf-filter">
-        <span class="sp-sect-icon">📊</span>
-        <div class="etf-watchlist" id="etf-watchlist"></div>
-        <span class="sp-row-vsep"></span>
-        <div class="filter-type-tabs sp-filter-inline" id="filter-area">
-          <button class="ftt active" data-ft="search">🔍 Search</button>
+      <!-- Row 2: ETFs (left) | Commodities (mid) | Filter tabs (right) -->
+      <div class="sp2-row sp2-row2">
+        <div class="sp2-sec sp2-etf">
+          <span class="sp2-icon">📊</span>
+          <div class="etf-watchlist" id="etf-watchlist"></div>
+        </div>
+        <div class="sp2-divider"></div>
+        <div class="sp2-sec sp2-commod">
+          <span class="sp2-icon">🥇</span>
+          <div class="commod-watchlist" id="commod-watchlist"></div>
+        </div>
+        <div class="sp2-divider"></div>
+        <div class="sp2-sec sp2-filter" id="filter-area">
+          <button class="ftt active" data-ft="search">🔍</button>
           <button class="ftt" data-ft="category">🗂 Cat</button>
           <button class="ftt" data-ft="shares">📊 Cap</button>
           <button class="ftt" data-ft="valuation">💰 Val</button>
         </div>
       </div>
-      <!-- Filter panel (below tabs) -->
       <div class="filter-panel" id="filter-panel"></div>
     </div>
     <div class="chart-header">
