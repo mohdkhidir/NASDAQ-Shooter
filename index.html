@@ -521,8 +521,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .search-icon{left:8px;font-size:12px;}
   .watchlist{gap:3px;padding:2px 0;flex-wrap:nowrap;overflow-x:auto;}
   .watch-chip{padding:2px 7px;font-size:10px;flex-shrink:0;}
-  /* Hide sector filter, commodity/forex/etf rows on phone — search bar is enough */
-  #filter-area,.filter-panel,.sp-row-commod,.sp-row-forex,.sp-row-etf{display:none !important;}
+  /* Hide commodity/forex/etf rows on phone — search bar is enough */
+  .sp-row-cf,.sp-row-etf-filter,.filter-panel{display:none !important;}
 
   /* Chart header */
   .chart-header{flex-wrap:nowrap;gap:6px;align-items:center;}
@@ -669,13 +669,29 @@ html[data-theme="light"] .diff-card.selected{border-color:var(--up);background:#
 .sp-row:last-child{border-bottom:none;}
 /* IMPORTANT: stocks row must NOT have overflow:hidden — it clips the dropdown */
 .sp-row-stocks{flex-wrap:nowrap;overflow:visible;position:relative;}
-.sp-row-commod{background:#f0883e07;border-left:3px solid #f0883e55;padding-left:7px;}
-.sp-row-forex{background:#58a6ff07;border-left:3px solid #58a6ff55;padding-left:7px;}
-.sp-sect-icon{font-size:12px;flex-shrink:0;opacity:.7;}
+/* Row 2: Commod + Forex merged */
+.sp-row-cf{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;background:linear-gradient(90deg,#f0883e07 0%,#58a6ff07 60%);}
+.sp-row-cf::-webkit-scrollbar{display:none;}
+/* Row 3: ETF + filter merged */
+.sp-row-etf-filter{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;background:#0f6b5e07;}
+.sp-row-etf-filter::-webkit-scrollbar{display:none;}
+/* Vertical separator between sections within a row */
+.sp-row-vsep{width:1px;min-width:1px;height:18px;background:#30363d;margin:0 6px;flex-shrink:0;align-self:center;}
+/* Inline filter tabs */
+.sp-filter-inline{display:flex;flex-shrink:0;gap:0;border-radius:5px;overflow:hidden;border:1px solid #30363d;}
+.sp-filter-inline .ftt{border-right:1px solid #30363d;padding:4px 10px;font-size:11px;flex:none;}
+.sp-filter-inline .ftt:last-child{border-right:none;}
+.sp-sect-icon{font-size:13px;flex-shrink:0;opacity:.8;}
 /* override watchlist defaults inside sp-rows */
 .sp-row .watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;overflow-x:auto;}
-.sp-row .commod-watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;}
-.sp-row .forex-watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;}
+.sp-row .commod-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
+.sp-row .forex-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
+.sp-row .etf-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
+html[data-theme="light"] .sp-row-cf{background:linear-gradient(90deg,#bf870008 0%,#0969da08 60%);}
+html[data-theme="light"] .sp-row-etf-filter{background:#0f5c5208;}
+html[data-theme="light"] .sp-filter-inline{border-color:var(--bdr);}
+html[data-theme="light"] .sp-filter-inline .ftt{border-right-color:var(--bdr);}
+html[data-theme="light"] .sp-row-vsep{background:var(--bdr);}
 
 /* ── Chart Toolbar ── */
 .chart-toolbar{display:flex;flex-direction:column;gap:3px;margin-bottom:5px;}
@@ -700,8 +716,7 @@ html[data-theme="light"] .ind-btn{background:var(--bg3);border-color:var(--bdr);
 html[data-theme="light"] .ind-btn.active{background:#8250df22;border-color:#8250df;color:#8250df;}
 html[data-theme="light"] .zoom-btn{background:var(--bg3);border-color:var(--bdr);color:var(--txt2);}
 html[data-theme="light"] .sp-row{border-color:var(--bdr);}
-html[data-theme="light"] .sp-row-commod{background:#bf870008;border-left-color:#bf870055;}
-html[data-theme="light"] .sp-row-forex{background:#0969da08;border-left-color:#0969da55;}
+/* sp-row-commod/forex removed — merged into sp-row-cf */
 
 /* ── ETF components table ── */
 .etf-comp-table{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px;}
@@ -940,9 +955,7 @@ html[data-theme="light"] .fh-bar-wrap{background:var(--bdr);}
 html[data-theme="light"] .etf-watchlist{border-color:var(--bdr);}
 html[data-theme="light"] .etf-chip{border-color:var(--tl);color:var(--tl);background:transparent;}
 html[data-theme="light"] .etf-chip:hover,.etf-chip.active{background:var(--tl);color:#fff;}
-.sp-row .etf-watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;}
-.sp-row-etf{border-bottom:1px solid #21262d;}
-html[data-theme="light"] .sp-row-etf{border-color:var(--bdr);}
+/* sp-row-etf merged into sp-row-etf-filter */
 
 /* ── Bank pane ── */
 .bank-pane-wrap{display:flex;flex-direction:column;gap:10px;}
@@ -1164,31 +1177,27 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         </div>
         <div class="watchlist" id="watchlist"></div>
       </div>
-      <!-- Row 2: Commodities (orange accent) -->
-      <div class="sp-row sp-row-commod">
+      <!-- Row 2: Commodities + Forex (merged single row) -->
+      <div class="sp-row sp-row-cf">
         <span class="sp-sect-icon">🥇</span>
         <div class="commod-watchlist" id="commod-watchlist"></div>
-      </div>
-      <!-- Row 3: Forex (blue accent) -->
-      <div class="sp-row sp-row-forex">
+        <span class="sp-row-vsep"></span>
         <span class="sp-sect-icon">💱</span>
         <div class="forex-watchlist" id="forex-watchlist"></div>
       </div>
-      <!-- Row 4: ETFs (teal accent) -->
-      <div class="sp-row sp-row-etf">
+      <!-- Row 3: ETFs + Filter tabs -->
+      <div class="sp-row sp-row-etf-filter">
         <span class="sp-sect-icon">📊</span>
         <div class="etf-watchlist" id="etf-watchlist"></div>
-      </div>
-      <!-- Row 4: Filter tabs (full-width, tabs only) -->
-      <div class="sp-row" id="filter-area" style="padding:3px 0;border-bottom:none;">
-        <div class="filter-type-tabs" style="flex:1">
+        <span class="sp-row-vsep"></span>
+        <div class="filter-type-tabs sp-filter-inline" id="filter-area">
           <button class="ftt active" data-ft="search">🔍 Search</button>
           <button class="ftt" data-ft="category">🗂 Category</button>
           <button class="ftt" data-ft="shares">📊 Mkt Cap</button>
           <button class="ftt" data-ft="valuation">💰 Valuation</button>
         </div>
       </div>
-      <!-- Filter panel (below tabs, not inside flex row) -->
+      <!-- Filter panel (below tabs) -->
       <div class="filter-panel" id="filter-panel"></div>
     </div>
     <div class="chart-header">
