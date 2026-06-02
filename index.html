@@ -667,14 +667,24 @@ html[data-theme="light"] .diff-card.selected{border-color:var(--up);background:#
 .search-panel{display:flex;flex-direction:column;gap:0;}
 .sp-row{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #21262d;min-height:32px;overflow:visible;}
 .sp-row:last-child{border-bottom:none;}
+/* ── Search visibility control bar ─────────────────────────── */
+.sp-ctrl-bar{display:flex;align-items:center;gap:12px;padding:4px 10px;background:#0d1117;border-bottom:1px solid #21262d;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+.sp-ctrl-bar::-webkit-scrollbar{display:none;}
+.sp-ctrl-lbl{font-size:11px;color:#8b949e;font-weight:700;flex-shrink:0;white-space:nowrap;}
+.sp-ctrl-cb{display:flex;align-items:center;gap:5px;font-size:12px;color:#c9d1d9;cursor:pointer;white-space:nowrap;flex-shrink:0;user-select:none;}
+.sp-ctrl-cb input[type=checkbox]{accent-color:#58a6ff;width:13px;height:13px;cursor:pointer;}
+.sp-ctrl-cb:hover{color:#58a6ff;}
+html[data-theme="light"] .sp-ctrl-bar{background:var(--bg3);border-color:var(--bdr);}
+html[data-theme="light"] .sp-ctrl-cb{color:var(--txt1);}
+
 /* ── 2-Row search panel ──────────────────────────────────────── */
 /* Row 1: stocks(left) + forex(right) | Row 2: etf+commod+filter */
-.sp2-row{display:flex;align-items:stretch;height:30px;border-bottom:1px solid #21262d;overflow:hidden;}
+.sp2-row{display:flex;align-items:stretch;height:36px;border-bottom:1px solid #21262d;overflow:hidden;}
 .sp2-row1{overflow:visible !important;z-index:10;position:relative;}
 .sp2-row2{}
 .sp2-sec{display:flex;align-items:center;gap:4px;padding:0 5px;overflow:hidden;min-width:0;}
 .sp2-divider{width:5px;background:#30363d;flex-shrink:0;align-self:stretch;cursor:col-resize;transition:background .15s;} .sp2-divider:hover,.sp2-divider.dragging{background:#58a6ff88;}
-.sp2-icon{font-size:11px;flex-shrink:0;opacity:.7;}
+.sp2-icon{font-size:14px;flex-shrink:0;opacity:.7;}
 .sp2-stocks{flex:3;overflow:visible !important;position:relative;}
 .sp2-forex  {flex:2;}
 .sp2-etf    {flex:2;}
@@ -693,7 +703,7 @@ html[data-theme="light"] .diff-card.selected{border-color:var(--up);background:#
 .sp2-sec .etf-watchlist::-webkit-scrollbar,
 .sp2-sec .commod-watchlist::-webkit-scrollbar{display:none;}
 /* Filter buttons in row 2 */
-.sp2-filter .ftt{padding:2px 5px;font-size:9px;flex:1;white-space:nowrap;border-radius:3px;border:1px solid #30363d;background:none;min-width:0;}
+.sp2-filter .ftt{padding:3px 7px;font-size:11px;flex:1;white-space:nowrap;border-radius:3px;border:1px solid #30363d;background:none;min-width:0;}
 .sp2-filter .ftt.active{background:#1f6feb;border-color:#1f6feb;color:#fff;}
 html[data-theme='light'] .sp2-row{border-color:var(--bdr);}
 html[data-theme='light'] .sp2-divider{background:var(--bdr);}
@@ -798,7 +808,7 @@ html[data-theme="light"] .mb-item{border-right-color:var(--bdr);}
 /* ── Commodity watchlist row ── */
 .commod-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .commod-watchlist::-webkit-scrollbar{display:none;}
-.commod-chip{flex-shrink:0;background:#21262d;border:1px solid #f0883e44;color:#f0883e;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s;}
+.commod-chip{flex-shrink:0;background:#21262d;border:1px solid #f0883e44;color:#f0883e;padding:4px 11px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s;}
 .commod-chip:hover{border-color:#f0883e;background:#f0883e22;}
 .commod-chip.active{background:#f0883e;border-color:#f0883e;color:#000;}
 html[data-theme="light"] .commod-watchlist{border-color:var(--bdr);}
@@ -821,7 +831,7 @@ html[data-theme="light"] .commod-chip.active{background:#bf8700;color:#fff;}
 /* ── Forex watchlist row ── */
 .forex-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .forex-watchlist::-webkit-scrollbar{display:none;}
-.forex-chip{flex-shrink:0;background:#21262d;border:1px solid #58a6ff44;color:#58a6ff;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;font-family:monospace;}
+.forex-chip{flex-shrink:0;background:#21262d;border:1px solid #58a6ff44;color:#58a6ff;padding:4px 11px;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;font-family:monospace;}
 .forex-chip:hover{border-color:#58a6ff;background:#58a6ff22;}
 .forex-chip.active{background:#58a6ff;border-color:#58a6ff;color:#000;}
 html[data-theme="light"] .forex-chip{background:var(--bg3);border-color:#0969da44;color:var(--bl);}
@@ -956,7 +966,7 @@ html[data-theme="light"] .fh-bar-wrap{background:var(--bdr);}
 /* ── ETF watchlist row ── */
 .etf-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .etf-watchlist::-webkit-scrollbar{display:none;}
-.etf-chip{flex-shrink:0;border:1px solid #0f6b5e44;color:#3fb950;background:#0f6b5e22;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;}
+.etf-chip{flex-shrink:0;border:1px solid #0f6b5e44;color:#3fb950;background:#0f6b5e22;padding:4px 11px;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;}
 .etf-chip:hover,.etf-chip.active{background:#0f6b5e;color:#fff;border-color:#0f6b5e;}
 html[data-theme="light"] .etf-watchlist{border-color:var(--bdr);}
 html[data-theme="light"] .etf-chip{border-color:var(--tl);color:var(--tl);background:transparent;}
@@ -1173,7 +1183,16 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <div class="chart-panel">
     <!-- Search panel — 4-row layout matching UI spec -->
     <div class="search-panel">
-      <!-- Row 1: Search input + Stock watchlist -->
+      <!-- Search section visibility toggles -->
+      <div class="sp-ctrl-bar">
+        <span class="sp-ctrl-lbl">Show:</span>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-search" checked> Search</label>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-stocks" checked> Stocks</label>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-forex"  checked> Forex</label>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-etf"    checked> ETF/Index</label>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-commod" checked> Commodity</label>
+        <label class="sp-ctrl-cb"><input type="checkbox" id="sp-cb-filter" checked> Filters</label>
+      </div>
       <!-- Row 1: Search+Stocks (left) | Forex (right) -->
       <div class="sp2-row sp2-row1">
         <div class="sp2-sec sp2-stocks">
@@ -1290,10 +1309,6 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
         <span class="sb-tab-label">Home</span>
       </button>
-      <button class="sb-tab" data-pane="portfolio">
-        <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></span>
-        <span class="sb-tab-label">Competitors</span>
-      </button>
       <button class="sb-tab" data-pane="bank">
         <span class="sb-tab-icon"><svg viewBox="0 0 24 24"><path d="M11.5 1L2 6v2h19V6l-9.5-5zM2 22h19v-2H2v2zm0-4h19v-2H2v2zm2-4h2v-6H4v6zm5 0h2v-6H9v6zm5 0h2v-6h-2v6zm5 0h2v-6h-2v6z"/></svg></span>
         <span class="sb-tab-label">Bank</span>
@@ -1340,13 +1355,6 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         <div>
           <div class="section-title">Trade Log</div>
           <div class="log-list" id="log-list"></div>
-        </div>
-      </div>
-
-      <!-- ── COMPETITORS PORTFOLIO ── -->
-      <div class="sb-pane" id="pane-portfolio">
-        <div id="sb-portfolio-content">
-          <div style="font-size:12px;color:#8b949e;text-align:center;padding:20px 0">Start trading to see competitors.</div>
         </div>
       </div>
 
@@ -5945,6 +5953,68 @@ function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
   document.addEventListener('touchend',()=>{
     dragging=false;handle.classList.remove('dragging');
   });
+})();
+
+// ── Search panel visibility checkboxes ───────────────────────
+(function(){
+  function initSpCheckboxes(){
+    const map={
+      'sp-cb-search': '.sp2-stocks',     // search input inside stocks section
+      'sp-cb-stocks': '.watchlist',       // stock chips
+      'sp-cb-forex':  '.sp2-forex',
+      'sp-cb-etf':    '.sp2-etf',
+      'sp-cb-commod': '.sp2-commod',
+      'sp-cb-filter': '.sp2-filter',
+    };
+    // Toggle entire row visibility based on whether any section is visible
+    function updateRows(){
+      // Row 1: stocks section (search+chips) and forex
+      const r1=document.querySelector('.sp2-row1');
+      if(r1){
+        const s=document.querySelector('.sp2-stocks'),fx=document.querySelector('.sp2-forex');
+        const sVis=s&&s.style.display!=='none',fxVis=fx&&fx.style.display!=='none';
+        r1.style.display=(sVis||fxVis)?'':'none';
+        // Divider in row1
+        const d=r1.querySelector('.sp2-divider');
+        if(d)d.style.display=(sVis&&fxVis)?'':'none';
+      }
+      // Row 2: etf, commod, filter
+      const r2=document.querySelector('.sp2-row2');
+      if(r2){
+        const etf=document.querySelector('.sp2-etf'),cm=document.querySelector('.sp2-commod'),ft=document.querySelector('.sp2-filter');
+        const ev=etf&&etf.style.display!=='none',cv=cm&&cm.style.display!=='none',fv=ft&&ft.style.display!=='none';
+        r2.style.display=(ev||cv||fv)?'':'none';
+        // Dividers in row2
+        const ds=r2.querySelectorAll('.sp2-divider');
+        if(ds[0])ds[0].style.display=(ev&&(cv||fv))?'':'none';
+        if(ds[1])ds[1].style.display=(cv&&fv)?'':'none';
+      }
+    }
+    // Special: search checkbox hides/shows the search input wrap only
+    const cbSearch=document.getElementById('sp-cb-search');
+    if(cbSearch){cbSearch.onchange=()=>{
+      const sw=document.querySelector('.sp2-stocks .search-input-wrap');
+      if(sw)sw.style.display=cbSearch.checked?'':'none';
+    };}
+    // Stocks checkbox: hide/show watchlist chips only (keep search input)
+    const cbStocks=document.getElementById('sp-cb-stocks');
+    if(cbStocks){cbStocks.onchange=()=>{
+      const wl=document.querySelector('.sp2-stocks .watchlist');
+      if(wl)wl.style.display=cbStocks.checked?'':'none';
+    };}
+    // Other sections: hide/show whole section + update rows
+    ['forex','etf','commod','filter'].forEach(key=>{
+      const cb=document.getElementById('sp-cb-'+key);
+      const sel='.sp2-'+key;
+      if(cb){cb.onchange=()=>{
+        const el=document.querySelector(sel);
+        if(el)el.style.display=cb.checked?'':'none';
+        updateRows();
+      };}
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initSpCheckboxes);
+  else initSpCheckboxes();
 })();
 
 // ── Search panel section divider drag-to-resize ───────────────
