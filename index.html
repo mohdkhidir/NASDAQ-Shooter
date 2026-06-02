@@ -519,8 +519,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .search-input-wrap{flex:1;min-width:0;}
   .search-input{padding:6px 8px 6px 28px;font-size:13px;}
   .search-icon{left:8px;font-size:12px;}
-  .watchlist{gap:3px;padding:2px 0;}
-  .watch-chip{padding:2px 7px;font-size:10px;}
+  .watchlist{gap:3px;padding:2px 0;flex-wrap:nowrap;overflow-x:auto;}
+  .watch-chip{padding:2px 7px;font-size:10px;flex-shrink:0;}
   /* Hide sector filter, commodity/forex/etf rows on phone — search bar is enough */
   #filter-area,.filter-panel,.sp-row-commod,.sp-row-forex,.sp-row-etf{display:none !important;}
 
@@ -1963,7 +1963,7 @@ function getLoanMonthlyPayment(principal,annualRate,years){
   return principal*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
 }
 function getMaxLoanAmount(){
-  const nw=calcNetWorth();
+  const nw=netWorth();
   return Math.max(1000,Math.floor(nw*10/1000)*1000);
 }
 
@@ -4243,7 +4243,7 @@ function withdrawSavings(bankId){
 function renderBankPane(){
   const el=document.getElementById('pane-bank');
   if(!el)return;
-  const nw=calcNetWorth();
+  const nw=netWorth();
   const maxLoan=getMaxLoanAmount();
   const totalOwed=state.loans.reduce((s,l)=>s+l.balance,0);
   const totalSav=state.savings.reduce((s,sv)=>s+sv.balance,0);
