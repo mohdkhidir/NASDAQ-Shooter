@@ -460,55 +460,159 @@ html[data-theme="light"] .toast-sub{color:var(--txt2);}
 html[data-theme="light"] .toast-title{color:var(--up);}
 
 /* ═══════════════════════════════════════════
-   MOBILE RESPONSIVE
+   TABLET (≤860px): stack chart above sidebar
 ═══════════════════════════════════════════ */
-/* Tablet: 768px */
-@media(max-width:768px){
-  header{padding:8px 14px;gap:6px;}
-  header h1{font-size:15px;}
-  .hud{gap:12px;}
-  .hud-label{font-size:9px;}
-  .hud-value{font-size:13px;}
-  .header-actions{gap:4px;}
-  .btn-hdr{padding:5px 9px;font-size:11px;}
+@media(max-width:860px){
   .main{flex-direction:column;}
-  .chart-panel{padding:10px 12px;gap:8px;}
-  .search-input-wrap{flex:1;max-width:100%;}
   .sidebar{width:100%;border-left:none;border-top:1px solid var(--bdr);max-height:none;min-height:0;}
-  .sb-content{max-height:420px;overflow-y:auto;}
+  .sb-content{max-height:380px;overflow-y:auto;}
   #info-panel .ip-body{grid-template-columns:1fr;}
   #info-panel .ip-col+.ip-col{border-left:none;border-top:1px solid var(--bdr);}
   .pf-grid{grid-template-columns:1fr 1fr;}
   .pf-two{grid-template-columns:1fr;}
-  .net-worth-bar{padding:6px 12px;gap:12px;}
 }
-/* Phone: 480px */
-@media(max-width:480px){
-  header{padding:6px 10px;}
-  header h1{font-size:13px;}
-  .hud{gap:8px;}
-  .hud-value{font-size:12px;}
-  .hud-item:nth-child(3),.hud-item:nth-child(4){display:none;}
+
+/* ═══════════════════════════════════════════
+   PHONE GAME LAYOUT (≤600px)
+   Everything fits in 100vh — no page scroll
+   Chart on top · Trade panel below
+═══════════════════════════════════════════ */
+@media(max-width:600px){
+  /* Lock entire page to viewport */
+  html,body{height:100%;overflow:hidden;}
+  body{display:flex;flex-direction:column;min-height:0;}
+
+  /* ── Header: single compact row ─────────── */
+  header{
+    padding:5px 8px;gap:5px;
+    flex-wrap:nowrap;flex-shrink:0;
+    align-items:center;justify-content:space-between;
+  }
+  header h1{font-size:12px;flex-shrink:0;}
+  .hud{flex:1;gap:0;justify-content:center;flex-wrap:nowrap;overflow:hidden;}
+  .hud-item{padding:0 7px;text-align:center;flex-shrink:0;}
+  /* Show only Cash (#1) and Net Worth (#3) */
+  .hud-item:nth-child(2),.hud-item:nth-child(4){display:none;}
+  .hud-label{font-size:8px;}
+  .hud-value{font-size:11px;}
+  .header-actions{gap:3px;flex-shrink:0;flex-wrap:nowrap;}
   .header-actions .player-name{display:none;}
-  .sb-tab-label{font-size:8px;}
-  .sb-tab{padding:7px 3px;}
+  /* Icon-only action buttons */
+  #btn-portfolio,#btn-leaderboard{font-size:0;padding:5px 7px;line-height:1;border-radius:6px;}
+  #btn-portfolio::before{content:'📊';font-size:15px;}
+  #btn-leaderboard::before{content:'🏆';font-size:15px;}
+  #theme-toggle{padding:5px 7px;font-size:15px;}
+
+  /* ── Main: fills remaining height ──────── */
+  .main{flex:1;flex-direction:column;overflow:hidden;min-height:0;}
+
+  /* ── Chart panel: top section ───────────── */
+  .chart-panel{
+    flex:0 0 auto;
+    padding:5px 8px 3px;
+    gap:4px;
+    overflow:hidden;
+  }
+
+  /* Search row */
+  .search-bar-row{gap:5px;flex-wrap:nowrap;}
+  .search-input-wrap{flex:1;min-width:0;}
+  .search-input{padding:6px 8px 6px 28px;font-size:13px;}
+  .search-icon{left:8px;font-size:12px;}
+  .watchlist{gap:3px;padding:2px 0;}
+  .watch-chip{padding:2px 7px;font-size:10px;}
+  /* Hide sector filter tabs — use search bar instead */
+  .filter-area{display:none;}
+
+  /* Chart header */
+  .chart-header{flex-wrap:nowrap;gap:6px;align-items:center;}
+  .chart-ticker{font-size:14px;}
+  .chart-name{display:none;}
+  .chart-price{font-size:17px;}
+  .chart-change{font-size:10px;padding:1px 5px;}
+
+  /* Chart canvas: compact height */
+  #chart{height:150px;}
+
+  /* Speed / timeframe bar: scroll horizontally, no wrap */
+  .speed-bar{
+    gap:3px;flex-wrap:nowrap;
+    overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .speed-bar::-webkit-scrollbar{display:none;}
+  .speed-bar > span{font-size:10px;flex-shrink:0;}
+  .speed-bar button,.tf-btn{padding:3px 6px;font-size:10px;flex-shrink:0;}
+  .sb-sep{margin:0 2px;}
+
+  /* Stock info panel: hidden — not enough room */
+  #info-panel{display:none;}
+
+  /* ── Sidebar: bottom trading panel ─────── */
+  .sidebar{
+    flex:1;min-height:0;
+    width:100%;max-height:none;
+    border-left:none;border-top:1px solid var(--bdr);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .sb-tabs{flex-shrink:0;}
+  .sb-tab{padding:6px 2px;}
   .sb-tab-icon{font-size:14px;}
-  .chart-header{gap:6px;}
-  .chart-ticker{font-size:16px;}
-  .chart-price{font-size:20px;}
-  .filter-type-tabs .ftt{font-size:9px;padding:5px 4px;}
-  .co-header{flex-direction:row;}
-  .pf-stats-row{grid-template-columns:repeat(3,1fr);}
-  .btn-setting{padding:4px 8px;font-size:11px;}
-  .net-worth-bar .label,.net-worth-bar .val{font-size:11px;}
+  .sb-tab-label{font-size:8px;letter-spacing:0;}
+  .sb-content{
+    flex:1;overflow-y:auto;max-height:none;
+    padding:8px 10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .sb-pane{gap:7px;}
+
+  /* Order form — 16px font prevents iOS auto-zoom on input focus */
+  .order-form{gap:5px;}
+  .order-form input{font-size:16px;padding:8px 10px;}
+  .btn-buy,.btn-sell{padding:11px;font-size:14px;}
+
+  /* Shorter lists inside sidebar */
+  .positions-list{max-height:100px;}
+  .log-list{max-height:60px;}
+
+  /* ── Status bar: no-wrap, scroll if needed ── */
+  .net-worth-bar{
+    flex-shrink:0;padding:4px 8px;gap:8px;
+    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+  }
+  .net-worth-bar::-webkit-scrollbar{display:none;}
+  .net-worth-bar .label,.net-worth-bar .val{font-size:10px;white-space:nowrap;flex-shrink:0;}
   #bar-ach{display:none;}
-  .search-bar-row{gap:5px;}
+  .btn-submit-score{font-size:10px;padding:3px 8px;flex-shrink:0;margin-left:auto;}
+
+  /* Portfolio dashboard modal: smaller grid */
+  .pf-grid{grid-template-columns:1fr 1fr;}
+  .pf-two{grid-template-columns:1fr;}
+  .btn-setting{padding:4px 8px;font-size:11px;}
 }
-/* Tiny: 360px */
+
+/* ── Extra-small phones (≤360px) ────────── */
 @media(max-width:360px){
-  .ftt span{display:none;}
-  .ftt{padding:5px 8px;font-size:11px;}
+  #chart{height:130px;}
   .sb-tabs{gap:0;}
+  .ftt{padding:4px 6px;font-size:10px;}
+}
+
+/* ── Landscape phone: side-by-side ─────── */
+@media(max-width:860px) and (orientation:landscape) and (max-height:520px){
+  html,body{height:100%;overflow:hidden;}
+  body{display:flex;flex-direction:column;min-height:0;}
+  .main{flex:1;flex-direction:row;overflow:hidden;min-height:0;}
+  .chart-panel{flex:1;overflow:hidden;padding:6px 10px;}
+  .sidebar{
+    width:240px;min-width:200px;flex-shrink:0;
+    border-left:1px solid var(--bdr);border-top:none;
+    max-height:none;display:flex;flex-direction:column;overflow:hidden;
+  }
+  .sb-content{flex:1;overflow-y:auto;max-height:none;}
+  #chart{height:auto;}
+  #info-panel{display:none;}
+  .filter-area{display:none;}
+  .net-worth-bar{flex-shrink:0;}
 }
 
 /* ── Difficulty Selection ── */
@@ -715,24 +819,16 @@ html[data-theme="light"] .forex-chip.active{background:var(--bl);color:#fff;}
 .btn-restart{background:#238636;border:none;color:#fff;padding:10px 28px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin:4px;}
 .btn-restart:hover{background:#2ea043;}
 
-/* ── PWA / Mobile touch improvements ── */
+/* ── Touch / PWA global fixes ── */
 *{-webkit-tap-highlight-color:transparent;}
-button,[role="button"],.watch-chip,.fpill,.ftt,.sb-tab,.stock-opt,.position-row,.lb-table tr,.diff-card{touch-action:manipulation;}
-/* iOS safe area insets */
-header{padding-top:max(10px,env(safe-area-inset-top));}
-.net-worth-bar{padding-bottom:max(7px,env(safe-area-inset-bottom));}
-body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
-/* Prevent accidental text selection on UI chrome */
-header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.filter-type-tabs,.order-form label,.section-title{user-select:none;-webkit-user-select:none;}
-/* Bigger touch targets on mobile */
-@media(max-width:768px){
-  .btn-buy,.btn-sell{min-height:48px;font-size:15px;}
-  .sb-tab{min-height:54px;}
-  .watch-chip{min-height:34px;display:inline-flex;align-items:center;}
-  .order-form input{min-height:42px;font-size:16px;} /* prevent iOS zoom on focus */
+button,[role="button"],.watch-chip,.fpill,.ftt,.sb-tab,.stock-opt,.diff-card{touch-action:manipulation;}
+header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-title{user-select:none;-webkit-user-select:none;}
+.sb-content,.positions-list,.log-list,.stock-dropdown,.modal-body{-webkit-overflow-scrolling:touch;}
+/* iOS safe area (notch phones) */
+@supports(padding:max(0px)){
+  header{padding-top:max(10px,env(safe-area-inset-top));}
+  .net-worth-bar{padding-bottom:max(7px,env(safe-area-inset-bottom));}
 }
-/* Smooth scrolling on iOS */
-.sb-content,.positions-list,.log-list,.stock-dropdown,.lb-table,.modal-body{-webkit-overflow-scrolling:touch;}
 </style>
 </head>
 <body>
