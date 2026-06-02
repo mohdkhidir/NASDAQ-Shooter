@@ -521,8 +521,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .search-icon{left:8px;font-size:12px;}
   .watchlist{gap:3px;padding:2px 0;}
   .watch-chip{padding:2px 7px;font-size:10px;}
-  /* Hide sector filter tabs — use search bar instead */
-  .filter-area{display:none;}
+  /* Hide sector filter, commodity row, forex row — search bar is enough */
+  #filter-area,.filter-panel,.sp-row-commod,.sp-row-forex{display:none !important;}
 
   /* Chart header */
   .chart-header{flex-wrap:nowrap;gap:6px;align-items:center;}
@@ -531,8 +531,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .chart-price{font-size:17px;}
   .chart-change{font-size:10px;padding:1px 5px;}
 
-  /* Chart canvas: compact height */
-  #chart{height:150px;}
+  /* Chart canvas: compact height (important overrides any JS inline style) */
+  #chart{height:150px !important;}
 
   /* Speed / timeframe bar: scroll horizontally, no wrap */
   .speed-bar{
@@ -546,6 +546,12 @@ html[data-theme="light"] .toast-title{color:var(--up);}
 
   /* Stock info panel: hidden — not enough room */
   #info-panel{display:none;}
+
+  /* Markets + news ticker bars: hidden on phone — they live outside .main */
+  .markets-bar,.news-bar{display:none !important;}
+
+  /* Chart toolbar hidden on phone — default candlestick chart, saves ~63px */
+  .chart-toolbar{display:none !important;}
 
   /* ── Sidebar: bottom trading panel ─────── */
   .sidebar{
