@@ -547,15 +547,15 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   /* Stock info panel: hidden — not enough room */
   #info-panel{display:none;}
 
-  /* Markets + news are now at top — keep them visible but compact on phone */
+  /* Markets + news at top — compact on phone */
   .markets-bar{padding:2px 0;font-size:10px;}
   .news-bar{padding:2px 8px;}
-  /* Players bar: show compact on phone */
-  .players-bar{padding:3px 8px;}
-  .player-card{min-width:90px;padding:4px 7px;}
 
-  /* Chart toolbar hidden on phone — default candlestick chart, saves ~63px */
+  /* Chart toolbar hidden on phone */
   .chart-toolbar{display:none !important;}
+  /* Players bar hidden — competitors shown in sidebar tab only */
+  /* DRIP label: one compact line */
+  #drip-toggle+span{white-space:nowrap;font-size:10px;}
 
   /* ── Sidebar: bottom trading panel ─────── */
   .sidebar{
@@ -879,7 +879,7 @@ html[data-theme="light"] .forex-chip.active{background:var(--bl);color:#fff;}
 html[data-theme="light"] .comp-card-me{background:#f3eeff;}
 
 /* ── Players bar ── */
-.players-bar{background:#0a0d12;border-bottom:1px solid #1a2030;padding:6px 14px;overflow:hidden;flex-shrink:0;}
+.players-bar{display:none;}
 .players-bar-inner{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
 .players-bar-inner::-webkit-scrollbar{display:none;}
 .player-card{flex-shrink:0;background:#161b22;border:1px solid #30363d;border-radius:9px;padding:8px 12px;cursor:pointer;min-width:135px;max-width:170px;transition:border-color .2s,background .2s;}
@@ -1302,8 +1302,8 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
             <div><label>Shares (fractional ok)</label><input type="number" id="order-qty" value="1" min="0.001" step="0.001"></div>
             <div id="order-cost" style="font-size:11px;color:#8b949e;">Cost: —</div>
             <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8b949e;">
-              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none">
-                <input type="checkbox" id="drip-toggle" style="accent-color:#3fb950"> DRIP (reinvest dividends)
+              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;white-space:nowrap">
+                <input type="checkbox" id="drip-toggle" style="accent-color:#3fb950"> DRIP — reinvest dividends
               </label>
             </div>
             <div class="btn-row">
