@@ -1464,6 +1464,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <span class="nwb-sep"></span>
   <button class="btn-hdr teal" id="btn-portfolio" style="padding:3px 9px;font-size:11px">📊 Portfolio</button>
   <button class="btn-hdr purple" id="btn-leaderboard" style="padding:3px 9px;font-size:11px">🏆 Leaderboard</button>
+  <a id="btn-realestate" href="realestate.html" onclick="syncSharedState()" style="background:#28180a;color:#f0883e;border:1px solid #6a3a1a;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px">🏢 Real Estate<span id="re-value-badge" style="display:none;background:rgba(240,136,62,.2);padding:0 5px;border-radius:8px;font-size:10px;margin-left:2px"></span></a>
   <button id="theme-toggle" style="background:none;border:1px solid #30363d;color:#8b949e;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:13px">🌙</button>
   <button class="btn-submit-score" id="btn-submit">💾 Save</button>
 </div>
@@ -2821,6 +2822,7 @@ function tick(){
   }
 
   checkAchievements();
+  collectREIncome();
   render();
   tickTimer=setTimeout(tick,state.speed);
 }
@@ -2846,8 +2848,57 @@ function netWorth(){
   const stocks=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);
   const loanBal=state.loans.reduce((s,l)=>s+l.balance,0);
   const savBal=state.savings.reduce((s,sv)=>s+sv.balance,0);
-  return state.cash+stocks+savBal-loanBal;
+  return state.cash+stocks+savBal-loanBal+(state.rePropertyValue||0);
 }
+
+// ── Real Estate integration ───────────────────────────────────────
+const RE_KEY='nq_re_v1', SH_KEY='nq_shared_v1';
+
+function syncSharedState(){
+  try{
+    const sh=JSON.parse(localStorage.getItem(SH_KEY)||'{}');
+    sh.cash=state.cash; sh.day=state.day; sh.playerName=playerName;
+    sh.rePropertyValue=state.rePropertyValue||0;
+    localStorage.setItem(SH_KEY,JSON.stringify(sh));
+  }catch(e){}
+}
+
+function collectREIncome(){
+  try{
+    const re=JSON.parse(localStorage.getItem(RE_KEY)||'null');
+    if(!re||!re.properties||!re.properties.length)return;
+    // Compute income for days since last sync
+    const lastDay=re.lastSyncDay||0;
+    const daysPassed=Math.max(0,state.day-lastDay);
+    if(daysPassed>0){
+      let inc=0;
+      re.properties.forEach(function(p){inc+=Math.max(0,(p.netIncomeDay||0)*daysPassed);});
+      if(inc>0.01){re.pendingIncome=(re.pendingIncome||0)+inc;re.totalEarned=(re.totalEarned||0)+inc;}
+      re.lastSyncDay=state.day;
+    }
+    // Collect
+    if((re.pendingIncome||0)>0.01){
+      const inc=re.pendingIncome;
+      state.cash+=inc;
+      re.pendingIncome=0;
+      if(inc>=1&&typeof addLog==='function')addLog('🏢 RE rental income: +'+fmt(inc));
+    }
+    // Pay for purchases/upgrades made in RE pages
+    if((re.pendingDebits||0)>0.01){
+      state.cash=Math.max(0,state.cash-re.pendingDebits);
+      re.pendingDebits=0;
+    }
+    // Cache property value for netWorth
+    state.rePropertyValue=re.properties.reduce(function(s,p){return s+(p.currentValue||p.purchasePrice||0);},0);
+    localStorage.setItem(RE_KEY,JSON.stringify(re));
+    // Update badge
+    const badge=document.getElementById('re-value-badge');
+    if(badge&&state.rePropertyValue>0){badge.style.display='';badge.textContent=fmt(state.rePropertyValue);}
+    // Sync shared state back
+    syncSharedState();
+  }catch(e){}
+}
+// ─────────────────────────────────────────────────────────────────
 
 function renderHUD(){
   const pv=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);

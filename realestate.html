@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate — NASDAQ Trader</title>
+<style>
+:root{--bg1:#0d1117;--bg2:#161b22;--bg3:#21262d;--bdr:#30363d;--txt1:#e6edf3;--txt2:#8b949e;--txt3:#444d56;--up:#3fb950;--dn:#f85149;--bl:#58a6ff;--gd:#ffd700;--re:#f0883e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg1);color:var(--txt1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+a{text-decoration:none;}
+
+/* ── Topbar ── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:20;}
+.logo{font-size:17px;font-weight:800;color:var(--re);white-space:nowrap;}
+.sep{width:1px;height:20px;background:var(--bdr);flex-shrink:0;}
+.si{display:flex;flex-direction:column;align-items:center;min-width:68px;}
+.si-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;}
+.si-val{font-size:14px;font-weight:700;}
+.btn{border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bdr);display:inline-flex;align-items:center;gap:5px;}
+.btn-back{background:var(--bg3);color:var(--txt1);}
+.btn-back:hover{border-color:var(--bl);color:var(--bl);}
+.btn-manage{background:rgba(26,74,74,.5);color:#4ac9c9;border-color:#2a6a6a;}
+.btn-manage:hover{background:#2a6a6a;}
+
+/* ── Layout ── */
+.main{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 53px);}
+@media(max-width:860px){.main{grid-template-columns:1fr;}}
+
+/* ── Marketplace ── */
+.marketplace{padding:16px;overflow-y:auto;}
+.mkt-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
+.mkt-title{font-size:16px;font-weight:700;}
+.mkt-sub{font-size:11px;color:var(--txt2);margin-top:2px;}
+.filter-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.fb{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt2);padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap;}
+.fb:hover{border-color:var(--re);color:var(--re);}
+.fb.active{background:rgba(240,136,62,.15);border-color:var(--re);color:var(--re);}
+.listings{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;}
+
+/* ── Listing card ── */
+.lc{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:13px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s;}
+.lc:hover{border-color:var(--re);}
+.lc-head{display:flex;align-items:flex-start;gap:9px;}
+.lc-icon{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px;}
+.lc-info{flex:1;min-width:0;}
+.lc-name{font-size:14px;font-weight:700;line-height:1.3;}
+.lc-loc{font-size:11px;color:var(--txt2);margin-top:1px;}
+.type-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;}
+.lc-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.ls{background:var(--bg3);border-radius:5px;padding:6px 8px;}
+.ls-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.ls-val{font-size:13px;font-weight:700;font-family:monospace;}
+.lc-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.lc-price{font-size:18px;font-weight:800;color:var(--bl);}
+.btn-buy{border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;background:var(--up);color:#fff;transition:all .15s;white-space:nowrap;}
+.btn-buy:hover:not(:disabled){background:#2ea043;}
+.btn-buy:disabled{background:var(--bg3);color:var(--txt3);cursor:not-allowed;}
+
+/* ── Right panel ── */
+.rp{background:var(--bg2);border-left:1px solid var(--bdr);padding:16px;overflow-y:auto;}
+.pane-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:10px;}
+.stat-card{background:var(--bg1);border:1px solid var(--bdr);border-radius:7px;padding:10px 12px;margin-bottom:7px;}
+.sc-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.sc-val{font-size:17px;font-weight:700;}
+.sc-sub{font-size:11px;color:var(--txt2);margin-top:2px;}
+.mini-prop{background:var(--bg1);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.mp-name{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-loc{font-size:10px;color:var(--txt2);}
+.mp-val{font-weight:700;font-family:monospace;font-size:12px;text-align:right;white-space:nowrap;flex-shrink:0;}
+.empty{text-align:center;color:var(--txt2);font-size:12px;padding:24px 0;line-height:1.8;}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="btn btn-back" href="index.html" onclick="syncBack()">← Back to Game</a>
+  <div class="logo">🏢 Real Estate</div>
+  <div class="sep"></div>
+  <div class="si"><span class="si-lbl">Game Cash</span><span class="si-val" id="tb-cash" style="color:var(--bl)">—</span></div>
+  <div class="si"><span class="si-lbl">RE Value</span><span class="si-val" id="tb-rev" style="color:var(--re)">$0</span></div>
+  <div class="si"><span class="si-lbl">Properties</span><span class="si-val" id="tb-cnt">0</span></div>
+  <div class="si"><span class="si-lbl">Income/Day</span><span class="si-val" id="tb-inc" style="color:var(--up)">$0</span></div>
+  <a class="btn btn-manage" href="buildings.html">🏗 Manage Buildings →</a>
+</div>
+
+<div class="main">
+  <div class="marketplace">
+    <div class="mkt-hdr">
+      <div><div class="mkt-title">Property Marketplace</div><div class="mkt-sub">Acquire land &amp; buildings · Earn passive rental income · Grow your empire</div></div>
+      <button class="btn" style="background:var(--bg3);color:var(--txt1)" id="btn-refresh">↻ Refresh</button>
+    </div>
+    <div class="filter-bar" id="filter-bar">
+      <button class="fb active" data-type="all">All Types</button>
+      <button class="fb" data-type="land">🌳 Land</button>
+      <button class="fb" data-type="house">🏠 Residential</button>
+      <button class="fb" data-type="apartment">🏢 Apartment</button>
+      <button class="fb" data-type="office">🏛 Office</button>
+      <button class="fb" data-type="industrial">🏭 Industrial</button>
+      <button class="fb" data-type="retail">🏪 Retail</button>
+    </div>
+    <div class="listings" id="listings"></div>
+  </div>
+
+  <div class="rp" id="rp">
+    <div style="margin-bottom:18px">
+      <div class="pane-title">Portfolio Summary</div>
+      <div class="stat-card"><div class="sc-lbl">Total Invested</div><div class="sc-val" id="ps-inv">$0</div></div>
+      <div class="stat-card"><div class="sc-lbl">Current Value</div><div class="sc-val" id="ps-val" style="color:var(--re)">$0</div><div class="sc-sub" id="ps-chg">—</div></div>
+      <div class="stat-card"><div class="sc-lbl">Total Income Earned</div><div class="sc-val" id="ps-earned" style="color:var(--up)">$0</div></div>
+    </div>
+    <div>
+      <div class="pane-title">My Properties <span id="pc-badge" style="color:var(--txt2)"></span></div>
+      <div id="my-props"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+const RE_KEY='nq_re_v1', SH_KEY='nq_shared_v1';
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+const fmtF=n=>'$'+n.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2});
+
+const PT={
+  land:      {icon:'🌳',label:'Vacant Land',      yield:.028,lo:30000,  hi:250000,  maint:.20,occ:.95,bg:'#1a3012',border:'#3a7a33'},
+  house:     {icon:'🏠',label:'Residential',      yield:.055,lo:90000,  hi:600000,  maint:.25,occ:.82,bg:'#0d2040',border:'#2460a0'},
+  apartment: {icon:'🏢',label:'Apartment Block',  yield:.068,lo:350000, hi:3000000, maint:.30,occ:.78,bg:'#220d40',border:'#6e40c9'},
+  office:    {icon:'🏛',label:'Office Building',  yield:.062,lo:600000, hi:10000000,maint:.35,occ:.70,bg:'#0d2828',border:'#1a8f8f'},
+  industrial:{icon:'🏭',label:'Industrial Unit',  yield:.058,lo:180000, hi:2000000, maint:.22,occ:.85,bg:'#28180a',border:'#bf6a1a'},
+  retail:    {icon:'🏪',label:'Retail Strip',     yield:.064,lo:250000, hi:4000000, maint:.32,occ:.72,bg:'#28081a',border:'#c93a7a'},
+};
+
+const NEIGH=['Downtown Core','Financial District','Tech Quarter','Harbor View','Midtown East','Uptown','Silicon Alley','Market Street','Business Park','Industrial Zone','Suburban Heights','Waterfront','Innovation Hub','Gateway District','Capitol Hill','Lakeshore'];
+
+const NAMES={
+  land:      ['Prime Corner Lot','Development Parcel','Commercial Site','Growth Zone Land','Greenfield Plot','Zoned Corner Block'],
+  house:     ['Victorian Terrace','Modern Townhouse','Garden Villa','Urban Cottage','Heritage Home','Brick Rowhouse'],
+  apartment: ['Meridian Apartments','The Pinnacle','Skyline Residences','Harbor Flats','City View Complex','The Grand'],
+  office:    ['Executive Tower','Commerce Plaza','Corporate Suite','Business Centre','Innovation House','The Exchange'],
+  industrial:['Logistics Hub','Distribution Depot','Manufacturing Unit','Tech Warehouse','Industrial Park Unit','Cold Storage Facility'],
+  retail:    ['Main Street Strip','Retail Promenade','Shopping Arcade','Commercial Row','Boutique Block','Market Centre'],
+};
+
+// ── Shared State ─────────────────────────────────────
+function loadRE(){try{return JSON.parse(localStorage.getItem(RE_KEY)||'null')||mkRE();}catch{return mkRE();}}
+function mkRE(){return{properties:[],pendingIncome:0,pendingDebits:0,lastSyncDay:0,totalEarned:0};}
+function saveRE(re){localStorage.setItem(RE_KEY,JSON.stringify(re));}
+function loadSH(){try{return JSON.parse(localStorage.getItem(SH_KEY)||'null')||{};}catch{return{};}}
+function saveSH(sh){localStorage.setItem(SH_KEY,JSON.stringify(sh));}
+function getCash(){return loadSH().cash||0;}
+function getDay(){return loadSH().day||0;}
+function deductCash(amount){const sh=loadSH();sh.cash=Math.max(0,(sh.cash||0)-amount);saveSH(sh);}
+function syncBack(){const sh=loadSH();const re=loadRE();sh.rePropertyValue=re.properties.reduce((s,p)=>s+(p.currentValue||0),0);saveSH(sh);}
+
+// ── Listing generation ────────────────────────────────
+let listings=[], filter='all';
+function sr(seed){const x=Math.sin(seed*9301+49297)*233280;return x-Math.floor(x);}
+
+function genListings(seed){
+  const types=Object.keys(PT);
+  listings=[];
+  for(let i=0;i<18;i++){
+    const s=seed+i*137;
+    const type=types[Math.floor(sr(s)*types.length)];
+    const p=PT[type];
+    const price=Math.round((p.lo+sr(s+1)*(p.hi-p.lo))/1000)*1000;
+    const grossDay=price*p.yield/365;
+    const maintDay=grossDay*p.maint;
+    const netDay=+(grossDay*p.occ-maintDay).toFixed(2);
+    const names=NAMES[type];
+    listings.push({
+      id:'l_'+s,type,
+      name:names[Math.floor(sr(s+2)*names.length)],
+      location:NEIGH[Math.floor(sr(s+3)*NEIGH.length)],
+      price,
+      netYield:+((netDay*365/price)*100).toFixed(2),
+      grossYield:+(p.yield*100).toFixed(2),
+      netIncomeDay:netDay,
+      occupancy:Math.round(p.occ*100),
+      size:Math.round(sr(s+4)*450+60),
+      tier:Math.floor(sr(s+5)*4)+1,
+    });
+  }
+}
+
+function refreshListings(){
+  const seed=Math.floor(Date.now()/120000);
+  genListings(seed);
+  renderListings();
+}
+
+// ── Render ────────────────────────────────────────────
+function renderListings(){
+  const cash=getCash();
+  const grid=document.getElementById('listings');
+  const list=filter==='all'?listings:listings.filter(l=>l.type===filter);
+  grid.innerHTML='';
+  if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--txt2);padding:40px 0">No listings match this filter.</div>';return;}
+  list.forEach(l=>{
+    const p=PT[l.type];
+    const canAfford=cash>=l.price;
+    const card=document.createElement('div');
+    card.className='lc';
+    card.innerHTML=`
+      <div class="lc-head">
+        <span class="lc-icon">${p.icon}</span>
+        <div class="lc-info">
+          <div class="lc-name">${l.name}</div>
+          <div class="lc-loc">📍 ${l.location}</div>
+          <span class="type-badge" style="background:${p.bg};color:#fff;border:1px solid ${p.border}">${p.label}</span>
+        </div>
+      </div>
+      <div class="lc-stats">
+        <div class="ls"><div class="ls-lbl">Net Yield/yr</div><div class="ls-val" style="color:var(--up)">${l.netYield}%</div></div>
+        <div class="ls"><div class="ls-lbl">Income/Day</div><div class="ls-val" style="color:var(--up)">${fmtF(l.netIncomeDay)}</div></div>
+        <div class="ls"><div class="ls-lbl">Occupancy</div><div class="ls-val">${l.occupancy}%</div></div>
+        <div class="ls"><div class="ls-lbl">Size</div><div class="ls-val">${l.size} m²</div></div>
+      </div>
+      <div class="lc-foot">
+        <div class="lc-price">${fmt(l.price)}</div>
+        <button class="btn-buy" data-lid="${l.id}" ${canAfford?'':'disabled'}>${canAfford?'🏗 Purchase':'⚠ Insufficient'}</button>
+      </div>`;
+    card.querySelector('.btn-buy').addEventListener('click',()=>buyProperty(l));
+    grid.appendChild(card);
+  });
+}
+
+function renderPanel(){
+  const re=loadRE();
+  const cash=getCash();
+  const inv=re.properties.reduce((s,p)=>s+p.purchasePrice,0);
+  const val=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice),0);
+  const inc=re.properties.reduce((s,p)=>s+(p.netIncomeDay||0),0);
+  const pnl=val-inv;
+
+  document.getElementById('tb-cash').textContent=fmt(cash);
+  document.getElementById('tb-rev').textContent=fmt(val);
+  document.getElementById('tb-cnt').textContent=re.properties.length;
+  document.getElementById('tb-inc').textContent=fmt(inc)+'/day';
+  document.getElementById('ps-inv').textContent=fmt(inv);
+  document.getElementById('ps-val').textContent=fmt(val);
+  document.getElementById('ps-chg').textContent=pnl>=0?`+${fmt(pnl)} unrealised gain`:`-${fmt(Math.abs(pnl))} unrealised loss`;
+  document.getElementById('ps-chg').style.color=pnl>=0?'var(--up)':'var(--dn)';
+  document.getElementById('ps-earned').textContent=fmt(re.totalEarned||0);
+  document.getElementById('pc-badge').textContent=re.properties.length?`(${re.properties.length})`:'';
+
+  const myList=document.getElementById('my-props');
+  if(!re.properties.length){myList.innerHTML='<div class="empty">No properties owned yet.<br>Browse listings on the left<br>to start building your empire.</div>';return;}
+  myList.innerHTML='';
+  re.properties.slice().reverse().forEach(p=>{
+    const pt=PT[p.type];
+    const pct=((( p.currentValue||p.purchasePrice)-p.purchasePrice)/p.purchasePrice*100).toFixed(1);
+    const d=document.createElement('div');
+    d.className='mini-prop';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:7px;min-width:0">
+      <span style="font-size:18px">${pt.icon}</span>
+      <div style="min-width:0"><div class="mp-name">${p.name}</div><div class="mp-loc">${p.location}</div></div>
+    </div>
+    <div class="mp-val">
+      <div style="color:var(--re)">${fmt(p.currentValue||p.purchasePrice)}</div>
+      <div style="font-size:10px;color:${parseFloat(pct)>=0?'var(--up)':'var(--dn)'}">${pct}%</div>
+    </div>`;
+    myList.appendChild(d);
+  });
+}
+
+// ── Buy ───────────────────────────────────────────────
+function buyProperty(listing){
+  const cash=getCash();
+  if(cash<listing.price){toast('Insufficient cash! Trade stocks to earn more.','var(--dn)');return;}
+  if(!confirm(`Purchase "${listing.name}" for ${fmt(listing.price)}?\n\nExpected income: ${fmtF(listing.netIncomeDay)}/day`))return;
+
+  const re=loadRE();
+  const p=PT[listing.type];
+  const grossDay=listing.price*p.yield/365;
+  const maintDay=grossDay*p.maint;
+
+  re.properties.push({
+    id:'prop_'+Date.now()+'_'+Math.floor(Math.random()*9999),
+    type:listing.type,
+    name:listing.name,
+    location:listing.location,
+    purchasePrice:listing.price,
+    currentValue:listing.price,
+    baseRentDay:+(grossDay*listing.occupancy/100).toFixed(4),
+    maintenanceDay:+maintDay.toFixed(4),
+    netIncomeDay:listing.netIncomeDay,
+    occupancy:listing.occupancy,
+    size:listing.size,
+    upgrades:[],
+    boughtDay:getDay(),
+    boughtAt:Date.now(),
+  });
+  re.pendingDebits=(re.pendingDebits||0)+listing.price;
+  saveRE(re);
+  deductCash(listing.price);
+  renderListings();
+  renderPanel();
+  toast(`Purchased ${listing.name}!`,'var(--up)');
+}
+
+function toast(msg,col){
+  col=col||'var(--up)';
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=col.includes('#')?col:'#238636';
+  t.style.color='#fff';t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2800);
+}
+
+// ── Events ────────────────────────────────────────────
+document.getElementById('filter-bar').addEventListener('click',e=>{
+  const b=e.target.closest('.fb');if(!b)return;
+  filter=b.dataset.type;
+  document.querySelectorAll('.fb').forEach(x=>x.classList.toggle('active',x===b));
+  renderListings();
+});
+document.getElementById('btn-refresh').addEventListener('click',refreshListings);
+
+// ── Init ──────────────────────────────────────────────
+refreshListings();
+renderPanel();
+setInterval(()=>{renderPanel();renderListings();},4000);
+</script>
+</body>
+</html>

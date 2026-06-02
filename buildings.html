@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildings — NASDAQ Trader</title>
+<style>
+:root{--bg1:#0d1117;--bg2:#161b22;--bg3:#21262d;--bdr:#30363d;--txt1:#e6edf3;--txt2:#8b949e;--txt3:#444d56;--up:#3fb950;--dn:#f85149;--bl:#58a6ff;--gd:#ffd700;--re:#f0883e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg1);color:var(--txt1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+a{text-decoration:none;}
+
+/* ── Topbar ── */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:20;}
+.logo{font-size:17px;font-weight:800;color:var(--re);white-space:nowrap;}
+.sep{width:1px;height:20px;background:var(--bdr);flex-shrink:0;}
+.si{display:flex;flex-direction:column;align-items:center;min-width:68px;}
+.si-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;}
+.si-val{font-size:14px;font-weight:700;}
+.btn{border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bdr);display:inline-flex;align-items:center;gap:5px;}
+.btn-back{background:var(--bg3);color:var(--txt1);}
+.btn-back:hover{border-color:var(--bl);color:var(--bl);}
+.btn-market{background:rgba(26,58,26,.5);color:#3fb950;border-color:#2a6a2a;}
+.btn-market:hover{background:#2a6a2a;}
+
+/* ── Sort bar ── */
+.ctrl-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--bdr);flex-wrap:wrap;}
+.ctrl-lbl{font-size:11px;color:var(--txt2);font-weight:600;}
+.sort-btn{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt2);padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;}
+.sort-btn.active{background:#1f6feb;border-color:#1f6feb;color:#fff;}
+.type-filter{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt2);padding:4px 10px;border-radius:14px;font-size:11px;cursor:pointer;}
+.type-filter.active{background:rgba(240,136,62,.15);border-color:var(--re);color:var(--re);}
+
+/* ── Grid ── */
+.prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;padding:16px;}
+
+/* ── Property card ── */
+.pc{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;transition:border-color .15s;}
+.pc:hover{border-color:var(--re);}
+.pc-head{padding:12px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr);}
+.pc-icon{font-size:24px;flex-shrink:0;}
+.pc-meta{flex:1;min-width:0;}
+.pc-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc-loc{font-size:11px;color:var(--txt2);margin-top:1px;}
+.type-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:3px;}
+.pc-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.pc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.pcs{background:var(--bg3);border-radius:5px;padding:6px 8px;}
+.pcs-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.pcs-val{font-size:12px;font-weight:700;font-family:monospace;}
+/* Occupancy bar */
+.occ-row{display:flex;align-items:center;gap:8px;}
+.occ-label{font-size:10px;color:var(--txt2);width:72px;flex-shrink:0;}
+.occ-bar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.occ-fill{height:100%;border-radius:3px;transition:width .4s;}
+.occ-pct{font-size:11px;font-weight:700;font-family:monospace;width:32px;text-align:right;flex-shrink:0;}
+/* Upgrades */
+.upgrades-section{border-top:1px solid var(--bdr);padding-top:10px;}
+.upgrades-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:7px;}
+.upgrades-applied{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;min-height:0;}
+.upg-chip{font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.3);color:var(--bl);}
+.upgrades-available{display:flex;flex-direction:column;gap:5px;}
+.upg-row{display:flex;align-items:center;gap:8px;background:var(--bg1);border:1px solid var(--bdr);border-radius:7px;padding:7px 10px;}
+.upg-icon{font-size:16px;flex-shrink:0;}
+.upg-info{flex:1;min-width:0;}
+.upg-name{font-size:12px;font-weight:600;}
+.upg-desc{font-size:10px;color:var(--txt2);margin-top:1px;}
+.btn-upg{border:none;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;background:#1f6feb;color:#fff;white-space:nowrap;flex-shrink:0;}
+.btn-upg:hover{background:#388bfd;}
+.btn-upg:disabled{background:var(--bg3);color:var(--txt3);cursor:not-allowed;}
+/* Footer */
+.pc-foot{padding:10px 14px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.net-income{font-size:13px;font-weight:700;}
+.btn-sell{border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;background:rgba(248,81,73,.15);color:var(--dn);border:1px solid rgba(248,81,73,.3);}
+.btn-sell:hover{background:var(--dn);color:#fff;}
+
+/* ── Empty state ── */
+.empty{text-align:center;color:var(--txt2);padding:60px 20px;font-size:14px;line-height:2;}
+.empty a{color:var(--re);}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="btn btn-back" href="index.html" onclick="syncBack()">← Back to Game</a>
+  <a class="btn btn-market" href="realestate.html">🏢 Marketplace</a>
+  <div class="logo">🏗 Buildings &amp; Facilities</div>
+  <div class="sep"></div>
+  <div class="si"><span class="si-lbl">Properties</span><span class="si-val" id="tb-cnt">0</span></div>
+  <div class="si"><span class="si-lbl">Portfolio Value</span><span class="si-val" id="tb-val" style="color:var(--re)">$0</span></div>
+  <div class="si"><span class="si-lbl">Unrealised P&L</span><span class="si-val" id="tb-pnl">—</span></div>
+  <div class="si"><span class="si-lbl">Net Income/Day</span><span class="si-val" id="tb-inc" style="color:var(--up)">$0</span></div>
+  <div class="si"><span class="si-lbl">Total Earned</span><span class="si-val" id="tb-earned" style="color:var(--gd)">$0</span></div>
+</div>
+
+<div class="ctrl-bar">
+  <span class="ctrl-lbl">Sort:</span>
+  <button class="sort-btn active" data-sort="boughtAt">Recent</button>
+  <button class="sort-btn" data-sort="currentValue">Value ↓</button>
+  <button class="sort-btn" data-sort="netIncomeDay">Income ↓</button>
+  <button class="sort-btn" data-sort="pnlPct">P&amp;L %</button>
+  <span class="sep"></span>
+  <span class="ctrl-lbl">Filter:</span>
+  <button class="type-filter active" data-type="all">All</button>
+  <button class="type-filter" data-type="land">🌳</button>
+  <button class="type-filter" data-type="house">🏠</button>
+  <button class="type-filter" data-type="apartment">🏢</button>
+  <button class="type-filter" data-type="office">🏛</button>
+  <button class="type-filter" data-type="industrial">🏭</button>
+  <button class="type-filter" data-type="retail">🏪</button>
+</div>
+
+<div class="prop-grid" id="prop-grid"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+const RE_KEY='nq_re_v1', SH_KEY='nq_shared_v1';
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+const fmtF=n=>'$'+n.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2});
+
+const PT={
+  land:      {icon:'🌳',label:'Vacant Land',      bg:'#1a3012',border:'#3a7a33'},
+  house:     {icon:'🏠',label:'Residential',      bg:'#0d2040',border:'#2460a0'},
+  apartment: {icon:'🏢',label:'Apartment Block',  bg:'#220d40',border:'#6e40c9'},
+  office:    {icon:'🏛',label:'Office Building',  bg:'#0d2828',border:'#1a8f8f'},
+  industrial:{icon:'🏭',label:'Industrial Unit',  bg:'#28180a',border:'#bf6a1a'},
+  retail:    {icon:'🏪',label:'Retail Strip',     bg:'#28081a',border:'#c93a7a'},
+};
+
+const UPGRADES={
+  security:  {icon:'🔒',name:'Security System',   desc:'+10% occupancy',                costMult:.04,effects:{occ:.10}},
+  renovation:{icon:'🔨',name:'Full Renovation',   desc:'+15% value, +8% rent income',   costMult:.09,effects:{value:.15,rent:.08}},
+  hvac:      {icon:'❄️', name:'HVAC System',       desc:'-20% maintenance cost',          costMult:.03,effects:{maint:-.20}},
+  lobby:     {icon:'🏛', name:'Premium Lobby',     desc:'+5% occupancy, +5% rent',        costMult:.05,effects:{occ:.05,rent:.05}},
+  solar:     {icon:'☀️', name:'Solar Panels',      desc:'-30% maintenance cost',          costMult:.06,effects:{maint:-.30}},
+  smart:     {icon:'📡',name:'Smart Building',    desc:'+5% value, +5% rent, -10% maint',costMult:.07,effects:{value:.05,rent:.05,maint:-.10}},
+};
+
+// ── State ─────────────────────────────────────────────
+function loadRE(){try{return JSON.parse(localStorage.getItem(RE_KEY)||'null')||{properties:[],totalEarned:0};}catch{return{properties:[],totalEarned:0};}}
+function saveRE(re){localStorage.setItem(RE_KEY,JSON.stringify(re));}
+function loadSH(){try{return JSON.parse(localStorage.getItem(SH_KEY)||'null')||{};}catch{return{};}}
+function saveSH(sh){localStorage.setItem(SH_KEY,JSON.stringify(sh));}
+function getCash(){return loadSH().cash||0;}
+function deductCash(amount){const sh=loadSH();sh.cash=Math.max(0,(sh.cash||0)-amount);saveSH(sh);}
+function addCash(amount){const sh=loadSH();sh.cash=(sh.cash||0)+amount;saveSH(sh);}
+function syncBack(){const sh=loadSH();const re=loadRE();sh.rePropertyValue=re.properties.reduce((s,p)=>s+(p.currentValue||0),0);saveSH(sh);}
+
+// ── Compute net income day from raw property stats ────
+function computeNetIncome(p){
+  let rent=p.baseRentDay*(p.occupancy/100);
+  let maint=p.maintenanceDay;
+  // Apply upgrade effects
+  (p.upgrades||[]).forEach(uid=>{
+    const u=UPGRADES[uid];if(!u)return;
+    if(u.effects.occ)rent=p.baseRentDay*Math.min(1,(p.occupancy/100)+u.effects.occ);
+    if(u.effects.rent)rent*=(1+u.effects.rent);
+    if(u.effects.maint)maint*=(1+u.effects.maint);
+  });
+  return Math.max(0,+(rent-maint).toFixed(4));
+}
+
+// ── Simulate value drift (called on page load) ────────
+function driftValues(re){
+  const sh=loadSH();
+  const today=sh.day||0;
+  re.properties.forEach(p=>{
+    const daysHeld=today-(p.boughtDay||0);
+    if(daysHeld<1)return;
+    // gentle appreciation ~3-5% per year, with random noise
+    const seed=p.id.split('').reduce((h,c)=>((h*31)+c.charCodeAt(0))>>>0,0);
+    const drift=1+((seed%7+3)/1000)*daysHeld;  // ~0.3-1% per 100 days
+    const noise=1+(((seed*17+3)%11)-5)/1000;   // ±0.5% noise
+    p.currentValue=Math.round(p.purchasePrice*Math.min(drift*noise,2.5));
+    p.netIncomeDay=computeNetIncome(p);
+  });
+  saveRE(re);
+  return re;
+}
+
+// ── Collect pending income ────────────────────────────
+function collectIncome(re){
+  const sh=loadSH();
+  const today=sh.day||0;
+  const lastSync=re.lastSyncDay||0;
+  const days=Math.max(0,today-lastSync);
+  if(days>0 && re.properties.length){
+    let income=0;
+    re.properties.forEach(p=>{income+=Math.max(0,(p.netIncomeDay||0)*days);});
+    if(income>0.01){
+      re.pendingIncome=(re.pendingIncome||0)+income;
+      re.totalEarned=(re.totalEarned||0)+income;
+    }
+    re.lastSyncDay=today;
+    saveRE(re);
+  }
+}
+
+// ── Sort + Filter ─────────────────────────────────────
+let sortBy='boughtAt', typeFilter='all';
+
+function getSorted(props){
+  let list=typeFilter==='all'?[...props]:props.filter(p=>p.type===typeFilter);
+  list.forEach(p=>{p.pnlPct=((p.currentValue||p.purchasePrice)-p.purchasePrice)/p.purchasePrice*100;});
+  return list.sort((a,b)=>{
+    if(sortBy==='boughtAt')return (b.boughtAt||0)-(a.boughtAt||0);
+    if(sortBy==='currentValue')return (b.currentValue||0)-(a.currentValue||0);
+    if(sortBy==='netIncomeDay')return (b.netIncomeDay||0)-(a.netIncomeDay||0);
+    if(sortBy==='pnlPct')return b.pnlPct-a.pnlPct;
+    return 0;
+  });
+}
+
+// ── Render cards ──────────────────────────────────────
+function renderGrid(){
+  const re=driftValues(loadRE());
+  collectIncome(re);
+  const props=getSorted(re.properties);
+  const grid=document.getElementById('prop-grid');
+
+  // Topbar stats
+  const totalVal=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice),0);
+  const totalInv=re.properties.reduce((s,p)=>s+p.purchasePrice,0);
+  const totalInc=re.properties.reduce((s,p)=>s+(p.netIncomeDay||0),0);
+  const pnl=totalVal-totalInv;
+  document.getElementById('tb-cnt').textContent=re.properties.length;
+  document.getElementById('tb-val').textContent=fmt(totalVal);
+  document.getElementById('tb-pnl').textContent=(pnl>=0?'+':'')+fmt(pnl);
+  document.getElementById('tb-pnl').style.color=pnl>=0?'var(--up)':'var(--dn)';
+  document.getElementById('tb-inc').textContent=fmtF(totalInc)+'/day';
+  document.getElementById('tb-earned').textContent=fmt(re.totalEarned||0);
+
+  if(!re.properties.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">
+      You have no properties yet.<br>
+      <a href="realestate.html">Browse the marketplace</a> to acquire land &amp; buildings.
+    </div>`;
+    return;
+  }
+  if(!props.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1">No properties match this filter.</div>';return;}
+
+  grid.innerHTML='';
+  props.forEach(p=>{
+    const pt=PT[p.type]||PT.house;
+    const pnlAmt=(p.currentValue||p.purchasePrice)-p.purchasePrice;
+    const pnlPct=((pnlAmt/p.purchasePrice)*100).toFixed(1);
+    const netInc=p.netIncomeDay||0;
+    const annualInc=netInc*365;
+    const annualYield=(annualInc/p.purchasePrice*100).toFixed(2);
+    const cash=getCash();
+
+    // Upgrades HTML
+    const applied=(p.upgrades||[]);
+    const appliedHtml=applied.map(uid=>{const u=UPGRADES[uid];return u?`<span class="upg-chip">${u.icon} ${u.name}</span>`:''}).join('');
+    const availableUpgrades=Object.entries(UPGRADES).filter(([uid])=>!applied.includes(uid));
+    const upgRows=availableUpgrades.map(([uid,u])=>{
+      const cost=Math.round(p.purchasePrice*u.costMult/100)*100;
+      const canAfford=cash>=cost;
+      return `<div class="upg-row">
+        <span class="upg-icon">${u.icon}</span>
+        <div class="upg-info"><div class="upg-name">${u.name}</div><div class="upg-desc">${u.desc}</div></div>
+        <button class="btn-upg" data-pid="${p.id}" data-uid="${uid}" data-cost="${cost}" ${canAfford?'':'disabled'}>${fmt(cost)}</button>
+      </div>`;
+    }).join('');
+
+    const card=document.createElement('div');
+    card.className='pc';
+    card.innerHTML=`
+      <div class="pc-head">
+        <span class="pc-icon">${pt.icon}</span>
+        <div class="pc-meta">
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-loc">📍 ${p.location} · ${p.size||0} m²</div>
+          <span class="type-badge" style="background:${pt.bg};color:#fff;border:1px solid ${pt.border}">${pt.label}</span>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-stats">
+          <div class="pcs"><div class="pcs-lbl">Current Value</div><div class="pcs-val" style="color:var(--re)">${fmt(p.currentValue||p.purchasePrice)}</div></div>
+          <div class="pcs"><div class="pcs-lbl">Purchase Price</div><div class="pcs-val">${fmt(p.purchasePrice)}</div></div>
+          <div class="pcs"><div class="pcs-lbl">Unrealised P&L</div><div class="pcs-val" style="color:${pnlAmt>=0?'var(--up)':'var(--dn)'}">${pnlAmt>=0?'+':''}${fmt(pnlAmt)}<span style="font-size:10px;display:block">${pnlPct}%</span></div></div>
+          <div class="pcs"><div class="pcs-lbl">Yield/yr</div><div class="pcs-val" style="color:var(--up)">${annualYield}%</div></div>
+          <div class="pcs"><div class="pcs-lbl">Income/Day</div><div class="pcs-val" style="color:var(--up)">${fmtF(netInc)}</div></div>
+          <div class="pcs"><div class="pcs-lbl">Size</div><div class="pcs-val">${p.size||0} m²</div></div>
+        </div>
+        <div>
+          <div class="occ-row">
+            <span class="occ-label">Occupancy</span>
+            <div class="occ-bar"><div class="occ-fill" style="width:${p.occupancy}%;background:${p.occupancy>=80?'var(--up)':p.occupancy>=60?'#f0883e':'var(--dn)'}"></div></div>
+            <span class="occ-pct" style="color:${p.occupancy>=80?'var(--up)':p.occupancy>=60?'#f0883e':'var(--dn)'}">${p.occupancy}%</span>
+          </div>
+        </div>
+        <div class="upgrades-section">
+          <div class="upgrades-title">Upgrades &amp; Facilities</div>
+          ${applied.length?`<div class="upgrades-applied">${appliedHtml}</div>`:''}
+          ${availableUpgrades.length?`<div class="upgrades-available">${upgRows}</div>`:'<div style="font-size:11px;color:var(--txt2)">All upgrades installed.</div>'}
+        </div>
+      </div>
+      <div class="pc-foot">
+        <div class="net-income">Net: <span style="color:var(--up)">${fmtF(netInc)}/day</span> · <span style="color:var(--gd)">${fmt(annualInc)}/yr</span></div>
+        <button class="btn-sell" data-pid="${p.id}">Sell</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Upgrade buttons
+  grid.querySelectorAll('.btn-upg').forEach(btn=>{
+    btn.addEventListener('click',()=>applyUpgrade(btn.dataset.pid,btn.dataset.uid,+btn.dataset.cost));
+  });
+  // Sell buttons
+  grid.querySelectorAll('.btn-sell').forEach(btn=>{
+    btn.addEventListener('click',()=>sellProperty(btn.dataset.pid));
+  });
+}
+
+// ── Upgrade ───────────────────────────────────────────
+function applyUpgrade(pid,uid,cost){
+  const cash=getCash();
+  if(cash<cost){toast('Insufficient cash for this upgrade.','#f85149');return;}
+  const u=UPGRADES[uid];
+  if(!confirm(`Install "${u.name}" for ${fmt(cost)}?\n\n${u.desc}`))return;
+
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===pid);
+  if(!p){toast('Property not found.','#f85149');return;}
+  if((p.upgrades||[]).includes(uid)){toast('Already installed.','#f85149');return;}
+
+  p.upgrades=(p.upgrades||[]).concat(uid);
+  // Apply effects
+  if(u.effects.occ) p.occupancy=Math.min(100,Math.round(p.occupancy+(u.effects.occ*100)));
+  if(u.effects.value) p.currentValue=Math.round((p.currentValue||p.purchasePrice)*(1+u.effects.value));
+  if(u.effects.rent) p.baseRentDay=+(p.baseRentDay*(1+u.effects.rent)).toFixed(4);
+  if(u.effects.maint) p.maintenanceDay=+(p.maintenanceDay*(1+u.effects.maint)).toFixed(4);
+  p.netIncomeDay=computeNetIncome(p);
+
+  re.pendingDebits=(re.pendingDebits||0)+cost;
+  saveRE(re);
+  deductCash(cost);
+  renderGrid();
+  toast(`${u.icon} ${u.name} installed!`);
+}
+
+// ── Sell ──────────────────────────────────────────────
+function sellProperty(pid){
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===pid);
+  if(!p)return;
+  const sellPrice=p.currentValue||p.purchasePrice;
+  const pnl=sellPrice-p.purchasePrice;
+  if(!confirm(`Sell "${p.name}" for ${fmt(sellPrice)}?\n\nP&L: ${pnl>=0?'+':''}${fmt(pnl)}`))return;
+
+  re.properties=re.properties.filter(x=>x.id!==pid);
+  saveRE(re);
+  addCash(sellPrice);
+  syncBack();
+  renderGrid();
+  toast(`Sold ${p.name} for ${fmt(sellPrice)}${pnl>=0?' 📈':' 📉'}`);
+}
+
+function toast(msg,bg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=bg||'#238636';t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2800);
+}
+
+// ── Controls ──────────────────────────────────────────
+document.querySelector('.ctrl-bar').addEventListener('click',e=>{
+  const sb=e.target.closest('.sort-btn');
+  if(sb){sortBy=sb.dataset.sort;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.toggle('active',b===sb));renderGrid();return;}
+  const tf=e.target.closest('.type-filter');
+  if(tf){typeFilter=tf.dataset.type;document.querySelectorAll('.type-filter').forEach(b=>b.classList.toggle('active',b===tf));renderGrid();}
+});
+
+// ── Init ──────────────────────────────────────────────
+renderGrid();
+setInterval(renderGrid,5000);
+</script>
+</body>
+</html>
