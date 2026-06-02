@@ -825,6 +825,31 @@ html[data-theme="light"] .forex-chip.active{background:var(--bl);color:#fff;}
 .btn-restart{background:#238636;border:none;color:#fff;padding:10px 28px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;margin:4px;}
 .btn-restart:hover{background:#2ea043;}
 
+/* ── Portfolio pane ── */
+.pf-chart-section{background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:10px 12px;}
+.pf-period-tabs{display:flex;gap:3px;}
+.pf-ptab{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600;transition:all .12s;}
+.pf-ptab:hover{border-color:#58a6ff;color:#58a6ff;}
+.pf-ptab.active{background:#1f6feb;border-color:#1f6feb;color:#fff;}
+/* Balance sheet */
+.bs-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
+.bs-col{background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;}
+.bs-header{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #30363d;}
+.bs-row{display:flex;justify-content:space-between;font-size:10px;color:#8b949e;padding:1px 0;}
+.bs-row span:last-child{font-weight:600;color:#e6edf3;font-family:monospace;}
+.bs-total{border-top:1px solid #30363d;margin-top:4px;padding-top:4px;font-weight:700;}
+.bs-total span{color:#e6edf3 !important;}
+/* Financial health bar */
+.fh-bar-wrap{background:#21262d;border-radius:4px;height:6px;overflow:hidden;margin-bottom:7px;}
+.fh-bar{height:100%;border-radius:4px;transition:width .4s ease;}
+/* Light mode */
+html[data-theme="light"] .pf-chart-section{background:var(--bg3);border-color:var(--bdr);}
+html[data-theme="light"] .pf-ptab{background:var(--bg3);border-color:var(--bdr);color:var(--txt2);}
+html[data-theme="light"] .bs-col{background:var(--bg3);border-color:var(--bdr);}
+html[data-theme="light"] .bs-row{color:var(--txt2);}
+html[data-theme="light"] .bs-row span:last-child{color:var(--txt1);}
+html[data-theme="light"] .fh-bar-wrap{background:var(--bdr);}
+
 /* ── Sidebar expand animation ── */
 .sidebar{transition:width .25s cubic-bezier(.4,0,.2,1);}
 .sidebar.sb-open{width:360px;}
@@ -4106,35 +4131,99 @@ document.addEventListener('click',e=>{
 });
 
 // ── Sidebar: Portfolio pane ───────────────────────────────────
+let pfChartPeriod='all';
+
 function renderSbPortfolio(){
   const sc=state.startCash||INITIAL_CASH;
   const net=netWorth(), pnl=net-sc, pct=(pnl/sc)*100;
-  const pv=net-state.cash+(state.loans.reduce((s,l)=>s+l.balance,0))-(state.savings.reduce((s,sv)=>s+sv.balance,0));
+  const totalLoans=state.loans.reduce((s,l)=>s+l.balance,0);
+  const totalSav=state.savings.reduce((s,sv)=>s+sv.balance,0);
+  const invested=Object.entries(state.positions).filter(([,p])=>p.shares>0)
+    .reduce((s,[t,p])=>s+(p.shares*(state.prices[t]||p.avgCost)),0);
+  const totalAssets=state.cash+invested+totalSav;
+  const winRate=state.winTrades+state.lossTrades>0?Math.round(state.winTrades/(state.winTrades+state.lossTrades)*100):null;
   const lb=loadLB();
   const rank=lb.findIndex(e=>e.name===playerName&&Math.abs(e.net-net)<1)+1||'—';
-  const winRate=state.winTrades+state.lossTrades>0?Math.round(state.winTrades/(state.winTrades+state.lossTrades)*100)+'%':'—';
   const positions=Object.entries(state.positions).filter(([,p])=>p.shares>0)
     .map(([t,p])=>{const cur=state.prices[t];const ppnl=(cur-p.avgCost)*p.shares;const ppct=((cur-p.avgCost)/p.avgCost)*100;return{t,p,cur,ppnl,ppct,val:p.shares*cur};})
     .sort((a,b)=>b.val-a.val);
 
+  // ── Financial health score (0-100) ──
+  const debtRatio=totalAssets>0?totalLoans/totalAssets:0;
+  const divScore=Math.min(positions.length*10,30);          // up to 30 pts
+  const pnlScore=Math.min(Math.max(pct*2,0),40);            // up to 40 pts
+  const debtScore=Math.max(30-debtRatio*100,0);             // up to 30 pts
+  const healthScore=Math.round(divScore+pnlScore+debtScore);
+  const healthLabel=healthScore>=80?['🟢','Excellent','#3fb950']:healthScore>=60?['🟡','Good','#ffd700']:healthScore>=40?['🟠','Fair','#f0883e']:['🔴','Poor','#f85149'];
+  const hasActiveBank=totalLoans>0||totalSav>0;
+
   document.getElementById('sb-portfolio-content').innerHTML=`
-    <div class="pf-stat-card" style="margin-bottom:8px">
-      <div class="pf-stat-label">Net Worth</div>
-      <div class="pf-stat-val" style="color:${net>=sc?'#3fb950':'#f85149'}">${fmt(net)}</div>
-      <div class="pf-stat-sub">${pnl>=0?'+':''}${fmt(pnl)} &nbsp; ${pnl>=0?'+':''}${pct.toFixed(2)}%</div>
+
+    <!-- ── Net Worth ── -->
+    <div class="pf-stat-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="pf-stat-label">Net Worth</div>
+          <div class="pf-stat-val" style="color:${net>=sc?'#3fb950':'#f85149'};font-size:22px">${fmt(net)}</div>
+          <div class="pf-stat-sub" style="color:${pnl>=0?'#3fb950':'#f85149'}">${pnl>=0?'▲':'▼'} ${fmt(Math.abs(pnl))} &nbsp; (${pnl>=0?'+':''}${pct.toFixed(2)}%)</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#8b949e">Health</div>
+          <div style="font-size:18px">${healthLabel[0]}</div>
+          <div style="font-size:10px;color:${healthLabel[2]};font-weight:700">${healthLabel[1]}</div>
+        </div>
+      </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px">
-      <div class="mini-stat"><div class="mini-stat-label">Cash</div><div class="mini-stat-val" style="color:#58a6ff">${fmt(state.cash)}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Invested</div><div class="mini-stat-val" style="color:#e6edf3">${fmt(pv)}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Debt</div><div class="mini-stat-val" style="color:${state.loans.reduce((s,l)=>s+l.balance,0)>0?'#f85149':'#3fb950'}">${fmt(state.loans.reduce((s,l)=>s+l.balance,0))}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Savings</div><div class="mini-stat-val" style="color:#3fb950">${fmt(state.savings.reduce((s,sv)=>s+sv.balance,0))}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Win Rate</div><div class="mini-stat-val" style="color:#3fb950">${winRate}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">LB Rank</div><div class="mini-stat-val" style="color:#ffd700">${rank==='—'?'—':'#'+rank}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Trades</div><div class="mini-stat-val">${state.trades}</div></div>
-      <div class="mini-stat"><div class="mini-stat-label">Day</div><div class="mini-stat-val">${state.day}</div></div>
+
+    <!-- ── Growth Chart ── -->
+    <div class="pf-chart-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div class="section-title" style="margin:0">Portfolio Growth</div>
+        <div class="pf-period-tabs">
+          <button class="pf-ptab${pfChartPeriod==='7d'?' active':''}"  onclick="setPfPeriod('7d')">7d</button>
+          <button class="pf-ptab${pfChartPeriod==='30d'?' active':''}" onclick="setPfPeriod('30d')">30d</button>
+          <button class="pf-ptab${pfChartPeriod==='90d'?' active':''}" onclick="setPfPeriod('90d')">90d</button>
+          <button class="pf-ptab${pfChartPeriod==='all'?' active':''}" onclick="setPfPeriod('all')">All</button>
+        </div>
+      </div>
+      <canvas id="sb-nw-canvas" height="110" style="width:100%;display:block;border-radius:6px;background:#0a0d12"></canvas>
     </div>
+
+    <!-- ── Balance Sheet ── -->
+    <div class="section-title">Balance Sheet</div>
+    <div class="bs-grid">
+      <div class="bs-col">
+        <div class="bs-header" style="color:#3fb950">ASSETS</div>
+        <div class="bs-row"><span>Cash</span><span style="color:#58a6ff">${fmt(state.cash)}</span></div>
+        <div class="bs-row"><span>Investments</span><span>${fmt(invested)}</span></div>
+        <div class="bs-row"><span>Savings</span><span style="color:#3fb950">${fmt(totalSav)}</span></div>
+        <div class="bs-row bs-total"><span>Total Assets</span><span style="color:#3fb950">${fmt(totalAssets)}</span></div>
+      </div>
+      <div class="bs-col">
+        <div class="bs-header" style="color:#f85149">LIABILITIES</div>
+        <div class="bs-row"><span>Loans</span><span style="color:${totalLoans>0?'#f85149':'#8b949e'}">${fmt(totalLoans)}</span></div>
+        <div class="bs-row" style="visibility:hidden"><span>—</span><span>—</span></div>
+        <div class="bs-row" style="visibility:hidden"><span>—</span><span>—</span></div>
+        <div class="bs-row bs-total"><span>Net Worth</span><span style="color:${net>=sc?'#3fb950':'#f85149'}">${fmt(net)}</span></div>
+      </div>
+    </div>
+
+    <!-- ── Financial Health ── -->
+    <div class="section-title">Financial Health</div>
+    <div class="fh-bar-wrap">
+      <div class="fh-bar" style="width:${healthScore}%;background:${healthLabel[2]}"></div>
+    </div>
+    <div class="fund-section" style="margin:0 0 4px">
+      <div class="fund-row"><span class="fund-key">Health Score</span><span class="fund-val" style="color:${healthLabel[2]}">${healthScore}/100 ${healthLabel[0]} ${healthLabel[1]}</span></div>
+      <div class="fund-row"><span class="fund-key">Debt / Assets</span><span class="fund-val" style="color:${debtRatio>0.5?'#f85149':debtRatio>0.2?'#ffd700':'#3fb950'}">${(debtRatio*100).toFixed(1)}%</span></div>
+      <div class="fund-row"><span class="fund-key">Diversification</span><span class="fund-val">${positions.length} position${positions.length!==1?'s':''}</span></div>
+      <div class="fund-row"><span class="fund-key">Win Rate</span><span class="fund-val" style="color:${winRate>=50?'#3fb950':'#f85149'}">${winRate!==null?winRate+'%':'—'}</span></div>
+      <div class="fund-row"><span class="fund-key">LB Rank</span><span class="fund-val" style="color:#ffd700">${rank==='—'?'—':'#'+rank}</span></div>
+    </div>
+
+    <!-- ── Positions ── -->
     <div class="section-title">Positions (${positions.length})</div>
-    ${positions.length===0?'<div style="font-size:11px;color:#8b949e">No open positions</div>':
+    ${positions.length===0?'<div style="font-size:11px;color:#8b949e;padding:4px 0">No open positions</div>':
       positions.map(({t,p,cur,ppnl,ppct,val})=>`
       <div class="position-row" onclick="switchTicker('${t}')" style="cursor:pointer">
         <div><div class="position-ticker">${t}</div>
@@ -4144,15 +4233,120 @@ function renderSbPortfolio(){
           ${ppnl>=0?'+':''}$${Math.abs(ppnl).toFixed(2)}<br>
           <span style="font-size:10px">${ppct>=0?'+':''}${ppct.toFixed(1)}%</span>
         </div></div>`).join('')}
-    <div class="section-title" style="margin-top:10px">Statistics</div>
-    <div class="fund-section" style="margin:0">
-      <div class="fund-row"><span class="fund-key">Best Trade</span><span class="fund-val" style="color:#3fb950">${state.bestTrade?'+$'+state.bestTrade.pnl.toFixed(2)+' '+state.bestTrade.ticker:'—'}</span></div>
-      <div class="fund-row"><span class="fund-key">Worst Trade</span><span class="fund-val" style="color:#f85149">${state.worstTrade?'$'+state.worstTrade.pnl.toFixed(2)+' '+state.worstTrade.ticker:'—'}</span></div>
-      <div class="fund-row"><span class="fund-key">Wins / Losses</span><span class="fund-val">${state.winTrades} / ${state.lossTrades}</span></div>
-      <div class="fund-row"><span class="fund-key">Max Win Streak</span><span class="fund-val" style="color:#3fb950">${state.maxStreak}</span></div>
-    </div>
-    ${renderBankSectionHTML()}`;
 
+    <!-- ── Trade Statistics ── -->
+    <div class="section-title" style="margin-top:8px">Trade Statistics</div>
+    <div class="fund-section" style="margin:0">
+      <div class="fund-row"><span class="fund-key">Total Trades</span><span class="fund-val">${state.trades}</span></div>
+      <div class="fund-row"><span class="fund-key">Wins / Losses</span><span class="fund-val">${state.winTrades} / ${state.lossTrades}</span></div>
+      <div class="fund-row"><span class="fund-key">Best Trade</span><span class="fund-val" style="color:#3fb950">${state.bestTrade?'+$'+state.bestTrade.pnl.toFixed(2)+' ('+state.bestTrade.ticker+')':'—'}</span></div>
+      <div class="fund-row"><span class="fund-key">Worst Trade</span><span class="fund-val" style="color:#f85149">${state.worstTrade?'$'+state.worstTrade.pnl.toFixed(2)+' ('+state.worstTrade.ticker+')':'—'}</span></div>
+      <div class="fund-row"><span class="fund-key">Max Win Streak</span><span class="fund-val" style="color:#3fb950">${state.maxStreak}</span></div>
+      <div class="fund-row"><span class="fund-key">Day</span><span class="fund-val">${state.day}</span></div>
+    </div>
+
+    <!-- ── Active Bank Summary (only if loan or savings active) ── -->
+    ${hasActiveBank?`
+    <div class="section-title" style="margin-top:8px">🏦 Active Banking</div>
+    <div class="fund-section" style="margin:0">
+      ${totalLoans>0?`<div class="fund-row"><span class="fund-key">Total Loans Owed</span><span class="fund-val" style="color:#f85149">${fmt(totalLoans)}</span></div>`:''}
+      ${totalSav>0?`<div class="fund-row"><span class="fund-key">Total Savings</span><span class="fund-val" style="color:#3fb950">${fmt(totalSav)}</span></div>`:''}
+      ${state.loans.filter(l=>l.balance>0).map(l=>{
+        const b=BANKS[l.bankId];const r=getBankLoanRate(l.bankId);
+        return`<div class="fund-row"><span class="fund-key">${b?.abbr||l.bankId} Loan</span><span class="fund-val" style="color:#f85149">${fmt(l.balance)} @ ${(r*100).toFixed(2)}%</span></div>
+        <div class="bank-action-row" style="margin:2px 0 6px">
+          <input class="bank-amt-input" id="pay-pf-${l.bankId}" type="number" min="1" step="1" placeholder="Pay amount…">
+          <button class="btn-bk-pay" onclick="payLoanFromPf('${l.bankId}')">Pay</button>
+        </div>`;
+      }).join('')}
+      ${state.savings.filter(sv=>sv.balance>0).map(sv=>{
+        const b=BANKS[sv.bankId];const r=getBankSavingsRate(sv.bankId);
+        return`<div class="fund-row"><span class="fund-key">${b?.abbr||sv.bankId} Savings</span><span class="fund-val" style="color:#3fb950">${fmt(sv.balance)} @ ${(r*100).toFixed(2)}%</span></div>`;
+      }).join('')}
+      <div style="font-size:10px;color:#8b949e;margin-top:4px">Go to 🏦 Bank tab to apply for new loans or manage savings.</div>
+    </div>`:''}
+  `;
+
+  drawSbNwChart();
+}
+
+function setPfPeriod(p){pfChartPeriod=p;renderSbPortfolio();}
+
+function payLoanFromPf(bankId){
+  const input=document.getElementById('pay-pf-'+bankId);
+  const amount=parseFloat(input?.value)||0;
+  if(amount<=0){addLog('Enter a payment amount','err');return;}
+  if(amount>state.cash){addLog('Insufficient cash','err');return;}
+  const loan=state.loans.find(l=>l.bankId===bankId);
+  if(!loan||loan.balance<=0){addLog('No outstanding loan','err');return;}
+  const pay=Math.min(amount,loan.balance);
+  state.cash-=pay;loan.balance-=pay;
+  addLog(`Loan payment: ${BANKS[bankId].name} -${fmt(pay)}`,'buy');
+  if(input)input.value='';
+  render();
+  renderSbPortfolio();
+  if(activeSbPane==='bank')renderBankPane();
+}
+
+function drawSbNwChart(){
+  const cvs=document.getElementById('sb-nw-canvas');
+  if(!cvs)return;
+  const dpr=window.devicePixelRatio||1;
+  const W=cvs.parentElement.clientWidth||260, H=110;
+  cvs.style.width=W+'px';cvs.style.height=H+'px';
+  cvs.width=W*dpr;cvs.height=H*dpr;
+  const c=cvs.getContext('2d');c.scale(dpr,dpr);
+
+  // filter by period
+  let hist=state.nwHistory;
+  if(pfChartPeriod!=='all'){
+    const days=pfChartPeriod==='7d'?7:pfChartPeriod==='30d'?30:90;
+    const cutoff=state.day-days;
+    hist=hist.filter(h=>h.day>=cutoff);
+  }
+  if(hist.length<2){
+    c.fillStyle='#8b949e';c.font='11px sans-serif';c.textAlign='center';
+    c.fillText('Keep trading to build history…',W/2,H/2);return;
+  }
+  const vals=hist.map(h=>h.net);
+  const sc=state.startCash||INITIAL_CASH;
+  const minV=Math.min(...vals,sc),maxV=Math.max(...vals,sc),rng=maxV-minV||1;
+  const pad={t:8,b:20,l:8,r:8};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const toX=i=>pad.l+(i/(hist.length-1))*cw;
+  const toY=v=>pad.t+ch-((v-minV)/rng)*ch;
+  const isUp=vals[vals.length-1]>=sc;
+  const col=isUp?'#3fb950':'#f85149';
+
+  // gradient fill
+  const grad=c.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,isUp?'#3fb95040':'#f8514940');
+  grad.addColorStop(1,'transparent');
+  c.beginPath();c.moveTo(toX(0),toY(vals[0]));
+  hist.forEach((_,i)=>{if(i>0)c.lineTo(toX(i),toY(vals[i]));});
+  c.lineTo(toX(hist.length-1),pad.t+ch);c.lineTo(toX(0),pad.t+ch);c.closePath();
+  c.fillStyle=grad;c.fill();
+
+  // line
+  c.beginPath();c.moveTo(toX(0),toY(vals[0]));
+  hist.forEach((_,i)=>{if(i>0)c.lineTo(toX(i),toY(vals[i]));});
+  c.strokeStyle=col;c.lineWidth=1.5;c.stroke();
+
+  // baseline
+  const baseY=toY(sc);
+  c.setLineDash([3,3]);c.strokeStyle='#8b949e55';c.lineWidth=1;
+  c.beginPath();c.moveTo(pad.l,baseY);c.lineTo(W-pad.r,baseY);c.stroke();c.setLineDash([]);
+
+  // labels
+  c.fillStyle='#8b949e';c.font='9px monospace';
+  c.textAlign='left'; c.fillText(fmtPrice(maxV),pad.l+2,pad.t+9);
+  c.fillText(fmtPrice(minV),pad.l+2,H-pad.b-2);
+  c.textAlign='right';c.fillText('Day '+hist[hist.length-1].day,W-pad.r,H-3);
+  c.textAlign='left'; c.fillText('Day '+hist[0].day,pad.l,H-3);
+
+  // end dot
+  const lx=toX(hist.length-1),ly=toY(vals[vals.length-1]);
+  c.beginPath();c.arc(lx,ly,3,0,Math.PI*2);c.fillStyle=col;c.fill();
 }
 
 // ── Bank section HTML builder ─────────────────────────────────
