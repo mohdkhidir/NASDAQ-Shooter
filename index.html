@@ -1133,16 +1133,16 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
 <header>
   <h1>📈 NASDAQ Trader</h1>
   <div class="header-actions">
-    <div class="player-name" id="player-name-label">Trader: <span id="player-name-display">—</span></div>
-    <button id="theme-toggle" title="Toggle dark/light mode">🌙</button>
-    <button class="btn-hdr teal"   id="btn-portfolio">📊 Portfolio</button>
-    <button class="btn-hdr purple" id="btn-leaderboard">🏆 Leaderboard</button>
+    <div class="player-name" id="player-name-label-h">Trader: <span id="player-name-display-h">—</span></div>
+    <button id="theme-toggle-h" title="Toggle dark/light mode">🌙</button>
+    <button class="btn-hdr teal"   id="btn-portfolio-h">📊 Portfolio</button>
+    <button class="btn-hdr purple" id="btn-leaderboard-h">🏆 Leaderboard</button>
   </div>
   <div class="hud">
     <div class="hud-item"><div class="hud-label">Cash</div><div class="hud-value neutral" id="hud-cash-old">$10,000</div></div>
-    <div class="hud-item"><div class="hud-label">Portfolio</div><div class="hud-value neutral" id="hud-portfolio-x">$0</div></div>
-    <div class="hud-item"><div class="hud-label">Net Worth</div><div class="hud-value neutral" id="hud-net-x">$10,000</div></div>
-    <div class="hud-item"><div class="hud-label">P&amp;L</div><div class="hud-value neutral" id="hud-pnl-x">$0.00</div></div>
+    <div class="hud-item"><div class="hud-label">Portfolio</div><div class="hud-value neutral" id="hud-portfolio-hx">$0</div></div>
+    <div class="hud-item"><div class="hud-label">Net Worth</div><div class="hud-value neutral" id="hud-net-hx">$10,000</div></div>
+    <div class="hud-item"><div class="hud-label">P&amp;L</div><div class="hud-value neutral" id="hud-pnl-hx">$0.00</div></div>
   </div>
 </header>
 
@@ -1436,7 +1436,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <span class="label">Net Worth</span><span class="val" id="hud-net" style="color:#3fb950">$10,000</span>
   <span class="label">P&amp;L</span><span class="val" id="hud-pnl" style="color:#8b949e">$0.00</span>
   <span class="nwb-sep"></span>
-  <span class="label">Day:</span><span class="val" id="bar-day">1</span>
+  <span class="label">Day:</span><span class="val" id="bar-day">1</span> <span class="label">Trades:</span><span class="val" id="bar-trades">0</span><span id="bar-best" style="display:none"></span><span id="bar-ach" style="display:none"></span>
   <span class="label">OPR:</span><span class="opr-badge" id="bar-opr">3.00%</span>
   <span class="session-badge overnight" id="session-badge">OVERNIGHT</span>
   <span class="nwb-sep"></span>
@@ -5896,7 +5896,7 @@ document.getElementById('btn-save-go-score').onclick=()=>{submitScore();};
 })();
 
 // ── Helpers ───────────────────────────────────────────────────
-function set(id,v){document.getElementById(id).textContent=v;}
+function set(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 function fmt(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtPrice(n){
   if(n>=10000)return'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});
