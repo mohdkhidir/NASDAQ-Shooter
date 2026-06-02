@@ -682,11 +682,21 @@ html[data-theme="light"] .diff-card.selected{border-color:var(--up);background:#
 .sp-filter-inline .ftt{border-right:1px solid #30363d;padding:4px 10px;font-size:11px;flex:none;}
 .sp-filter-inline .ftt:last-child{border-right:none;}
 .sp-sect-icon{font-size:13px;flex-shrink:0;opacity:.8;}
-/* override watchlist defaults inside sp-rows */
+/* override watchlist defaults inside sp-rows — no internal scroll, parent row scrolls */
 .sp-row .watchlist{border-top:none;margin:0;padding:0;flex:1;min-width:0;overflow-x:auto;}
-.sp-row .commod-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
-.sp-row .forex-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
-.sp-row .etf-watchlist{border-top:none;margin:0;padding:0;flex-shrink:0;}
+.sp-row-cf .commod-watchlist,
+.sp-row-cf .forex-watchlist{
+  border-top:none !important;margin:0 !important;padding:0 !important;
+  overflow-x:visible;flex-wrap:nowrap;flex-shrink:0;
+}
+.sp-row-etf-filter .etf-watchlist{
+  border-top:none !important;margin:0 !important;padding:0 !important;
+  overflow-x:visible;flex-wrap:nowrap;flex-shrink:0;
+}
+/* Compact filter tabs — half width so they fit on one row with ETFs */
+.sp-filter-inline{display:flex;flex-shrink:0;gap:0;border-radius:5px;overflow:hidden;border:1px solid #30363d;}
+.sp-filter-inline .ftt{border-right:1px solid #30363d;padding:4px 7px;font-size:10px;flex:none;white-space:nowrap;}
+.sp-filter-inline .ftt:last-child{border-right:none;}
 html[data-theme="light"] .sp-row-cf{background:linear-gradient(90deg,#bf870008 0%,#0969da08 60%);}
 html[data-theme="light"] .sp-row-etf-filter{background:#0f5c5208;}
 html[data-theme="light"] .sp-filter-inline{border-color:var(--bdr);}
@@ -790,7 +800,7 @@ html[data-theme="light"] .mb-item{border-right-color:var(--bdr);}
 .div-badge{display:inline-block;background:#ffd70022;border:1px solid #ffd70055;color:#ffd700;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:6px;}
 
 /* ── Commodity watchlist row ── */
-.commod-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;}
+.commod-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .commod-watchlist::-webkit-scrollbar{display:none;}
 .commod-chip{flex-shrink:0;background:#21262d;border:1px solid #f0883e44;color:#f0883e;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .12s;}
 .commod-chip:hover{border-color:#f0883e;background:#f0883e22;}
@@ -813,7 +823,7 @@ html[data-theme="light"] .commod-chip.active{background:#bf8700;color:#fff;}
 .commod-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;}
 
 /* ── Forex watchlist row ── */
-.forex-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;}
+.forex-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .forex-watchlist::-webkit-scrollbar{display:none;}
 .forex-chip{flex-shrink:0;background:#21262d;border:1px solid #58a6ff44;color:#58a6ff;padding:3px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;font-family:monospace;}
 .forex-chip:hover{border-color:#58a6ff;background:#58a6ff22;}
@@ -948,7 +958,7 @@ html[data-theme="light"] .fh-bar-wrap{background:var(--bdr);}
 @media(max-width:860px){.sidebar.sb-open{width:100%;}}
 
 /* ── ETF watchlist row ── */
-.etf-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;}
+.etf-watchlist{display:flex;gap:4px;overflow-x:auto;padding:3px 0;scrollbar-width:none;border-top:1px solid #21262d;margin-top:3px;padding-top:5px;flex-wrap:nowrap;}
 .etf-watchlist::-webkit-scrollbar{display:none;}
 .etf-chip{flex-shrink:0;border:1px solid #0f6b5e44;color:#3fb950;background:#0f6b5e22;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s;}
 .etf-chip:hover,.etf-chip.active{background:#0f6b5e;color:#fff;border-color:#0f6b5e;}
@@ -1192,9 +1202,9 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
         <span class="sp-row-vsep"></span>
         <div class="filter-type-tabs sp-filter-inline" id="filter-area">
           <button class="ftt active" data-ft="search">🔍 Search</button>
-          <button class="ftt" data-ft="category">🗂 Category</button>
-          <button class="ftt" data-ft="shares">📊 Mkt Cap</button>
-          <button class="ftt" data-ft="valuation">💰 Valuation</button>
+          <button class="ftt" data-ft="category">🗂 Cat</button>
+          <button class="ftt" data-ft="shares">📊 Cap</button>
+          <button class="ftt" data-ft="valuation">💰 Val</button>
         </div>
       </div>
       <!-- Filter panel (below tabs) -->
