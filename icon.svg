@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="rnd"><rect width="512" height="512" rx="90" ry="90"/></clipPath>
+    <linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3fb950" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#3fb950" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="90" fill="#0d1117"/>
+  <!-- Subtle grid -->
+  <g clip-path="url(#rnd)" stroke="#21262d" stroke-width="1.5">
+    <line x1="64" y1="160" x2="448" y2="160"/>
+    <line x1="64" y1="256" x2="448" y2="256"/>
+    <line x1="64" y1="352" x2="448" y2="352"/>
+    <line x1="160" y1="64" x2="160" y2="448"/>
+    <line x1="256" y1="64" x2="256" y2="448"/>
+    <line x1="352" y1="64" x2="352" y2="448"/>
+  </g>
+  <!-- Chart fill area -->
+  <polygon clip-path="url(#rnd)"
+    points="64,378 150,308 236,328 310,198 390,158 448,90 448,448 64,448"
+    fill="url(#gfill)"/>
+  <!-- Chart line -->
+  <polyline clip-path="url(#rnd)"
+    points="64,378 150,308 236,328 310,198 390,158 448,90"
+    fill="none" stroke="#3fb950" stroke-width="22"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Tip dot -->
+  <circle cx="448" cy="90" r="20" fill="#3fb950"/>
+  <!-- $ badge bottom-left -->
+  <rect x="44" y="380" width="90" height="90" rx="18" fill="#58a6ff22"/>
+  <text x="89" y="442" text-anchor="middle" font-family="Arial Black,Arial,sans-serif"
+        font-size="62" font-weight="900" fill="#58a6ff">$</text>
+  <!-- "TRADE" label -->
+  <text x="310" y="445" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="48" font-weight="700" fill="#8b949e" letter-spacing="4">TRADE</text>
+</svg>
