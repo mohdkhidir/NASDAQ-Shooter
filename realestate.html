@@ -4,328 +4,813 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Real Estate — NASDAQ Trader</title>
-<style>
-:root{--bg1:#0d1117;--bg2:#161b22;--bg3:#21262d;--bdr:#30363d;--txt1:#e6edf3;--txt2:#8b949e;--txt3:#444d56;--up:#3fb950;--dn:#f85149;--bl:#58a6ff;--gd:#ffd700;--re:#f0883e;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg1);color:var(--txt1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
-a{text-decoration:none;}
-
-/* ── Topbar ── */
-.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:20;}
-.logo{font-size:17px;font-weight:800;color:var(--re);white-space:nowrap;}
-.sep{width:1px;height:20px;background:var(--bdr);flex-shrink:0;}
-.si{display:flex;flex-direction:column;align-items:center;min-width:68px;}
-.si-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;}
-.si-val{font-size:14px;font-weight:700;}
-.btn{border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bdr);display:inline-flex;align-items:center;gap:5px;}
-.btn-back{background:var(--bg3);color:var(--txt1);}
-.btn-back:hover{border-color:var(--bl);color:var(--bl);}
-.btn-manage{background:rgba(26,74,74,.5);color:#4ac9c9;border-color:#2a6a6a;}
-.btn-manage:hover{background:#2a6a6a;}
-
-/* ── Layout ── */
-.main{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 53px);}
-@media(max-width:860px){.main{grid-template-columns:1fr;}}
-
-/* ── Marketplace ── */
-.marketplace{padding:16px;overflow-y:auto;}
-.mkt-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}
-.mkt-title{font-size:16px;font-weight:700;}
-.mkt-sub{font-size:11px;color:var(--txt2);margin-top:2px;}
-.filter-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
-.fb{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt2);padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;white-space:nowrap;}
-.fb:hover{border-color:var(--re);color:var(--re);}
-.fb.active{background:rgba(240,136,62,.15);border-color:var(--re);color:var(--re);}
-.listings{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;}
-
-/* ── Listing card ── */
-.lc{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:13px;display:flex;flex-direction:column;gap:9px;transition:border-color .15s;}
-.lc:hover{border-color:var(--re);}
-.lc-head{display:flex;align-items:flex-start;gap:9px;}
-.lc-icon{font-size:26px;line-height:1;flex-shrink:0;margin-top:2px;}
-.lc-info{flex:1;min-width:0;}
-.lc-name{font-size:14px;font-weight:700;line-height:1.3;}
-.lc-loc{font-size:11px;color:var(--txt2);margin-top:1px;}
-.type-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;}
-.lc-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
-.ls{background:var(--bg3);border-radius:5px;padding:6px 8px;}
-.ls-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
-.ls-val{font-size:13px;font-weight:700;font-family:monospace;}
-.lc-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;}
-.lc-price{font-size:18px;font-weight:800;color:var(--bl);}
-.btn-buy{border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;background:var(--up);color:#fff;transition:all .15s;white-space:nowrap;}
-.btn-buy:hover:not(:disabled){background:#2ea043;}
-.btn-buy:disabled{background:var(--bg3);color:var(--txt3);cursor:not-allowed;}
-
-/* ── Right panel ── */
-.rp{background:var(--bg2);border-left:1px solid var(--bdr);padding:16px;overflow-y:auto;}
-.pane-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:10px;}
-.stat-card{background:var(--bg1);border:1px solid var(--bdr);border-radius:7px;padding:10px 12px;margin-bottom:7px;}
-.sc-lbl{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
-.sc-val{font-size:17px;font-weight:700;}
-.sc-sub{font-size:11px;color:var(--txt2);margin-top:2px;}
-.mini-prop{background:var(--bg1);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;}
-.mp-name{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mp-loc{font-size:10px;color:var(--txt2);}
-.mp-val{font-weight:700;font-family:monospace;font-size:12px;text-align:right;white-space:nowrap;flex-shrink:0;}
-.empty{text-align:center;color:var(--txt2);font-size:12px;padding:24px 0;line-height:1.8;}
-
-/* ── Toast ── */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:8px;font-weight:700;font-size:13px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;}
-</style>
+<link rel="stylesheet" href="re_style.css">
 </head>
 <body>
 
+<!-- ── Top Bar ─────────────────────────────────────────────── -->
 <div class="topbar">
-  <a class="btn btn-back" href="index.html" onclick="syncBack()">← Back to Game</a>
-  <div class="logo">🏢 Real Estate</div>
+  <a class="btn-back" href="#" onclick="return reBack()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    Stock Market Game
+  </a>
+  <div class="logo">🏢 Real Estate Empire</div>
   <div class="sep"></div>
-  <div class="si"><span class="si-lbl">Game Cash</span><span class="si-val" id="tb-cash" style="color:var(--bl)">—</span></div>
-  <div class="si"><span class="si-lbl">RE Value</span><span class="si-val" id="tb-rev" style="color:var(--re)">$0</span></div>
-  <div class="si"><span class="si-lbl">Properties</span><span class="si-val" id="tb-cnt">0</span></div>
-  <div class="si"><span class="si-lbl">Income/Day</span><span class="si-val" id="tb-inc" style="color:var(--up)">$0</span></div>
-  <a class="btn btn-manage" href="buildings.html">🏗 Manage Buildings →</a>
+  <div class="tb-stat"><span class="tb-lbl">Cash</span><span class="tb-val blue" id="tb-cash">—</span></div>
+  <div class="tb-stat"><span class="tb-lbl">Portfolio</span><span class="tb-val orange" id="tb-rev">$0</span></div>
+  <div class="tb-stat"><span class="tb-lbl">Properties</span><span class="tb-val" id="tb-cnt">0</span></div>
+  <div class="tb-stat"><span class="tb-lbl">Net Income/Day</span><span class="tb-val green" id="tb-inc">$0.00</span></div>
+  <div class="tb-stat"><span class="tb-lbl">Tax Due/Day</span><span class="tb-val red" id="tb-tax">$0.00</span></div>
 </div>
 
-<div class="main">
-  <div class="marketplace">
-    <div class="mkt-hdr">
-      <div><div class="mkt-title">Property Marketplace</div><div class="mkt-sub">Acquire land &amp; buildings · Earn passive rental income · Grow your empire</div></div>
-      <button class="btn" style="background:var(--bg3);color:var(--txt1)" id="btn-refresh">↻ Refresh</button>
-    </div>
-    <div class="filter-bar" id="filter-bar">
-      <button class="fb active" data-type="all">All Types</button>
-      <button class="fb" data-type="land">🌳 Land</button>
-      <button class="fb" data-type="house">🏠 Residential</button>
-      <button class="fb" data-type="apartment">🏢 Apartment</button>
-      <button class="fb" data-type="office">🏛 Office</button>
-      <button class="fb" data-type="industrial">🏭 Industrial</button>
-      <button class="fb" data-type="retail">🏪 Retail</button>
-    </div>
-    <div class="listings" id="listings"></div>
-  </div>
+<!-- ── Nav Tabs ─────────────────────────────────────────────── -->
+<div class="nav-tabs">
+  <button class="nav-tab active" data-tab="market">🏪 Marketplace</button>
+  <button class="nav-tab" data-tab="myprops">🏠 My Properties</button>
+  <button class="nav-tab" data-tab="report">📊 Market Report</button>
+</div>
 
-  <div class="rp" id="rp">
-    <div style="margin-bottom:18px">
-      <div class="pane-title">Portfolio Summary</div>
-      <div class="stat-card"><div class="sc-lbl">Total Invested</div><div class="sc-val" id="ps-inv">$0</div></div>
-      <div class="stat-card"><div class="sc-lbl">Current Value</div><div class="sc-val" id="ps-val" style="color:var(--re)">$0</div><div class="sc-sub" id="ps-chg">—</div></div>
-      <div class="stat-card"><div class="sc-lbl">Total Income Earned</div><div class="sc-val" id="ps-earned" style="color:var(--up)">$0</div></div>
-    </div>
-    <div>
-      <div class="pane-title">My Properties <span id="pc-badge" style="color:var(--txt2)"></span></div>
-      <div id="my-props"></div>
-    </div>
+<!-- ═══════════════ TAB: MARKETPLACE ════════════════════════ -->
+<div class="tab-pane active" id="tab-market">
+  <div class="area-grid" id="area-grid">
+    <!-- Populated by JS -->
   </div>
+</div>
+
+<!-- ═══════════════ TAB: MY PROPERTIES ══════════════════════ -->
+<div class="tab-pane" id="tab-myprops">
+  <div class="myprops-layout">
+    <div class="props-summary" id="props-summary"></div>
+    <div class="props-list"   id="props-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB: MARKET REPORT ══════════════════════ -->
+<div class="tab-pane" id="tab-report">
+  <div class="report-grid" id="report-grid"></div>
+</div>
+
+<!-- ── Modals ──────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="prop-modal">
+  <div class="modal-box" id="prop-modal-body"></div>
+</div>
+
+<div class="modal-overlay hidden" id="build-modal">
+  <div class="modal-box" id="build-modal-body"></div>
 </div>
 
 <div id="toast"></div>
+<div id="sfx-layer"></div>
 
 <script>
 'use strict';
-const RE_KEY='nq_re_v1', SH_KEY='nq_shared_v1';
-const fmt=n=>'$'+Math.round(n).toLocaleString();
-const fmtF=n=>'$'+n.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2});
+/* ─────────────────────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────────────────────── */
+const RE_KEY='nq_re_v2', SH_KEY='nq_shared_v1';
+const fmt  = n=>'$'+Math.round(n).toLocaleString();
+const fmtF = n=>'$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtK = n=>n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':'$'+Math.round(n);
 
-const PT={
-  land:      {icon:'🌳',label:'Vacant Land',      yield:.028,lo:30000,  hi:250000,  maint:.20,occ:.95,bg:'#1a3012',border:'#3a7a33'},
-  house:     {icon:'🏠',label:'Residential',      yield:.055,lo:90000,  hi:600000,  maint:.25,occ:.82,bg:'#0d2040',border:'#2460a0'},
-  apartment: {icon:'🏢',label:'Apartment Block',  yield:.068,lo:350000, hi:3000000, maint:.30,occ:.78,bg:'#220d40',border:'#6e40c9'},
-  office:    {icon:'🏛',label:'Office Building',  yield:.062,lo:600000, hi:10000000,maint:.35,occ:.70,bg:'#0d2828',border:'#1a8f8f'},
-  industrial:{icon:'🏭',label:'Industrial Unit',  yield:.058,lo:180000, hi:2000000, maint:.22,occ:.85,bg:'#28180a',border:'#bf6a1a'},
-  retail:    {icon:'🏪',label:'Retail Strip',     yield:.064,lo:250000, hi:4000000, maint:.32,occ:.72,bg:'#28081a',border:'#c93a7a'},
+/* ── Area definitions ─────────────────────────────────────── */
+const AREAS = {
+  village:  { label:'Village',  emoji:'🏘️',  grad:'linear-gradient(135deg,#0a2010,#061508)', border:'#2d6b3a', accent:'#4ade80',
+               demandBase:55, priceMulti:0.6,  taxRate:0.010, popGrowth:0.8 },
+  town:     { label:'Town',    emoji:'🏙️',  grad:'linear-gradient(135deg,#0a1828,#060f1a)', border:'#1f5f9e', accent:'#60a5fa',
+               demandBase:68, priceMulti:1.0,  taxRate:0.015, popGrowth:1.2 },
+  urban:    { label:'Urban',   emoji:'🌆', grad:'linear-gradient(135deg,#180a30,#0e0620)', border:'#6e40c9', accent:'#c084fc',
+               demandBase:80, priceMulti:2.2,  taxRate:0.020, popGrowth:1.8 },
+  megacity: { label:'Megacity',emoji:'🌇', grad:'linear-gradient(135deg,#281800,#180e00)', border:'#c97b00', accent:'#fbbf24',
+               demandBase:92, priceMulti:5.5,  taxRate:0.025, popGrowth:2.5 },
 };
 
-const NEIGH=['Downtown Core','Financial District','Tech Quarter','Harbor View','Midtown East','Uptown','Silicon Alley','Market Street','Business Park','Industrial Zone','Suburban Heights','Waterfront','Innovation Hub','Gateway District','Capitol Hill','Lakeshore'];
-
-const NAMES={
-  land:      ['Prime Corner Lot','Development Parcel','Commercial Site','Growth Zone Land','Greenfield Plot','Zoned Corner Block'],
-  house:     ['Victorian Terrace','Modern Townhouse','Garden Villa','Urban Cottage','Heritage Home','Brick Rowhouse'],
-  apartment: ['Meridian Apartments','The Pinnacle','Skyline Residences','Harbor Flats','City View Complex','The Grand'],
-  office:    ['Executive Tower','Commerce Plaza','Corporate Suite','Business Centre','Innovation House','The Exchange'],
-  industrial:['Logistics Hub','Distribution Depot','Manufacturing Unit','Tech Warehouse','Industrial Park Unit','Cold Storage Facility'],
-  retail:    ['Main Street Strip','Retail Promenade','Shopping Arcade','Commercial Row','Boutique Block','Market Centre'],
+/* ── Property type definitions ────────────────────────────── */
+const PTYPES = {
+  land:       { icon:'🌱', label:'Vacant Land',     yieldBase:.025, maint:.10, occBase:.95, buildable:true,
+                 img:'🌿🌿🌿\n🌿🌿🌿\n🌿🌿🌿',  areas:['village','town','urban'] },
+  farm:       { icon:'🌾', label:'Farm/Agriculture', yieldBase:.030, maint:.18, occBase:.90, buildable:false,
+                 img:'🌾🌾🌾\n🚜🌾🌾\n🌾🌾🌾',  areas:['village'] },
+  house:      { icon:'🏠', label:'Residential House',yieldBase:.052, maint:.22, occBase:.84, buildable:false,
+                 img:'🏠🌳🌳\n🌺🌿🌺\n🛣️🛣️🛣️',  areas:['village','town','urban'] },
+  apartment:  { icon:'🏢', label:'Apartment Block',  yieldBase:.070, maint:.28, occBase:.80, buildable:false,
+                 img:'🏢🏢🌆\n🚗🚗🚗\n🛣️🛣️🛣️',  areas:['town','urban','megacity'] },
+  shop:       { icon:'🏪', label:'Retail Shop',      yieldBase:.060, maint:.25, occBase:.76, buildable:false,
+                 img:'🏪🏪🏬\n👥👥👥\n🛣️🛣️🛣️',  areas:['town','urban','megacity'] },
+  office:     { icon:'🏛️', label:'Office Building',  yieldBase:.065, maint:.30, occBase:.72, buildable:false,
+                 img:'🏛️🏛️🌆\n💼💼💼\n🛣️🛣️🛣️',  areas:['urban','megacity'] },
+  factory:    { icon:'🏭', label:'Factory/Industrial',yieldBase:.058, maint:.20, occBase:.88, buildable:false,
+                 img:'🏭🏭🏗️\n⚙️⚙️⚙️\n🛣️🛣️🛣️',  areas:['town','urban'] },
+  skyscraper: { icon:'🏙️', label:'Skyscraper',       yieldBase:.080, maint:.35, occBase:.75, buildable:false,
+                 img:'🏙️🌃🌆\n💎💎💎\n🛣️🛣️🛣️',  areas:['megacity'] },
+  mall:       { icon:'🏬', label:'Shopping Mall',    yieldBase:.072, maint:.33, occBase:.70, buildable:false,
+                 img:'🏬🏬🏬\n👥👥👥\n🛣️🛣️🛣️',  areas:['urban','megacity'] },
+  hotel:      { icon:'🏨', label:'Hotel',             yieldBase:.085, maint:.40, occBase:.68, buildable:false,
+                 img:'🏨🌟🌟\n🛎️🛎️🛎️\n🛣️🛣️🛣️',  areas:['urban','megacity'] },
 };
 
-// ── Shared State ─────────────────────────────────────
-function loadRE(){try{return JSON.parse(localStorage.getItem(RE_KEY)||'null')||mkRE();}catch{return mkRE();}}
-function mkRE(){return{properties:[],pendingIncome:0,pendingDebits:0,lastSyncDay:0,totalEarned:0};}
-function saveRE(re){localStorage.setItem(RE_KEY,JSON.stringify(re));}
+/* ── Improvements ─────────────────────────────────────────── */
+const IMPROVEMENTS = [
+  {id:'landscape',  icon:'🌿', name:'Landscaping',      cost:5000,   valuePct:.04, incPct:.03, area:['village','town','urban','megacity']},
+  {id:'utilities',  icon:'🔌', name:'Utility Upgrade',  cost:12000,  valuePct:.06, incPct:.05, area:['village','town','urban','megacity']},
+  {id:'security',   icon:'🔒', name:'Security System',  cost:8000,   valuePct:.04, incPct:.04, area:['town','urban','megacity']},
+  {id:'solar',      icon:'☀️', name:'Solar Panels',     cost:20000,  valuePct:.07, incPct:.06, area:['village','town','urban','megacity']},
+  {id:'carpark',    icon:'🅿️', name:'Car Park',         cost:25000,  valuePct:.08, incPct:.07, area:['town','urban','megacity']},
+  {id:'pool',       icon:'🏊', name:'Swimming Pool',    cost:40000,  valuePct:.10, incPct:.08, area:['urban','megacity']},
+  {id:'renovate',   icon:'🔨', name:'Full Renovation',  cost:60000,  valuePct:.15, incPct:.12, area:['village','town','urban','megacity']},
+  {id:'smarttech',  icon:'📱', name:'Smart Technology', cost:35000,  valuePct:.09, incPct:.10, area:['urban','megacity']},
+  {id:'elevator',   icon:'🛗', name:'Elevator/Lifts',   cost:50000,  valuePct:.08, incPct:.06, area:['urban','megacity']},
+  {id:'rooftop',    icon:'🌅', name:'Rooftop Garden',   cost:30000,  valuePct:.06, incPct:.05, area:['urban','megacity']},
+];
+
+/* ── Buildable options on land ────────────────────────────── */
+const BUILD_OPTIONS = {
+  village:  [{type:'house',label:'🏠 House',      baseM:0.8},{type:'farm',label:'🌾 Farm',         baseM:0.6},{type:'shop',label:'🏪 Small Shop',baseM:0.9}],
+  town:     [{type:'house',label:'🏠 House',      baseM:1.0},{type:'apartment',label:'🏢 Apartment',baseM:1.5},{type:'shop',label:'🏪 Shop',  baseM:1.2},{type:'factory',label:'🏭 Factory',baseM:1.3}],
+  urban:    [{type:'apartment',label:'🏢 Apartment',baseM:1.8},{type:'office',label:'🏛️ Office',    baseM:2.0},{type:'mall',label:'🏬 Mall',   baseM:2.5},{type:'hotel',label:'🏨 Hotel',   baseM:2.8}],
+  megacity: [{type:'skyscraper',label:'🏙️ Skyscraper',baseM:3.5},{type:'mall',label:'🏬 Mega Mall',baseM:3.0},{type:'hotel',label:'🏨 Hotel',baseM:3.2}],
+};
+
+/* ── Neighborhood names per area ─────────────────────────── */
+const HOODS = {
+  village:  ['Meadow Lane','Green Acres','Riverside','Hillside','Old Village','Creekside','Sunflower Farm','Maple Grove'],
+  town:     ['Main Street','Market Square','High Street','Town Centre','North End','South Side','Elm Quarter','Bridge Road'],
+  urban:    ['Financial District','Tech Quarter','Midtown','Harbor View','Uptown','Silicon Mile','Commerce Park','Arts District'],
+  megacity: ['Downtown Core','Central Business','Platinum Mile','Sky Quarter','Diamond District','Global Hub','Prestige Row','Apex Zone'],
+};
+
+/* ═════════════════════════════════════════════════════════════
+   STATE
+═════════════════════════════════════════════════════════════ */
+let currentTab='market', filterArea='all', filterType='all';
+let areaDemand = { village:55, town:68, urban:80, megacity:92 };
+let listings=[];
+
+/* ─────────────────────────────────────────────────────────────
+   PERSISTENCE
+───────────────────────────────────────────────────────────── */
+function loadRE(){try{const d=JSON.parse(localStorage.getItem(RE_KEY)||'null'); return d||mkRE();}catch{return mkRE();}}
+function mkRE(){return{properties:[],totalEarned:0,totalTaxPaid:0,totalSpent:0,pendingIncome:0,pendingDebits:0,lastSyncDay:0,demand:null};}
+function saveRE(re){try{localStorage.setItem(RE_KEY,JSON.stringify(re));}catch{}}
 function loadSH(){try{return JSON.parse(localStorage.getItem(SH_KEY)||'null')||{};}catch{return{};}}
-function saveSH(sh){localStorage.setItem(SH_KEY,JSON.stringify(sh));}
+function saveSH(sh){try{localStorage.setItem(SH_KEY,JSON.stringify(sh));}catch{}}
 function getCash(){return loadSH().cash||0;}
-function getDay(){return loadSH().day||0;}
-function deductCash(amount){const sh=loadSH();sh.cash=Math.max(0,(sh.cash||0)-amount);saveSH(sh);}
-function syncBack(){const sh=loadSH();const re=loadRE();sh.rePropertyValue=re.properties.reduce((s,p)=>s+(p.currentValue||0),0);saveSH(sh);}
+function getDay(){return loadSH().day||1;}
+function deductCash(amt){const sh=loadSH();sh.cash=Math.max(0,(sh.cash||0)-amt);saveSH(sh);}
+function addCash(amt){const sh=loadSH();sh.cash=(sh.cash||0)+amt;saveSH(sh);}
+function syncBack(){
+  const sh=loadSH(),re=loadRE();
+  sh.rePropertyValue=re.properties.reduce((s,p)=>s+(p.currentValue||0),0);
+  saveSH(sh);
+}
+function reBack(){
+  syncBack();
+  if(window.parent!==window){window.parent.postMessage('closeRE','*');return false;}
+  window.location.href='index.html'; return false;
+}
 
-// ── Listing generation ────────────────────────────────
-let listings=[], filter='all';
-function sr(seed){const x=Math.sin(seed*9301+49297)*233280;return x-Math.floor(x);}
+/* ─────────────────────────────────────────────────────────────
+   DEMAND SIMULATION
+───────────────────────────────────────────────────────────── */
+function initDemand(){
+  const re=loadRE();
+  if(re.demand){areaDemand=re.demand;}
+  else{areaDemand={village:55+rand(-5,5),town:68+rand(-5,5),urban:80+rand(-5,5),megacity:92+rand(-3,3)};}
+}
+function tickDemand(){
+  const re=loadRE();
+  ['village','town','urban','megacity'].forEach(a=>{
+    const shift=rand(-2,2)+(AREAS[a].popGrowth*0.1);
+    areaDemand[a]=Math.max(20,Math.min(100,areaDemand[a]+shift));
+  });
+  re.demand=areaDemand;
+  saveRE(re);
+}
+function rand(lo,hi){return lo+(Math.random()*(hi-lo));}
 
-function genListings(seed){
-  const types=Object.keys(PT);
+/* ─────────────────────────────────────────────────────────────
+   INCOME PROCESSING (runs on load / daily)
+───────────────────────────────────────────────────────────── */
+function processIncome(){
+  const re=loadRE(); const day=getDay();
+  if(!re.properties.length){saveRE(re);return;}
+  const daysSince=Math.max(0,day-(re.lastSyncDay||day));
+  if(daysSince<=0)return;
+  let incomeTotal=0, taxTotal=0;
+  re.properties.forEach(p=>{
+    const area=AREAS[p.area];
+    const demand=areaDemand[p.area]||70;
+    const occFactor=Math.min(1,(demand/100)*1.05);
+    const dailyGross=(p.baseRentDay||0)*occFactor;
+    const dailyMaint=(p.maintenanceDay||0);
+    const dailyTax=(p.currentValue||0)*(area.taxRate/365);
+    const dailyNet=dailyGross-dailyMaint-dailyTax;
+    const earned=dailyNet*daysSince;
+    incomeTotal+=earned; taxTotal+=dailyTax*daysSince;
+    p.totalEarned=(p.totalEarned||0)+earned;
+    // Appreciation
+    const appRate=(AREAS[p.area].popGrowth*0.0001)*(demand/80);
+    p.currentValue=Math.round((p.currentValue||p.purchasePrice)*(1+appRate*daysSince));
+  });
+  re.totalEarned=(re.totalEarned||0)+incomeTotal;
+  re.totalTaxPaid=(re.totalTaxPaid||0)+taxTotal;
+  re.lastSyncDay=day;
+  if(incomeTotal>0){addCash(incomeTotal); re.pendingIncome=(re.pendingIncome||0)+incomeTotal;}
+  saveRE(re);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LISTING GENERATION
+───────────────────────────────────────────────────────────── */
+function sr(s){const x=Math.sin(s*9301+49297)*233280;return x-Math.floor(x);}
+
+function calcPrice(type,area,seed){
+  const pt=PTYPES[type], ar=AREAS[area];
+  const bases={land:30000,farm:25000,house:90000,apartment:350000,shop:200000,office:600000,factory:180000,skyscraper:3000000,mall:1500000,hotel:2000000};
+  const base=(bases[type]||100000)*ar.priceMulti;
+  return Math.round((base*(0.7+sr(seed)*0.6))/5000)*5000;
+}
+
+function genListings(){
   listings=[];
-  for(let i=0;i<18;i++){
-    const s=seed+i*137;
-    const type=types[Math.floor(sr(s)*types.length)];
-    const p=PT[type];
-    const price=Math.round((p.lo+sr(s+1)*(p.hi-p.lo))/1000)*1000;
-    const grossDay=price*p.yield/365;
-    const maintDay=grossDay*p.maint;
-    const netDay=+(grossDay*p.occ-maintDay).toFixed(2);
-    const names=NAMES[type];
-    listings.push({
-      id:'l_'+s,type,
-      name:names[Math.floor(sr(s+2)*names.length)],
-      location:NEIGH[Math.floor(sr(s+3)*NEIGH.length)],
-      price,
-      netYield:+((netDay*365/price)*100).toFixed(2),
-      grossYield:+(p.yield*100).toFixed(2),
-      netIncomeDay:netDay,
-      occupancy:Math.round(p.occ*100),
-      size:Math.round(sr(s+4)*450+60),
-      tier:Math.floor(sr(s+5)*4)+1,
-    });
-  }
+  const seed=Math.floor(Date.now()/180000);
+  let idx=0;
+  Object.keys(AREAS).forEach(area=>{
+    const types=Object.keys(PTYPES).filter(t=>PTYPES[t].areas.includes(area));
+    for(let i=0;i<6;i++){
+      const s=seed+idx*137; idx++;
+      const type=types[Math.floor(sr(s+10)*types.length)];
+      const pt=PTYPES[type];
+      const ar=AREAS[area];
+      const price=calcPrice(type,area,s);
+      const demand=areaDemand[area]||70;
+      const occFactor=Math.min(1,(demand/100)*1.05);
+      const grossDay=price*pt.yieldBase/365;
+      const maintDay=grossDay*pt.maint;
+      const netDay=+(grossDay*occFactor-maintDay).toFixed(2);
+      const hood=HOODS[area];
+      listings.push({
+        id:'l'+s, type, area,
+        name:genName(type,s),
+        location:hood[Math.floor(sr(s+3)*hood.length)],
+        price, netDay,
+        grossYield:+(pt.yieldBase*100).toFixed(2),
+        netYield:+((netDay*365/price)*100).toFixed(2),
+        occupancy:Math.round(occFactor*100),
+        size:Math.round(sr(s+4)*500+40),
+        tier:Math.floor(sr(s+5)*3)+1,
+      });
+    }
+  });
 }
 
-function refreshListings(){
-  const seed=Math.floor(Date.now()/120000);
-  genListings(seed);
-  renderListings();
+function genName(type,seed){
+  const n={
+    land:     ['Prime Corner Lot','Development Parcel','Growth Zone Plot','Greenfield Site','Corner Block','Zoned Parcel'],
+    farm:     ['Hillside Farm','Valley Farm','Sunrise Ranch','Harvest Fields','Green Pastures','Orchard Estate'],
+    house:    ['Garden Villa','Modern Townhouse','Heritage Home','Brick Rowhouse','Sunset Cottage','Urban Retreat'],
+    apartment:['Meridian Residences','Skyline Flats','The Pinnacle','City View Complex','Harbor Suites','The Grand'],
+    shop:     ['Main Street Shop','Market Strip','Corner Boutique','Retail Unit','Commercial Space','Trade Square'],
+    office:   ['Executive Tower','Commerce Plaza','Innovation House','Corporate Suite','The Exchange','Business Hub'],
+    factory:  ['Logistics Hub','Distribution Depot','Manufacturing Unit','Tech Warehouse','Industrial Park','Production Yard'],
+    skyscraper:['Apex Tower','Pinnacle One','Diamond Heights','Central Tower','Sky Landmark','Prestige Centre'],
+    mall:     ['Shopping Promenade','Mega Mall','Retail Park','The Arcade','Trade Centre','Commercial Complex'],
+    hotel:    ['Grand Hotel','City Suites','Luxury Inn','Premier Hotel','Business Hotel','Boutique Hotel'],
+  };
+  const arr=n[type]||['Property'];
+  return arr[Math.floor(sr(seed+20)*arr.length)];
 }
 
-// ── Render ────────────────────────────────────────────
-function renderListings(){
+/* ─────────────────────────────────────────────────────────────
+   RENDER MARKETPLACE
+───────────────────────────────────────────────────────────── */
+function renderMarket(){
   const cash=getCash();
-  const grid=document.getElementById('listings');
-  const list=filter==='all'?listings:listings.filter(l=>l.type===filter);
-  grid.innerHTML='';
-  if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--txt2);padding:40px 0">No listings match this filter.</div>';return;}
-  list.forEach(l=>{
-    const p=PT[l.type];
-    const canAfford=cash>=l.price;
-    const card=document.createElement('div');
-    card.className='lc';
-    card.innerHTML=`
-      <div class="lc-head">
-        <span class="lc-icon">${p.icon}</span>
-        <div class="lc-info">
-          <div class="lc-name">${l.name}</div>
-          <div class="lc-loc">📍 ${l.location}</div>
-          <span class="type-badge" style="background:${p.bg};color:#fff;border:1px solid ${p.border}">${p.label}</span>
+  const container=document.getElementById('area-grid');
+  container.innerHTML='';
+
+  // Filter controls
+  const filterBar=document.createElement('div');
+  filterBar.className='filter-bar';
+  filterBar.innerHTML=`
+    <div class="filter-group">
+      <span class="filter-lbl">Area:</span>
+      ${['all','village','town','urban','megacity'].map(a=>`<button class="fb${filterArea===a?' active':''}" data-fa="${a}">${a==='all'?'All Areas':AREAS[a].emoji+' '+AREAS[a].label}</button>`).join('')}
+    </div>
+    <div class="filter-group">
+      <span class="filter-lbl">Type:</span>
+      ${['all','land','house','apartment','shop','office','factory'].map(t=>`<button class="fb${filterType===t?' active':''}" data-ft="${t}">${t==='all'?'All Types':PTYPES[t]?.icon+' '+PTYPES[t]?.label}</button>`).join('')}
+    </div>
+  `;
+  container.appendChild(filterBar);
+
+  // Group listings by area
+  Object.keys(AREAS).forEach(area=>{
+    if(filterArea!=='all'&&filterArea!==area)return;
+    const ar=AREAS[area];
+    const demand=areaDemand[area]||70;
+    const areaListings=listings.filter(l=>l.area===area&&(filterType==='all'||l.type===filterType));
+    if(!areaListings.length)return;
+
+    const section=document.createElement('div');
+    section.className='area-section';
+    section.style.cssText=`border:1px solid ${ar.border};border-radius:14px;overflow:hidden;margin-bottom:16px;`;
+
+    const demandColor=demand>=80?'#3fb950':demand>=60?'#fbbf24':'#f85149';
+    section.innerHTML=`
+      <div class="area-header" style="background:${ar.grad};border-bottom:1px solid ${ar.border}">
+        <div class="area-header-left">
+          <span class="area-emoji">${ar.emoji}</span>
+          <div>
+            <div class="area-name" style="color:${ar.accent}">${ar.label}</div>
+            <div class="area-sub">Tax rate ${(ar.taxRate*100).toFixed(1)}%/yr · Pop growth ${ar.popGrowth}%/yr</div>
+          </div>
+        </div>
+        <div class="area-demand">
+          <div class="demand-label">Market Demand</div>
+          <div class="demand-bar-wrap"><div class="demand-bar" style="width:${demand}%;background:${demandColor}"></div></div>
+          <div class="demand-val" style="color:${demandColor}">${Math.round(demand)}%</div>
         </div>
       </div>
-      <div class="lc-stats">
-        <div class="ls"><div class="ls-lbl">Net Yield/yr</div><div class="ls-val" style="color:var(--up)">${l.netYield}%</div></div>
-        <div class="ls"><div class="ls-lbl">Income/Day</div><div class="ls-val" style="color:var(--up)">${fmtF(l.netIncomeDay)}</div></div>
-        <div class="ls"><div class="ls-lbl">Occupancy</div><div class="ls-val">${l.occupancy}%</div></div>
-        <div class="ls"><div class="ls-lbl">Size</div><div class="ls-val">${l.size} m²</div></div>
-      </div>
-      <div class="lc-foot">
-        <div class="lc-price">${fmt(l.price)}</div>
-        <button class="btn-buy" data-lid="${l.id}" ${canAfford?'':'disabled'}>${canAfford?'🏗 Purchase':'⚠ Insufficient'}</button>
-      </div>`;
-    card.querySelector('.btn-buy').addEventListener('click',()=>buyProperty(l));
-    grid.appendChild(card);
+      <div class="area-listings" id="listings-${area}"></div>
+    `;
+    container.appendChild(section);
+
+    const grid=section.querySelector(`#listings-${area}`);
+    areaListings.forEach(l=>{
+      const pt=PTYPES[l.type];
+      const canAfford=cash>=l.price;
+      const card=document.createElement('div');
+      card.className='listing-card';
+      card.innerHTML=`
+        <div class="lc-visual" style="background:${AREAS[l.area].grad};border-bottom:1px solid ${AREAS[l.area].border}">
+          <div class="lc-visual-inner">${pt.img||pt.icon}</div>
+          <span class="lc-type-badge" style="background:${AREAS[l.area].border}22;color:${ar.accent};border:1px solid ${ar.border}">${pt.label}</span>
+        </div>
+        <div class="lc-body">
+          <div class="lc-name">${l.name}</div>
+          <div class="lc-loc">📍 ${l.location} · ${l.size} m²</div>
+          <div class="lc-stats-grid">
+            <div class="lst"><div class="lst-lbl">Net Yield/yr</div><div class="lst-val green">${l.netYield}%</div></div>
+            <div class="lst"><div class="lst-lbl">Income/Day</div><div class="lst-val green">${fmtF(l.netDay)}</div></div>
+            <div class="lst"><div class="lst-lbl">Occupancy</div><div class="lst-val">${l.occupancy}%</div></div>
+            <div class="lst"><div class="lst-lbl">Tax/yr</div><div class="lst-val red">${fmtK(l.price*AREAS[l.area].taxRate)}</div></div>
+          </div>
+          <div class="lc-foot">
+            <div class="lc-price">${fmtK(l.price)}</div>
+            <button class="btn-purchase${canAfford?'':' disabled'}" data-lid="${l.id}" ${canAfford?'':'disabled'}>
+              ${canAfford?'🏗 Purchase':'⚠ Need '+fmtK(l.price-cash)+' more'}
+            </button>
+          </div>
+        </div>
+      `;
+      card.querySelector('.btn-purchase').addEventListener('click',()=>buyListing(l));
+      grid.appendChild(card);
+    });
   });
+
+  // Wire filter buttons
+  container.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>{filterArea=b.dataset.fa;renderMarket();});
+  container.querySelectorAll('[data-ft]').forEach(b=>b.onclick=()=>{filterType=b.dataset.ft;renderMarket();});
 }
 
-function renderPanel(){
-  const re=loadRE();
-  const cash=getCash();
+/* ─────────────────────────────────────────────────────────────
+   RENDER MY PROPERTIES
+───────────────────────────────────────────────────────────── */
+function renderMyProps(){
+  const re=loadRE(); const cash=getCash();
   const inv=re.properties.reduce((s,p)=>s+p.purchasePrice,0);
   const val=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice),0);
-  const inc=re.properties.reduce((s,p)=>s+(p.netIncomeDay||0),0);
-  const pnl=val-inv;
+  const netDay=re.properties.reduce((s,p)=>s+(p.netIncomeDay||0),0);
+  const taxDay=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice)*AREAS[p.area].taxRate/365,0);
 
-  document.getElementById('tb-cash').textContent=fmt(cash);
-  document.getElementById('tb-rev').textContent=fmt(val);
-  document.getElementById('tb-cnt').textContent=re.properties.length;
-  document.getElementById('tb-inc').textContent=fmt(inc)+'/day';
-  document.getElementById('ps-inv').textContent=fmt(inv);
-  document.getElementById('ps-val').textContent=fmt(val);
-  document.getElementById('ps-chg').textContent=pnl>=0?`+${fmt(pnl)} unrealised gain`:`-${fmt(Math.abs(pnl))} unrealised loss`;
-  document.getElementById('ps-chg').style.color=pnl>=0?'var(--up)':'var(--dn)';
-  document.getElementById('ps-earned').textContent=fmt(re.totalEarned||0);
-  document.getElementById('pc-badge').textContent=re.properties.length?`(${re.properties.length})`:'';
-
-  const myList=document.getElementById('my-props');
-  if(!re.properties.length){myList.innerHTML='<div class="empty">No properties owned yet.<br>Browse listings on the left<br>to start building your empire.</div>';return;}
-  myList.innerHTML='';
-  re.properties.slice().reverse().forEach(p=>{
-    const pt=PT[p.type];
-    const pct=((( p.currentValue||p.purchasePrice)-p.purchasePrice)/p.purchasePrice*100).toFixed(1);
-    const d=document.createElement('div');
-    d.className='mini-prop';
-    d.innerHTML=`<div style="display:flex;align-items:center;gap:7px;min-width:0">
-      <span style="font-size:18px">${pt.icon}</span>
-      <div style="min-width:0"><div class="mp-name">${p.name}</div><div class="mp-loc">${p.location}</div></div>
+  document.getElementById('props-summary').innerHTML=`
+    <div class="summary-strip">
+      <div class="sum-card"><div class="sum-lbl">Total Invested</div><div class="sum-val">${fmtK(inv)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Portfolio Value</div><div class="sum-val orange">${fmtK(val)}</div>
+        <div class="sum-sub ${val>=inv?'green':'red'}">${val>=inv?'+':''}${fmtK(val-inv)} (${inv>0?((val-inv)/inv*100).toFixed(1):0}%)</div>
+      </div>
+      <div class="sum-card"><div class="sum-lbl">Net Income/Day</div><div class="sum-val green">${fmtF(netDay)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Tax Cost/Day</div><div class="sum-val red">${fmtF(taxDay)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Total Earned</div><div class="sum-val green">${fmtK(re.totalEarned||0)}</div></div>
+      <div class="sum-card"><div class="sum-lbl">Tax Paid</div><div class="sum-val red">${fmtK(re.totalTaxPaid||0)}</div></div>
     </div>
-    <div class="mp-val">
-      <div style="color:var(--re)">${fmt(p.currentValue||p.purchasePrice)}</div>
-      <div style="font-size:10px;color:${parseFloat(pct)>=0?'var(--up)':'var(--dn)'}">${pct}%</div>
-    </div>`;
-    myList.appendChild(d);
+  `;
+
+  const list=document.getElementById('props-list');
+  if(!re.properties.length){
+    list.innerHTML='<div class="empty-state"><div style="font-size:48px">🏗️</div><div class="empty-title">No Properties Yet</div><div class="empty-sub">Visit the Marketplace tab to acquire your first property.</div></div>';
+    return;
+  }
+  list.innerHTML='';
+  re.properties.slice().reverse().forEach(p=>{
+    const ar=AREAS[p.area];
+    const pt=PTYPES[p.type];
+    const demand=areaDemand[p.area]||70;
+    const pnl=(p.currentValue||p.purchasePrice)-p.purchasePrice;
+    const pnlPct=(pnl/p.purchasePrice*100).toFixed(1);
+    const taxDay=(p.currentValue||p.purchasePrice)*ar.taxRate/365;
+    const card=document.createElement('div');
+    card.className='my-prop-card';
+    card.style.borderColor=ar.border;
+    card.innerHTML=`
+      <div class="mpc-header" style="background:${ar.grad}">
+        <div class="mpc-header-left">
+          <span style="font-size:28px">${pt.icon}</span>
+          <div>
+            <div class="mpc-name">${p.name}</div>
+            <div class="mpc-loc">📍 ${p.location} · <span style="color:${ar.accent}">${ar.emoji} ${ar.label}</span></div>
+          </div>
+        </div>
+        <div class="mpc-value-box">
+          <div class="mpc-value">${fmtK(p.currentValue||p.purchasePrice)}</div>
+          <div class="mpc-pnl ${pnl>=0?'green':'red'}">${pnl>=0?'▲':'▼'} ${Math.abs(pnlPct)}%</div>
+        </div>
+      </div>
+      <div class="mpc-body">
+        <div class="mpc-stats">
+          <div class="mpc-s"><div class="mpc-s-lbl">Income/Day</div><div class="mpc-s-val green">${fmtF(p.netIncomeDay||0)}</div></div>
+          <div class="mpc-s"><div class="mpc-s-lbl">Tax/Day</div><div class="mpc-s-val red">${fmtF(taxDay)}</div></div>
+          <div class="mpc-s"><div class="mpc-s-lbl">Demand</div><div class="mpc-s-val">${Math.round(demand)}%</div></div>
+          <div class="mpc-s"><div class="mpc-s-lbl">Total Earned</div><div class="mpc-s-val green">${fmtK(p.totalEarned||0)}</div></div>
+          <div class="mpc-s"><div class="mpc-s-lbl">Upgrades</div><div class="mpc-s-val">${(p.improvements||[]).length}</div></div>
+          <div class="mpc-s"><div class="mpc-s-lbl">Size</div><div class="mpc-s-val">${p.size} m²</div></div>
+        </div>
+        ${p.improvements&&p.improvements.length?`<div class="impr-tags">${p.improvements.map(i=>{const imp=IMPROVEMENTS.find(x=>x.id===i);return imp?`<span class="impr-tag">${imp.icon} ${imp.name}</span>`:''}).join('')}</div>`:''}
+        <div class="mpc-actions">
+          ${p.type==='land'?`<button class="btn-action btn-build" onclick="openBuildModal('${p.id}')">🏗️ Build</button>`:''}
+          <button class="btn-action btn-improve" onclick="openImproveModal('${p.id}')">⬆️ Improve</button>
+          <button class="btn-action btn-lease" onclick="toggleLease('${p.id}')">${p.isLeased?'📋 Leased (Edit)':'🤝 Add Lease'}</button>
+          <button class="btn-action btn-sell" onclick="sellProperty('${p.id}')">💰 Sell</button>
+        </div>
+        ${p.isLeased?`<div class="lease-info">📋 <strong>Leased:</strong> ${p.tenant||'Commercial Tenant'} · ${p.leaseType||'Long-term'} · ${fmtF(p.leaseRent||p.netIncomeDay||0)}/day guaranteed</div>`:''}
+      </div>
+    `;
+    list.appendChild(card);
   });
 }
 
-// ── Buy ───────────────────────────────────────────────
-function buyProperty(listing){
-  const cash=getCash();
-  if(cash<listing.price){toast('Insufficient cash! Trade stocks to earn more.','var(--dn)');return;}
-  if(!confirm(`Purchase "${listing.name}" for ${fmt(listing.price)}?\n\nExpected income: ${fmtF(listing.netIncomeDay)}/day`))return;
-
+/* ─────────────────────────────────────────────────────────────
+   RENDER MARKET REPORT
+───────────────────────────────────────────────────────────── */
+function renderReport(){
   const re=loadRE();
-  const p=PT[listing.type];
-  const grossDay=listing.price*p.yield/365;
-  const maintDay=grossDay*p.maint;
+  const container=document.getElementById('report-grid');
+  const events=generateMarketEvents();
+  container.innerHTML=`
+    <div class="report-section">
+      <div class="rep-title">📊 Area Demand Index</div>
+      <div class="demand-cards">
+        ${Object.keys(AREAS).map(a=>{
+          const ar=AREAS[a], d=Math.round(areaDemand[a]||70);
+          const col=d>=80?'#3fb950':d>=60?'#fbbf24':'#f85149';
+          return `<div class="demand-card" style="border-color:${ar.border}">
+            <div style="font-size:32px">${ar.emoji}</div>
+            <div class="dc-name" style="color:${ar.accent}">${ar.label}</div>
+            <div class="dc-demand" style="color:${col}">${d}%</div>
+            <div class="dc-bar-wrap"><div class="dc-bar" style="width:${d}%;background:${col}"></div></div>
+            <div class="dc-stats">
+              <div>Tax: ${(ar.taxRate*100).toFixed(1)}%/yr</div>
+              <div>Growth: +${ar.popGrowth}%/yr</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="rep-title">📰 Market Events</div>
+      <div class="events-list">
+        ${events.map(e=>`<div class="event-item ${e.type}">
+          <span class="event-icon">${e.icon}</span>
+          <div><div class="event-title">${e.title}</div><div class="event-desc">${e.desc}</div></div>
+          <span class="event-effect">${e.effect}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="report-section">
+      <div class="rep-title">💹 Price Index by Area</div>
+      <div class="price-table">
+        <div class="pt-row pt-head"><span>Area</span><span>Land</span><span>Residential</span><span>Commercial</span><span>Industrial</span></div>
+        ${Object.keys(AREAS).map(a=>{
+          const ar=AREAS[a];
+          return `<div class="pt-row" style="border-left:3px solid ${ar.border}">
+            <span style="color:${ar.accent}">${ar.emoji} ${ar.label}</span>
+            <span>${fmtK(calcPrice('land',a,100))}</span>
+            <span>${fmtK(calcPrice('house',a,200))}</span>
+            <span>${fmtK(calcPrice('shop',a,300))}</span>
+            <span>${fmtK(PTYPES.factory.areas.includes(a)?calcPrice('factory',a,400):0)||'N/A'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
 
+function generateMarketEvents(){
+  const seed=Math.floor(Date.now()/3600000);
+  const events=[
+    {type:'positive',icon:'📈',title:'Population Growth Surge',desc:'Urban areas see 15% population increase, boosting apartment demand.',effect:'+Urban Demand'},
+    {type:'positive',icon:'🏗️',title:'Infrastructure Investment',desc:'New metro line announced through Town district.',effect:'+Town Value'},
+    {type:'neutral', icon:'📋',title:'New Zoning Regulations',desc:'Mixed-use zoning approved for residential-commercial areas.',effect:'Rezoning'},
+    {type:'negative',icon:'📉',title:'Interest Rate Rise',desc:'Central bank raises rates, cooling property investment.',effect:'-Demand 3%'},
+    {type:'positive',icon:'🏢',title:'Tech Company HQ Announced',desc:'Major tech firm to build HQ in Urban district.',effect:'+Urban 8%'},
+    {type:'negative',icon:'🌧️',title:'Economic Slowdown',desc:'Village and Town areas see reduced retail spending.',effect:'-Village Occ'},
+    {type:'positive',icon:'🌟',title:'Tourism Boom',desc:'Hotel occupancy up 20% in Megacity areas.',effect:'+Megacity Inc'},
+    {type:'neutral', icon:'⚖️',title:'Property Tax Review',desc:'Government reviewing property tax rates for next fiscal year.',effect:'Tax Pending'},
+  ];
+  const r=seed%events.length;
+  return [events[r],events[(r+2)%events.length],events[(r+4)%events.length]];
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUY PROPERTY
+───────────────────────────────────────────────────────────── */
+function buyListing(l){
+  const cash=getCash();
+  if(cash<l.price){toast('Insufficient cash — earn more from stock trading!','#f85149');return;}
+  playSound('buy');
+  const ar=AREAS[l.area], pt=PTYPES[l.type];
+  const demand=areaDemand[l.area]||70;
+  const occFactor=Math.min(1,(demand/100)*1.05);
+  const grossDay=l.price*pt.yieldBase/365;
+  const maintDay=grossDay*pt.maint;
+  const netDay=+(grossDay*occFactor-maintDay).toFixed(4);
+  const re=loadRE();
   re.properties.push({
-    id:'prop_'+Date.now()+'_'+Math.floor(Math.random()*9999),
-    type:listing.type,
-    name:listing.name,
-    location:listing.location,
-    purchasePrice:listing.price,
-    currentValue:listing.price,
-    baseRentDay:+(grossDay*listing.occupancy/100).toFixed(4),
+    id:'p'+Date.now()+Math.floor(Math.random()*9999),
+    type:l.type, area:l.area,
+    name:l.name, location:l.location,
+    purchasePrice:l.price, currentValue:l.price,
+    baseRentDay:+(grossDay*l.occupancy/100).toFixed(4),
     maintenanceDay:+maintDay.toFixed(4),
-    netIncomeDay:listing.netIncomeDay,
-    occupancy:listing.occupancy,
-    size:listing.size,
-    upgrades:[],
+    netIncomeDay:netDay,
+    occupancy:l.occupancy, size:l.size,
+    improvements:[],
+    isLeased:false, tenant:null,
+    totalEarned:0,
     boughtDay:getDay(),
-    boughtAt:Date.now(),
   });
-  re.pendingDebits=(re.pendingDebits||0)+listing.price;
-  saveRE(re);
-  deductCash(listing.price);
-  renderListings();
-  renderPanel();
-  toast(`Purchased ${listing.name}!`,'var(--up)');
+  re.pendingDebits=(re.pendingDebits||0)+l.price;
+  saveRE(re); deductCash(l.price);
+  updateTopBar(); renderListings(); renderMarket();
+  toast(`✅ ${l.name} purchased for ${fmtK(l.price)}!`,'#238636');
+  setTimeout(()=>switchTab('myprops'),600);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   BUILD ON LAND
+───────────────────────────────────────────────────────────── */
+function openBuildModal(propId){
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  const ar=AREAS[p.area], options=BUILD_OPTIONS[p.area]||[];
+  const cash=getCash();
+  document.getElementById('build-modal-body').innerHTML=`
+    <div class="modal-header" style="background:${ar.grad}">
+      <div class="modal-title">🏗️ Build on ${p.name}</div>
+      <div class="modal-sub">${ar.emoji} ${ar.label} · ${p.location}</div>
+      <button class="modal-close" onclick="closeModal('build-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="build-options">
+        ${options.map(opt=>{
+          const pt=PTYPES[opt.type];
+          const buildCost=Math.round(p.currentValue*opt.baseM);
+          const newValue=Math.round(p.currentValue*(1+opt.baseM*0.4));
+          const canAfford=cash>=buildCost;
+          return `<div class="build-option ${canAfford?'':'unaffordable'}">
+            <div class="bo-icon">${pt.icon}</div>
+            <div class="bo-info">
+              <div class="bo-name">${opt.label}</div>
+              <div class="bo-desc">${pt.label}</div>
+              <div class="bo-val">Value after: ${fmtK(newValue)} · +${fmtK(newValue-p.currentValue)}</div>
+            </div>
+            <button class="btn-build-opt" onclick="buildOn('${propId}','${opt.type}',${buildCost},${newValue})" ${canAfford?'':'disabled'}>
+              ${canAfford?'Build '+fmtK(buildCost):'Need '+fmtK(buildCost)}
+            </button>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById('build-modal').classList.remove('hidden');
+}
+
+function buildOn(propId,type,cost,newValue){
+  const cash=getCash();
+  if(cash<cost){toast('Insufficient cash','#f85149');return;}
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  const pt=PTYPES[type], ar=AREAS[p.area];
+  const demand=areaDemand[p.area]||70;
+  const occFactor=Math.min(1,(demand/100)*1.05);
+  const grossDay=newValue*pt.yieldBase/365;
+  const maintDay=grossDay*pt.maint;
+  p.type=type; p.currentValue=newValue;
+  p.baseRentDay=+(grossDay*occFactor).toFixed(4);
+  p.maintenanceDay=+maintDay.toFixed(4);
+  p.netIncomeDay=+(grossDay*occFactor-maintDay).toFixed(4);
+  p.buildingCost=(p.buildingCost||0)+cost;
+  saveRE(re); deductCash(cost);
+  closeModal('build-modal'); renderMyProps(); updateTopBar();
+  playSound('build');
+  toast(`🏗️ ${PTYPES[type].label} built! Property value increased to ${fmtK(newValue)}`,'#1f6feb');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   IMPROVEMENTS
+───────────────────────────────────────────────────────────── */
+function openImproveModal(propId){
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  const ar=AREAS[p.area]; const cash=getCash();
+  const owned=p.improvements||[];
+  const available=IMPROVEMENTS.filter(i=>i.area.includes(p.area)&&!owned.includes(i.id));
+  document.getElementById('prop-modal-body').innerHTML=`
+    <div class="modal-header" style="background:${ar.grad}">
+      <div class="modal-title">⬆️ Improve: ${p.name}</div>
+      <div class="modal-sub">Current value: ${fmtK(p.currentValue||p.purchasePrice)}</div>
+      <button class="modal-close" onclick="closeModal('prop-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      ${owned.length?`<div class="owned-imprs"><div class="oi-title">Installed Improvements</div><div class="oi-tags">${owned.map(id=>{const i=IMPROVEMENTS.find(x=>x.id===id);return i?`<span class="oi-tag">${i.icon} ${i.name}</span>`:''}).join('')}</div></div>`:''}
+      <div class="improve-grid">
+        ${available.length?available.map(imp=>{
+          const canAfford=cash>=imp.cost;
+          const valInc=Math.round((p.currentValue||p.purchasePrice)*imp.valuePct);
+          const incInc=((p.netIncomeDay||0)*imp.incPct);
+          return `<div class="imp-card ${canAfford?'':'unaffordable'}">
+            <div class="imp-icon">${imp.icon}</div>
+            <div class="imp-name">${imp.name}</div>
+            <div class="imp-effect">+${(imp.valuePct*100).toFixed(0)}% value · +${(imp.incPct*100).toFixed(0)}% income</div>
+            <div class="imp-nums">+${fmtK(valInc)} value · +${fmtF(incInc)}/day</div>
+            <button class="btn-impr" onclick="addImprovement('${propId}','${imp.id}')" ${canAfford?'':'disabled'}>
+              ${canAfford?fmtK(imp.cost):'Need '+fmtK(imp.cost)}
+            </button>
+          </div>`;
+        }).join(''):`<div class="empty-state" style="padding:24px">All improvements installed! 🎉</div>`}
+      </div>
+    </div>
+  `;
+  document.getElementById('prop-modal').classList.remove('hidden');
+}
+
+function addImprovement(propId,impId){
+  const cash=getCash(); const imp=IMPROVEMENTS.find(i=>i.id===impId); if(!imp)return;
+  if(cash<imp.cost){toast('Insufficient cash','#f85149');return;}
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  if(!p.improvements)p.improvements=[];
+  p.improvements.push(impId);
+  p.currentValue=Math.round((p.currentValue||p.purchasePrice)*(1+imp.valuePct));
+  p.netIncomeDay=+(((p.netIncomeDay||0)*(1+imp.incPct))).toFixed(4);
+  saveRE(re); deductCash(imp.cost);
+  closeModal('prop-modal');
+  openImproveModal(propId); // reopen updated
+  renderMyProps(); updateTopBar();
+  playSound('improve');
+  toast(`${imp.icon} ${imp.name} added! Property value +${(imp.valuePct*100).toFixed(0)}%`,'#1f6feb');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LEASE
+───────────────────────────────────────────────────────────── */
+function toggleLease(propId){
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  const tenants=['Blue Chip Corp','Metro Retail Ltd','TechSpace Inc','National Logistics','Urban Living Co','Prime Holdings'];
+  const leaseTypes=['Long-term (3yr)','Medium-term (1yr)','Short-term (6mo)'];
+  if(!p.isLeased){
+    p.isLeased=true;
+    p.tenant=tenants[Math.floor(Math.random()*tenants.length)];
+    p.leaseType=leaseTypes[Math.floor(Math.random()*leaseTypes.length)];
+    p.leaseRent=+((p.netIncomeDay||0)*1.05).toFixed(4);
+    toast(`🤝 Lease signed with ${p.tenant}!`,'#238636');
+  } else {
+    p.isLeased=false; p.tenant=null; p.leaseRent=0;
+    toast('📋 Lease terminated','#f85149');
+  }
+  saveRE(re); renderMyProps();
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SELL PROPERTY
+───────────────────────────────────────────────────────────── */
+function sellProperty(propId){
+  const re=loadRE();
+  const p=re.properties.find(x=>x.id===propId); if(!p)return;
+  const salePrice=p.currentValue||p.purchasePrice;
+  const gain=salePrice-p.purchasePrice;
+  const tax=gain>0?Math.round(gain*0.20):0;
+  const proceeds=salePrice-tax;
+  if(!confirm(`Sell ${p.name} for ${fmtK(salePrice)}?\n\nCapital gain: ${fmtK(gain)}\nCGT (20%): ${fmtK(tax)}\nNet proceeds: ${fmtK(proceeds)}`))return;
+  re.properties=re.properties.filter(x=>x.id!==propId);
+  saveRE(re); addCash(proceeds);
+  renderMyProps(); updateTopBar();
+  playSound('sell');
+  toast(`💰 Sold for ${fmtK(salePrice)} · Net ${fmtK(proceeds)} after ${fmtK(tax)} CGT`,'#1f6feb');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOP BAR
+───────────────────────────────────────────────────────────── */
+function updateTopBar(){
+  const re=loadRE(), cash=getCash();
+  const val=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice),0);
+  const netDay=re.properties.reduce((s,p)=>s+(p.netIncomeDay||0),0);
+  const taxDay=re.properties.reduce((s,p)=>s+(p.currentValue||p.purchasePrice)*AREAS[p.area].taxRate/365,0);
+  document.getElementById('tb-cash').textContent=fmtK(cash);
+  document.getElementById('tb-rev').textContent=fmtK(val);
+  document.getElementById('tb-cnt').textContent=re.properties.length;
+  document.getElementById('tb-inc').textContent=fmtF(netDay)+'/day';
+  document.getElementById('tb-tax').textContent=fmtF(taxDay)+'/day';
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TAB SWITCHING
+───────────────────────────────────────────────────────────── */
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));
+  if(tab==='market')renderMarket();
+  else if(tab==='myprops'){processIncome();renderMyProps();}
+  else if(tab==='report')renderReport();
+}
+document.querySelectorAll('.nav-tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+
+/* ─────────────────────────────────────────────────────────────
+   MODALS
+───────────────────────────────────────────────────────────── */
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.onclick=e=>{if(e.target===o)o.classList.add('hidden');});
+
+/* ─────────────────────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────────────────────── */
 function toast(msg,col){
-  col=col||'var(--up)';
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.background=col.includes('#')?col:'#238636';
-  t.style.color='#fff';t.style.opacity='1';
-  setTimeout(()=>t.style.opacity='0',2800);
+  t.textContent=msg; t.style.background=col||'#238636';
+  t.style.color='#fff'; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ── Events ────────────────────────────────────────────
-document.getElementById('filter-bar').addEventListener('click',e=>{
-  const b=e.target.closest('.fb');if(!b)return;
-  filter=b.dataset.type;
-  document.querySelectorAll('.fb').forEach(x=>x.classList.toggle('active',x===b));
-  renderListings();
-});
-document.getElementById('btn-refresh').addEventListener('click',refreshListings);
+/* ─────────────────────────────────────────────────────────────
+   SOUNDS (Web Audio API)
+───────────────────────────────────────────────────────────── */
+let _ac=null;
+function getAC(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
+function playSound(type){
+  try{
+    const ac=getAC();
+    if(type==='buy'){
+      [[440,.1],[550,.18],[660,.28]].forEach(([f,t])=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);o.type='triangle';o.frequency.value=f;
+        const st=ac.currentTime+t;
+        g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.18,st+.02);g.gain.exponentialRampToValueAtTime(.001,st+.35);
+        o.start(st);o.stop(st+.4);
+      });
+    } else if(type==='build'){
+      [220,330,440,330,440,550].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);o.type='square';o.frequency.value=f;
+        const st=ac.currentTime+i*.08;
+        g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.10,st+.01);g.gain.exponentialRampToValueAtTime(.001,st+.2);
+        o.start(st);o.stop(st+.2);
+      });
+    } else if(type==='improve'){
+      [523,659,784,1047].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);o.type='triangle';o.frequency.value=f;
+        const st=ac.currentTime+i*.12;
+        g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.15,st+.02);g.gain.exponentialRampToValueAtTime(.001,st+.5);
+        o.start(st);o.stop(st+.5);
+      });
+    } else if(type==='sell'){
+      [660,550,440].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);o.type='sawtooth';o.frequency.value=f;
+        const st=ac.currentTime+i*.1;
+        g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.12,st+.01);g.gain.exponentialRampToValueAtTime(.001,st+.3);
+        o.start(st);o.stop(st+.3);
+      });
+    }
+  }catch(e){}
+}
 
-// ── Init ──────────────────────────────────────────────
-refreshListings();
-renderPanel();
-setInterval(()=>{renderPanel();renderListings();},4000);
+/* ─────────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────────── */
+initDemand();
+processIncome();
+genListings();
+updateTopBar();
+renderMarket();
+// Refresh demand and listings every 2 min
+setInterval(()=>{tickDemand();genListings();if(currentTab==='market')renderMarket();if(currentTab==='report')renderReport();updateTopBar();},120000);
+// Process income every 30s
+setInterval(()=>{processIncome();updateTopBar();if(currentTab==='myprops')renderMyProps();},30000);
 </script>
 </body>
 </html>
