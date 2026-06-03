@@ -8937,6 +8937,8 @@ function startGame(name,diffLevel){
     playerName=name.trim()||'Trader';
     set('player-name-display',playerName);
     document.getElementById('name-overlay').classList.add('hidden');
+    document.getElementById('gameover-overlay').classList.add('hidden');
+    state.gameOver=false;
 
     // Apply difficulty
     const diff=DIFFICULTY_LEVELS[diffLevel]||DIFFICULTY_LEVELS[2];
@@ -9094,7 +9096,10 @@ function continueGame(){
     state.startCash=sv.startCash||sv.cash; state.difficulty=sv.difficulty||2;
     set('player-name-display',playerName);
     document.getElementById('name-overlay').classList.add('hidden');
-    renderHUD(); renderPlayersBar(); render();
+    document.getElementById('gameover-overlay').classList.add('hidden');
+    state.gameOver=false;
+    clearTimeout(tickTimer);
+    renderHUD(); renderPlayersBar(); render(); tick();
     addLog('Welcome back '+playerName+'! Day '+state.day+' resumed.','buy');
   },280);
 }
