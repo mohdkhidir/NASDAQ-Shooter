@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASDAQ Stock Trader — Mind Map</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  h1 {
+    text-align: center;
+    padding: 28px 20px 8px;
+    font-size: 22px;
+    color: #58a6ff;
+    letter-spacing: .04em;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #8b949e;
+    margin-bottom: 32px;
+  }
+
+  .canvas-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0 20px 60px;
+  }
+
+  svg {
+    max-width: 1400px;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* tooltip */
+  #tip {
+    position: fixed;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 8px 13px;
+    font-size: 12px;
+    color: #e6edf3;
+    pointer-events: none;
+    display: none;
+    max-width: 220px;
+    line-height: 1.5;
+    z-index: 999;
+    box-shadow: 0 4px 16px #0008;
+  }
+</style>
+</head>
+<body>
+
+<h1>🧠 NASDAQ Stock Trader — Mind Map</h1>
+<p class="subtitle">Hover a node for details</p>
+
+<div class="canvas-wrap">
+<svg id="mm" viewBox="0 0 1400 1200" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#30363d"/>
+  </marker>
+  <!-- glow filters -->
+  <filter id="glow-blue" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glow-green" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<!-- ============================================================
+     EDGES  (drawn first so nodes paint on top)
+     ============================================================ -->
+
+<!-- Core → branches -->
+<line x1="700" y1="600" x2="700" y2="120" stroke="#58a6ff44" stroke-width="2"/>
+<line x1="700" y1="600" x2="200" y2="200" stroke="#3fb95044" stroke-width="2"/>
+<line x1="700" y1="600" x2="1200" y2="200" stroke="#f8514944" stroke-width="2"/>
+<line x1="700" y1="600" x2="200" y2="600" stroke="#ffd70044" stroke-width="2"/>
+<line x1="700" y1="600" x2="1200" y2="600" stroke="#d2a8ff44" stroke-width="2"/>
+<line x1="700" y1="600" x2="200" y2="1000" stroke="#f0883e44" stroke-width="2"/>
+<line x1="700" y1="600" x2="1200" y2="1000" stroke="#58a6ff44" stroke-width="2"/>
+<line x1="700" y1="600" x2="700" y2="1090" stroke="#3fb95044" stroke-width="2"/>
+
+<!-- TRADING branch children -->
+<line x1="700" y1="120" x2="560" y2="35" stroke="#58a6ff33" stroke-width="1.5"/>
+<line x1="700" y1="120" x2="700" y2="30" stroke="#58a6ff33" stroke-width="1.5"/>
+<line x1="700" y1="120" x2="840" y2="35" stroke="#58a6ff33" stroke-width="1.5"/>
+
+<!-- PORTFOLIO branch children -->
+<line x1="200" y1="200" x2="90" y2="110" stroke="#3fb95033" stroke-width="1.5"/>
+<line x1="200" y1="200" x2="60" y2="200" stroke="#3fb95033" stroke-width="1.5"/>
+<line x1="200" y1="200" x2="85" y2="300" stroke="#3fb95033" stroke-width="1.5"/>
+
+<!-- CHART branch children -->
+<line x1="1200" y1="200" x2="1310" y2="110" stroke="#f8514933" stroke-width="1.5"/>
+<line x1="1200" y1="200" x2="1340" y2="200" stroke="#f8514933" stroke-width="1.5"/>
+<line x1="1200" y1="200" x2="1315" y2="300" stroke="#f8514933" stroke-width="1.5"/>
+
+<!-- BANKING branch children -->
+<line x1="200" y1="600" x2="60" y2="500" stroke="#ffd70033" stroke-width="1.5"/>
+<line x1="200" y1="600" x2="40" y2="600" stroke="#ffd70033" stroke-width="1.5"/>
+<line x1="200" y1="600" x2="60" y2="700" stroke="#ffd70033" stroke-width="1.5"/>
+
+<!-- NEWS branch children -->
+<line x1="1200" y1="600" x2="1340" y2="500" stroke="#d2a8ff33" stroke-width="1.5"/>
+<line x1="1200" y1="600" x2="1360" y2="600" stroke="#d2a8ff33" stroke-width="1.5"/>
+<line x1="1200" y1="600" x2="1340" y2="700" stroke="#d2a8ff33" stroke-width="1.5"/>
+
+<!-- REAL ESTATE branch children -->
+<line x1="200" y1="1000" x2="60" y2="910" stroke="#f0883e33" stroke-width="1.5"/>
+<line x1="200" y1="1000" x2="40" y2="1000" stroke="#f0883e33" stroke-width="1.5"/>
+<line x1="200" y1="1000" x2="60" y2="1090" stroke="#f0883e33" stroke-width="1.5"/>
+
+<!-- ACHIEVEMENTS branch children -->
+<line x1="1200" y1="1000" x2="1320" y2="910" stroke="#58a6ff33" stroke-width="1.5"/>
+<line x1="1200" y1="1000" x2="1360" y2="1000" stroke="#58a6ff33" stroke-width="1.5"/>
+<line x1="1200" y1="1000" x2="1325" y2="1095" stroke="#58a6ff33" stroke-width="1.5"/>
+
+<!-- GAME MECHANICS branch children -->
+<line x1="700" y1="1090" x2="560" y2="1165" stroke="#3fb95033" stroke-width="1.5"/>
+<line x1="700" y1="1090" x2="700" y2="1175" stroke="#3fb95033" stroke-width="1.5"/>
+<line x1="700" y1="1090" x2="840" y2="1165" stroke="#3fb95033" stroke-width="1.5"/>
+
+
+<!-- ============================================================
+     CORE NODE
+     ============================================================ -->
+<g class="node" data-tip="NASDAQ Stock Trader — start with $10,000, grow your portfolio, compete on the leaderboard.">
+  <circle cx="700" cy="600" r="68" fill="#1f6feb" stroke="#58a6ff" stroke-width="2.5" filter="url(#glow-blue)"/>
+  <text x="700" y="593" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">📈 NASDAQ</text>
+  <text x="700" y="613" text-anchor="middle" font-size="13" fill="#cde" font-weight="600">Stock Trader</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 1 — TRADING  (top-center, blue)
+     ============================================================ -->
+<g class="node" data-tip="Core trading loop: search 300+ NASDAQ stocks &amp; ETFs, place buy/sell orders, view live charts.">
+  <ellipse cx="700" cy="120" rx="90" ry="36" fill="#0f3460" stroke="#58a6ff" stroke-width="2"/>
+  <text x="700" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#58a6ff">💹 Trading</text>
+  <text x="700" y="132" text-anchor="middle" font-size="10" fill="#8b949e">Buy / Sell Orders</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Search 300+ tickers, filter by sector, ETF or stock type.">
+  <rect x="468" y="12" width="164" height="42" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="550" y="30" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">🔍 Stock Search</text>
+  <text x="550" y="46" text-anchor="middle" font-size="9.5" fill="#8b949e">300+ tickers · Sectors · ETFs</text>
+</g>
+<g class="node" data-tip="Set quantity, see cost preview, execute BUY or SELL instantly.">
+  <rect x="618" y="6" width="164" height="42" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="700" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">🛒 Order Form</text>
+  <text x="700" y="40" text-anchor="middle" font-size="9.5" fill="#8b949e">Quantity · Cost preview · Execute</text>
+</g>
+<g class="node" data-tip="Simulation speed: 1×, 2×, 5×, 10×, 25×. Controls how fast time ticks.">
+  <rect x="758" y="12" width="164" height="42" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="840" y="30" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">⚡ Speed Control</text>
+  <text x="840" y="46" text-anchor="middle" font-size="9.5" fill="#8b949e">1× 2× 5× 10× 25×</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 2 — PORTFOLIO  (top-left, green)
+     ============================================================ -->
+<g class="node" data-tip="Track your holdings, P&amp;L, best/worst trades, win-rate, and net worth history.">
+  <ellipse cx="200" cy="200" rx="90" ry="36" fill="#0f3020" stroke="#3fb950" stroke-width="2"/>
+  <text x="200" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#3fb950">📊 Portfolio</text>
+  <text x="200" y="212" text-anchor="middle" font-size="10" fill="#8b949e">Dashboard · Holdings</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Live positions table: ticker, shares, cost basis, current price, unrealised P&amp;L.">
+  <rect x="10" y="82" width="160" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="90" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">🗃 Positions</text>
+  <text x="90" y="116" text-anchor="middle" font-size="9.5" fill="#8b949e">Holdings · Cost basis</text>
+  <text x="90" y="128" text-anchor="middle" font-size="9.5" fill="#8b949e">Unrealised P&amp;L</text>
+</g>
+<g class="node" data-tip="Net worth history chart. Tracks daily portfolio value over the simulation.">
+  <rect x="0" y="168" width="120" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="60" y="187" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">📈 NW History</text>
+  <text x="60" y="202" text-anchor="middle" font-size="9.5" fill="#8b949e">Daily net worth</text>
+  <text x="60" y="215" text-anchor="middle" font-size="9.5" fill="#8b949e">chart &amp; stats</text>
+</g>
+<g class="node" data-tip="Best trade, worst trade, total win/loss count, streak, win-rate %.">
+  <rect x="8" y="272" width="154" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="85" y="291" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">🏅 Trade Stats</text>
+  <text x="85" y="306" text-anchor="middle" font-size="9.5" fill="#8b949e">Best · Worst · Streak</text>
+  <text x="85" y="318" text-anchor="middle" font-size="9.5" fill="#8b949e">Win rate %</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 3 — CHART / ANALYSIS  (top-right, red)
+     ============================================================ -->
+<g class="node" data-tip="Interactive price chart with multiple timeframes, chart types, and technical indicators.">
+  <ellipse cx="1200" cy="200" rx="96" ry="36" fill="#3a1020" stroke="#f85149" stroke-width="2"/>
+  <text x="1200" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="#f85149">📉 Chart &amp; Analysis</text>
+  <text x="1200" y="212" text-anchor="middle" font-size="10" fill="#8b949e">Candle · Line · Indicators</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Timeframes: 5m, 15m, 1h, 4h, 1D. Chart types: Candlestick or Line.">
+  <rect x="1230" y="78" width="160" height="52" rx="8" fill="#161b22" stroke="#f8514988" stroke-width="1.5"/>
+  <text x="1310" y="97" text-anchor="middle" font-size="11" font-weight="700" fill="#f85149">⏱ Timeframes</text>
+  <text x="1310" y="112" text-anchor="middle" font-size="9.5" fill="#8b949e">5m · 15m · 1h · 4h · 1D</text>
+  <text x="1310" y="124" text-anchor="middle" font-size="9.5" fill="#8b949e">Candle or Line view</text>
+</g>
+<g class="node" data-tip="Indicators: MA20, MA50, EMA20/50/100, Bollinger Bands, Ichimoku, RSI, MACD, Volume.">
+  <rect x="1260" y="168" width="160" height="52" rx="8" fill="#161b22" stroke="#f8514988" stroke-width="1.5"/>
+  <text x="1340" y="187" text-anchor="middle" font-size="11" font-weight="700" fill="#f85149">📐 Indicators</text>
+  <text x="1340" y="202" text-anchor="middle" font-size="9.5" fill="#8b949e">MA · EMA · BB · Ichimoku</text>
+  <text x="1340" y="215" text-anchor="middle" font-size="9.5" fill="#8b949e">RSI · MACD · Volume</text>
+</g>
+<g class="node" data-tip="Company fundamentals panel: P/E, EPS, market cap, 52w range, sector, description.">
+  <rect x="1238" y="272" width="154" height="52" rx="8" fill="#161b22" stroke="#f8514988" stroke-width="1.5"/>
+  <text x="1315" y="291" text-anchor="middle" font-size="11" font-weight="700" fill="#f85149">🏢 Fundamentals</text>
+  <text x="1315" y="306" text-anchor="middle" font-size="9.5" fill="#8b949e">P/E · EPS · Market Cap</text>
+  <text x="1315" y="318" text-anchor="middle" font-size="9.5" fill="#8b949e">52w range · Sector</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 4 — BANKING  (left, gold)
+     ============================================================ -->
+<g class="node" data-tip="In-game bank: take loans, open savings accounts, earn interest, manage OPR rate.">
+  <ellipse cx="200" cy="600" rx="90" ry="36" fill="#332800" stroke="#ffd700" stroke-width="2"/>
+  <text x="200" y="596" text-anchor="middle" font-size="13" font-weight="700" fill="#ffd700">🏦 Banking</text>
+  <text x="200" y="612" text-anchor="middle" font-size="10" fill="#8b949e">Loans · Savings · OPR</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Borrow money at interest to leverage your positions. Repay anytime.">
+  <rect x="0" y="468" width="120" height="52" rx="8" fill="#161b22" stroke="#ffd70088" stroke-width="1.5"/>
+  <text x="60" y="487" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd700">💳 Loans</text>
+  <text x="60" y="502" text-anchor="middle" font-size="9.5" fill="#8b949e">Borrow · Leverage</text>
+  <text x="60" y="515" text-anchor="middle" font-size="9.5" fill="#8b949e">Repay anytime</text>
+</g>
+<g class="node" data-tip="Park idle cash in savings for daily interest. Rate tied to OPR.">
+  <rect x="0" y="568" width="120" height="52" rx="8" fill="#161b22" stroke="#ffd70088" stroke-width="1.5"/>
+  <text x="60" y="587" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd700">💰 Savings</text>
+  <text x="60" y="602" text-anchor="middle" font-size="9.5" fill="#8b949e">Daily interest</text>
+  <text x="60" y="615" text-anchor="middle" font-size="9.5" fill="#8b949e">Tied to OPR</text>
+</g>
+<g class="node" data-tip="Official Policy Rate. Fluctuates during simulation, affecting loan costs and savings yield.">
+  <rect x="0" y="668" width="120" height="52" rx="8" fill="#161b22" stroke="#ffd70088" stroke-width="1.5"/>
+  <text x="60" y="687" text-anchor="middle" font-size="11" font-weight="700" fill="#ffd700">📊 OPR</text>
+  <text x="60" y="702" text-anchor="middle" font-size="9.5" fill="#8b949e">Policy rate</text>
+  <text x="60" y="715" text-anchor="middle" font-size="9.5" fill="#8b949e">Dynamic · Simulated</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 5 — NEWS  (right, purple)
+     ============================================================ -->
+<g class="node" data-tip="Live news feed: events affect stock prices. Breaking news, Fed announcements, earnings.">
+  <ellipse cx="1200" cy="600" rx="90" ry="36" fill="#1a1030" stroke="#d2a8ff" stroke-width="2"/>
+  <text x="1200" y="596" text-anchor="middle" font-size="13" font-weight="700" fill="#d2a8ff">📰 News Feed</text>
+  <text x="1200" y="612" text-anchor="middle" font-size="10" fill="#8b949e">Events · Market Impact</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Scrolling ticker at top. Breaking: War, disaster, politics, Fed, earnings.">
+  <rect x="1268" y="468" width="160" height="52" rx="8" fill="#161b22" stroke="#d2a8ff88" stroke-width="1.5"/>
+  <text x="1348" y="487" text-anchor="middle" font-size="11" font-weight="700" fill="#d2a8ff">📡 Breaking News</text>
+  <text x="1348" y="502" text-anchor="middle" font-size="9.5" fill="#8b949e">War · Fed · Earnings</text>
+  <text x="1348" y="515" text-anchor="middle" font-size="9.5" fill="#8b949e">Politics · Disasters</text>
+</g>
+<g class="node" data-tip="Filter news by sentiment (positive/negative/neutral) or by category.">
+  <rect x="1280" y="568" width="160" height="52" rx="8" fill="#161b22" stroke="#d2a8ff88" stroke-width="1.5"/>
+  <text x="1360" y="587" text-anchor="middle" font-size="11" font-weight="700" fill="#d2a8ff">🔎 News Filter</text>
+  <text x="1360" y="602" text-anchor="middle" font-size="9.5" fill="#8b949e">Pos · Neg · Neutral</text>
+  <text x="1360" y="615" text-anchor="middle" font-size="9.5" fill="#8b949e">Category filter</text>
+</g>
+<g class="node" data-tip="Each news event has a stock impact: price moves up/down. Unread badge count shown.">
+  <rect x="1268" y="668" width="160" height="52" rx="8" fill="#161b22" stroke="#d2a8ff88" stroke-width="1.5"/>
+  <text x="1348" y="687" text-anchor="middle" font-size="11" font-weight="700" fill="#d2a8ff">💥 Price Impact</text>
+  <text x="1348" y="702" text-anchor="middle" font-size="9.5" fill="#8b949e">Stock moves on events</text>
+  <text x="1348" y="715" text-anchor="middle" font-size="9.5" fill="#8b949e">Unread badge count</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 6 — REAL ESTATE  (bottom-left, orange)
+     ============================================================ -->
+<g class="node" data-tip="Side module: buy land &amp; buildings, collect rent, manage facilities. Runs while game ticks.">
+  <ellipse cx="200" cy="1000" rx="96" ry="36" fill="#2a1400" stroke="#f0883e" stroke-width="2"/>
+  <text x="200" y="996" text-anchor="middle" font-size="13" font-weight="700" fill="#f0883e">🏢 Real Estate</text>
+  <text x="200" y="1012" text-anchor="middle" font-size="10" fill="#8b949e">Land · Buildings · Rent</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Purchase land plots at varying prices. Location affects building value.">
+  <rect x="0" y="878" width="120" height="52" rx="8" fill="#161b22" stroke="#f0883e88" stroke-width="1.5"/>
+  <text x="60" y="897" text-anchor="middle" font-size="11" font-weight="700" fill="#f0883e">🌍 Land</text>
+  <text x="60" y="912" text-anchor="middle" font-size="9.5" fill="#8b949e">Buy plots</text>
+  <text x="60" y="925" text-anchor="middle" font-size="9.5" fill="#8b949e">Location value</text>
+</g>
+<g class="node" data-tip="Construct office, retail, residential buildings. Each generates passive rent income.">
+  <rect x="0" y="968" width="120" height="52" rx="8" fill="#161b22" stroke="#f0883e88" stroke-width="1.5"/>
+  <text x="60" y="987" text-anchor="middle" font-size="11" font-weight="700" fill="#f0883e">🏗 Buildings</text>
+  <text x="60" y="1002" text-anchor="middle" font-size="9.5" fill="#8b949e">Office · Retail</text>
+  <text x="60" y="1015" text-anchor="middle" font-size="9.5" fill="#8b949e">Residential · Rent</text>
+</g>
+<g class="node" data-tip="Upgrade facilities: HVAC, security, gym. Boosts rent &amp; property value.">
+  <rect x="0" y="1058" width="120" height="52" rx="8" fill="#161b22" stroke="#f0883e88" stroke-width="1.5"/>
+  <text x="60" y="1077" text-anchor="middle" font-size="11" font-weight="700" fill="#f0883e">⚙ Facilities</text>
+  <text x="60" y="1092" text-anchor="middle" font-size="9.5" fill="#8b949e">HVAC · Security</text>
+  <text x="60" y="1105" text-anchor="middle" font-size="9.5" fill="#8b949e">Upgrades · Value</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 7 — ACHIEVEMENTS  (bottom-right, blue)
+     ============================================================ -->
+<g class="node" data-tip="15 achievements tracking milestones: trades, profit, net worth, streaks, moon shots.">
+  <ellipse cx="1200" cy="1000" rx="96" ry="36" fill="#0a1828" stroke="#58a6ff" stroke-width="2"/>
+  <text x="1200" y="996" text-anchor="middle" font-size="13" font-weight="700" fill="#58a6ff">🏆 Achievements</text>
+  <text x="1200" y="1012" text-anchor="middle" font-size="10" fill="#8b949e">15 badges · Milestones</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="Net worth goals: In the Green ($10.5k), Bull ($15k), Whale ($25k), King ($50k), Legendary ($100k).">
+  <rect x="1240" y="878" width="160" height="52" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="1320" y="897" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">💰 Wealth Goals</text>
+  <text x="1320" y="912" text-anchor="middle" font-size="9.5" fill="#8b949e">$15k · $25k · $50k</text>
+  <text x="1320" y="925" text-anchor="middle" font-size="9.5" fill="#8b949e">$100k Legendary</text>
+</g>
+<g class="node" data-tip="Trading badges: First Trade, Speed Trader (20 trades), High Roller ($5k+ single), Hot Streak (3 wins).">
+  <rect x="1280" y="968" width="160" height="52" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="1360" y="987" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">⚡ Trader Badges</text>
+  <text x="1360" y="1002" text-anchor="middle" font-size="9.5" fill="#8b949e">First · Speed · High Roller</text>
+  <text x="1360" y="1015" text-anchor="middle" font-size="9.5" fill="#8b949e">Hot Streak · Moon Shot</text>
+</g>
+<g class="node" data-tip="Diversity: hold 5+ stocks. Diamond Hands: hold 10+. Century: reach Day 100.">
+  <rect x="1245" y="1058" width="160" height="52" rx="8" fill="#161b22" stroke="#58a6ff88" stroke-width="1.5"/>
+  <text x="1325" y="1077" text-anchor="middle" font-size="11" font-weight="700" fill="#58a6ff">📊 Diversity / Time</text>
+  <text x="1325" y="1092" text-anchor="middle" font-size="9.5" fill="#8b949e">5+ stocks · 10+ stocks</text>
+  <text x="1325" y="1105" text-anchor="middle" font-size="9.5" fill="#8b949e">Day 100 Century</text>
+</g>
+
+
+<!-- ============================================================
+     BRANCH 8 — GAME MECHANICS  (bottom-center, green)
+     ============================================================ -->
+<g class="node" data-tip="Core game systems: difficulty, avatars, leaderboard, heatmap, market sessions, game over.">
+  <ellipse cx="700" cy="1090" rx="96" ry="36" fill="#0f2018" stroke="#3fb950" stroke-width="2"/>
+  <text x="700" y="1086" text-anchor="middle" font-size="13" font-weight="700" fill="#3fb950">⚙ Game Mechanics</text>
+  <text x="700" y="1102" text-anchor="middle" font-size="10" fill="#8b949e">Difficulty · Sessions · Heatmap</text>
+</g>
+<!-- children -->
+<g class="node" data-tip="5 difficulty levels affecting price volatility, starting cash, and interest rates.">
+  <rect x="478" y="1148" width="164" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="560" y="1167" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">🎮 Difficulty</text>
+  <text x="560" y="1182" text-anchor="middle" font-size="9.5" fill="#8b949e">5 levels · Volatility</text>
+  <text x="560" y="1194" text-anchor="middle" font-size="9.5" fill="#8b949e">Starting cash</text>
+</g>
+<g class="node" data-tip="Market sessions: NYSE, Pre-market, After-hours, London, Tokyo, Overnight, Weekend.">
+  <rect x="618" y="1148" width="164" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="700" y="1167" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">🌍 Market Sessions</text>
+  <text x="700" y="1182" text-anchor="middle" font-size="9.5" fill="#8b949e">NYSE · Pre · After-hours</text>
+  <text x="700" y="1194" text-anchor="middle" font-size="9.5" fill="#8b949e">London · Tokyo · Weekend</text>
+</g>
+<g class="node" data-tip="Sector heatmap: colour-coded tiles showing % change per stock. Leaderboard for all players.">
+  <rect x="758" y="1148" width="164" height="52" rx="8" fill="#161b22" stroke="#3fb95088" stroke-width="1.5"/>
+  <text x="840" y="1167" text-anchor="middle" font-size="11" font-weight="700" fill="#3fb950">🗺 Heatmap &amp; LB</text>
+  <text x="840" y="1182" text-anchor="middle" font-size="9.5" fill="#8b949e">Sector heatmap tiles</text>
+  <text x="840" y="1194" text-anchor="middle" font-size="9.5" fill="#8b949e">Global leaderboard</text>
+</g>
+
+</svg>
+</div>
+
+<div id="tip"></div>
+
+<script>
+  const tip = document.getElementById('tip');
+  document.querySelectorAll('.node').forEach(n => {
+    n.style.cursor = 'pointer';
+    n.addEventListener('mouseenter', e => {
+      tip.textContent = n.dataset.tip;
+      tip.style.display = 'block';
+    });
+    n.addEventListener('mousemove', e => {
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY + 14) + 'px';
+    });
+    n.addEventListener('mouseleave', () => {
+      tip.style.display = 'none';
+    });
+  });
+</script>
+</body>
+</html>
