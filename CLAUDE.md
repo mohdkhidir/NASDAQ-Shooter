@@ -31,6 +31,14 @@ Always append to the body:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
+## Links
+
+Always show URLs as short markdown links, never as bare long URLs. Format:
+
+```
+[Preview](https://...)
+```
+
 ## Mobile HUD Design System
 
 New mobile elements are **hidden on desktop** and activated via `@media(max-width:600px)` in `index.html`. All styles live at the top of `style.css`.
