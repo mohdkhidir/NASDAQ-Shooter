@@ -69,7 +69,9 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 .sq.lc::after{content:'';position:absolute;inset:0;border:4px solid rgba(0,0,0,.28);pointer-events:none}
 .sq.mv.lt{background:#f0e060!important}.sq.mv.dk{background:#8aaa28!important}
 .sq.chk{background:#e74c3c!important}
-.piece{width:87%;height:87%;background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:none}
+.piece{font-size:44px;line-height:1;pointer-events:none;text-align:center;display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.piece[data-c="w"]{color:#fff;-webkit-text-stroke:1.5px #333;paint-order:stroke fill;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+.piece[data-c="b"]{color:#111;-webkit-text-stroke:.5px #555;filter:drop-shadow(0 1px 2px rgba(255,255,255,.15))}
 
 /* game status */
 .gstatus{font-size:.92rem;min-height:24px;text-align:center;width:100%;max-width:540px}
@@ -136,6 +138,7 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 @media(max-width:620px){
   #board{grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);border-color:#3a6228}
   .sq{width:44px;height:44px}
+  .piece{font-size:30px}
   .sq.lm::after{width:15px;height:15px}
   .ranks span{height:44px}.files span{width:44px}
   .pinfo,.history,.action-bar,.gstatus,.draw-banner,.spec-badge{max-width:372px}
@@ -298,8 +301,6 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 //  CHESS ENGINE
 // ════════════════════════════════════════════════════════════
 const GLYPHS={white:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},black:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
-const CDN='https://cdn.jsdelivr.net/gh/lichess-org/lila/public/piece/cburnett/';
-const PIMG={white:{k:'wK',q:'wQ',r:'wR',b:'wB',n:'wN',p:'wP'},black:{k:'bK',q:'bQ',r:'bR',b:'bB',n:'bN',p:'bP'}};
 
 function cloneBoard(b){return b.map(r=>r.map(c=>c?{...c}:null))}
 function findKing(b,color){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]&&b[r][c].type==='k'&&b[r][c].color===color)return[r,c];return null}
@@ -731,8 +732,9 @@ function renderBoard(){
     if(piece&&piece.type==='k'&&inCheck(G.board,piece.color))cls+=' chk';
     sq.className=cls;
     const pel=sq.querySelector('.piece');
-    pel.style.backgroundImage=piece?`url(${CDN}${PIMG[piece.color][piece.type]}.svg)`:'';
-    pel.textContent='';
+    pel.style.backgroundImage='';
+    if(piece){pel.textContent=GLYPHS[piece.color][piece.type];pel.dataset.c=piece.color==='white'?'w':'b';}
+    else{pel.textContent='';pel.dataset.c='';}
   });
   // captured
   const cW=G.capW.map(p=>GLYPHS.black[p.type]).join('');
