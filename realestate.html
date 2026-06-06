@@ -13,18 +13,16 @@
   <a class="btn-back" href="#" onclick="return reBack()" title="Back to Stock Market">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
   </a>
-
-  <div class="logo">🏢 Real Estate Empire</div>
-
-  <div class="topbar-divider"></div>
-
-  <div class="tb-networth">
-    <span class="tb-lbl">Net Worth</span>
-    <span class="tb-val" id="tb-networth">—</span>
+  <div class="logo">
+    <div class="logo-icon">🏢</div>
+    <span class="logo-text">Real Estate Empire</span>
   </div>
-
   <div class="topbar-divider"></div>
-
+  <div class="tb-networth">
+    <span class="tb-nw-lbl">Net Worth</span>
+    <span class="tb-nw-val" id="tb-networth">—</span>
+  </div>
+  <div class="topbar-divider"></div>
   <div class="tb-stats">
     <div class="tb-chip">
       <span class="tb-lbl">Cash</span>
@@ -45,6 +43,14 @@
   </div>
 </div>
 
+<!-- ══ News Ticker ════════════════════════════════════════════════ -->
+<div class="news-ticker-bar">
+  <div class="ticker-label">RE NEWS</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div>
+</div>
+
 <!-- ══ Nav Tabs ══════════════════════════════════════════════════ -->
 <div class="nav-tabs">
   <button class="nav-tab active" data-tab="overview">Overview</button>
@@ -55,17 +61,13 @@
 
 <!-- ════════════════ TAB: OVERVIEW ═══════════════════════════════ -->
 <div class="tab-pane active" id="tab-overview">
-  <div class="overview-wrap" id="overview-wrap">
-    <!-- Populated by renderOverview() -->
-  </div>
+  <div class="overview-wrap" id="overview-wrap"></div>
 </div>
 
 <!-- ════════════════ TAB: MARKETPLACE ═══════════════════════════ -->
 <div class="tab-pane" id="tab-market">
   <div class="market-wrap">
-    <div id="market-inner">
-      <!-- Populated by renderMarket() -->
-    </div>
+    <div id="market-inner"></div>
   </div>
 </div>
 
@@ -79,22 +81,18 @@
 
 <!-- ════════════════ TAB: INSIGHTS ══════════════════════════════ -->
 <div class="tab-pane" id="tab-insights">
-  <div class="insights-wrap" id="insights-wrap">
-    <!-- Populated by renderInsights() -->
-  </div>
+  <div class="insights-wrap" id="insights-wrap"></div>
 </div>
 
 <!-- ── Modals ──────────────────────────────────────────────────── -->
 <div class="modal-overlay hidden" id="prop-modal">
   <div class="modal-box" id="prop-modal-body"></div>
 </div>
-
 <div class="modal-overlay hidden" id="build-modal">
   <div class="modal-box" id="build-modal-body"></div>
 </div>
 
 <div id="toast"></div>
-<div id="sfx-layer"></div>
 
 <script>
 'use strict';
@@ -127,7 +125,7 @@ const AREAS = {
 
 /* ── Property type definitions ────────────────────────────── */
 const PTYPES = {
-  land:       { icon:'🌱', label:'Vacant Land',      yieldBase:.025, maint:.10, occBase:.95, buildable:true,  areas:['village','town','urban'] },
+  land:       { icon:'🌱', label:'Vacant Land',       yieldBase:.025, maint:.10, occBase:.95, buildable:true,  areas:['village','town','urban'] },
   farm:       { icon:'🌾', label:'Farm/Agriculture',  yieldBase:.030, maint:.18, occBase:.90, buildable:false, areas:['village'] },
   house:      { icon:'🏠', label:'Residential House', yieldBase:.052, maint:.22, occBase:.84, buildable:false, areas:['village','town','urban'] },
   apartment:  { icon:'🏢', label:'Apartment Block',   yieldBase:.070, maint:.28, occBase:.80, buildable:false, areas:['town','urban','megacity'] },
@@ -138,6 +136,36 @@ const PTYPES = {
   mall:       { icon:'🏬', label:'Shopping Mall',     yieldBase:.072, maint:.33, occBase:.70, buildable:false, areas:['urban','megacity'] },
   hotel:      { icon:'🏨', label:'Hotel',              yieldBase:.085, maint:.40, occBase:.68, buildable:false, areas:['urban','megacity'] },
 };
+
+/* ── Property SVG illustrations ───────────────────────────── */
+const PROP_SVG = {
+  land:`<svg viewBox="0 0 80 80" fill="none"><path d="M6 64 Q20 46 34 52 Q48 58 58 40 Q66 28 74 36 L74 72 L6 72Z" fill="rgba(16,185,129,.28)"/><path d="M6 64 Q20 46 34 52 Q48 58 58 40 Q66 28 74 36" fill="none" stroke="rgba(110,231,183,.65)" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="48" r="8" fill="rgba(16,185,129,.38)"/><circle cx="20" cy="48" r="4" fill="rgba(16,185,129,.6)"/><circle cx="56" cy="38" r="6" fill="rgba(16,185,129,.3)"/><circle cx="56" cy="38" r="3" fill="rgba(16,185,129,.5)"/></svg>`,
+  farm:`<svg viewBox="0 0 80 80" fill="none"><rect x="22" y="40" width="36" height="28" rx="2" fill="rgba(220,80,60,.3)" stroke="rgba(220,100,80,.5)" stroke-width="1.5"/><path d="M16 40 L40 18 L64 40Z" fill="rgba(180,60,40,.45)" stroke="rgba(220,80,60,.4)" stroke-width="1.5"/><rect x="34" y="54" width="12" height="14" rx="6" fill="rgba(140,50,30,.5)"/><rect x="27" y="47" width="10" height="8" rx="1.5" fill="rgba(255,220,80,.22)" stroke="rgba(255,220,80,.3)" stroke-width="1"/><rect x="43" y="47" width="10" height="8" rx="1.5" fill="rgba(255,220,80,.18)" stroke="rgba(255,220,80,.25)" stroke-width="1"/><circle cx="62" cy="22" r="7" fill="rgba(245,158,11,.5)"/><path d="M6 68 L74 68" stroke="rgba(16,185,129,.4)" stroke-width="2" stroke-linecap="round"/></svg>`,
+  house:`<svg viewBox="0 0 80 80" fill="none"><rect x="14" y="42" width="52" height="28" rx="3" fill="rgba(56,189,248,.22)" stroke="rgba(56,189,248,.5)" stroke-width="1.5"/><path d="M8 42 L40 16 L72 42Z" fill="rgba(56,189,248,.38)" stroke="rgba(56,189,248,.6)" stroke-width="1.5"/><rect x="33" y="56" width="14" height="14" rx="2" fill="rgba(56,189,248,.3)" stroke="rgba(56,189,248,.4)" stroke-width="1"/><rect x="18" y="48" width="13" height="10" rx="2" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.25)" stroke-width="1"/><rect x="49" y="48" width="13" height="10" rx="2" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.25)" stroke-width="1"/><rect x="50" y="24" width="7" height="16" rx="1" fill="rgba(56,189,248,.4)"/></svg>`,
+  apartment:`<svg viewBox="0 0 80 80" fill="none"><rect x="18" y="24" width="44" height="46" rx="3" fill="rgba(167,139,250,.2)" stroke="rgba(167,139,250,.45)" stroke-width="1.5"/><rect x="12" y="20" width="56" height="7" rx="2" fill="rgba(167,139,250,.4)"/><rect x="32" y="56" width="16" height="14" rx="2" fill="rgba(167,139,250,.3)"/><rect x="22" y="30" width="10" height="7" rx="1.5" fill="rgba(255,220,80,.28)"/><rect x="35" y="30" width="10" height="7" rx="1.5" fill="rgba(255,255,255,.18)"/><rect x="48" y="30" width="10" height="7" rx="1.5" fill="rgba(255,220,80,.35)"/><rect x="22" y="41" width="10" height="7" rx="1.5" fill="rgba(255,255,255,.18)"/><rect x="35" y="41" width="10" height="7" rx="1.5" fill="rgba(255,220,80,.22)"/><rect x="48" y="41" width="10" height="7" rx="1.5" fill="rgba(255,255,255,.15)"/><rect x="22" y="52" width="10" height="5" rx="1" fill="rgba(255,220,80,.18)"/><rect x="48" y="52" width="10" height="5" rx="1" fill="rgba(255,255,255,.15)"/></svg>`,
+  shop:`<svg viewBox="0 0 80 80" fill="none"><rect x="8" y="36" width="64" height="34" rx="3" fill="rgba(251,146,60,.2)" stroke="rgba(251,146,60,.45)" stroke-width="1.5"/><path d="M4 36 Q40 24 76 36" fill="rgba(251,146,60,.35)" stroke="rgba(251,146,60,.55)" stroke-width="1.5"/><rect x="16" y="22" width="48" height="16" rx="3" fill="rgba(251,146,60,.28)" stroke="rgba(251,146,60,.4)" stroke-width="1"/><rect x="28" y="52" width="24" height="18" rx="2" fill="rgba(56,189,248,.15)" stroke="rgba(56,189,248,.25)" stroke-width="1"/><rect x="11" y="44" width="13" height="11" rx="2" fill="rgba(255,255,255,.1)"/><rect x="56" y="44" width="13" height="11" rx="2" fill="rgba(255,255,255,.1)"/></svg>`,
+  office:`<svg viewBox="0 0 80 80" fill="none"><rect x="6" y="30" width="26" height="40" rx="2" fill="rgba(56,189,248,.17)" stroke="rgba(56,189,248,.38)" stroke-width="1.5"/><rect x="38" y="18" width="36" height="52" rx="2" fill="rgba(56,189,248,.24)" stroke="rgba(56,189,248,.52)" stroke-width="1.5"/><rect x="10" y="36" width="8" height="6" rx="1" fill="rgba(255,220,80,.22)"/><rect x="21" y="36" width="8" height="6" rx="1" fill="rgba(255,255,255,.15)"/><rect x="10" y="46" width="8" height="6" rx="1" fill="rgba(255,255,255,.15)"/><rect x="21" y="46" width="8" height="6" rx="1" fill="rgba(255,220,80,.2)"/><rect x="10" y="56" width="8" height="6" rx="1" fill="rgba(255,220,80,.15)"/><rect x="21" y="56" width="8" height="6" rx="1" fill="rgba(255,255,255,.12)"/><rect x="42" y="24" width="11" height="7" rx="1" fill="rgba(255,220,80,.28)"/><rect x="57" y="24" width="11" height="7" rx="1" fill="rgba(255,255,255,.15)"/><rect x="42" y="35" width="11" height="7" rx="1" fill="rgba(255,255,255,.15)"/><rect x="57" y="35" width="11" height="7" rx="1" fill="rgba(255,220,80,.22)"/><rect x="42" y="46" width="11" height="7" rx="1" fill="rgba(255,220,80,.18)"/><rect x="57" y="46" width="11" height="7" rx="1" fill="rgba(255,255,255,.12)"/><rect x="42" y="57" width="11" height="7" rx="1" fill="rgba(255,255,255,.12)"/><rect x="57" y="57" width="11" height="7" rx="1" fill="rgba(255,220,80,.15)"/></svg>`,
+  factory:`<svg viewBox="0 0 80 80" fill="none"><rect x="6" y="46" width="54" height="24" rx="2" fill="rgba(100,116,139,.28)" stroke="rgba(100,116,139,.5)" stroke-width="1.5"/><rect x="62" y="26" width="12" height="44" rx="2" fill="rgba(100,116,139,.35)" stroke="rgba(100,116,139,.5)" stroke-width="1.5"/><rect x="6" y="40" width="54" height="8" rx="2" fill="rgba(100,116,139,.45)"/><rect x="26" y="28" width="9" height="18" rx="1.5" fill="rgba(100,116,139,.4)"/><circle cx="68" cy="22" r="5" fill="rgba(220,220,220,.1)"/><circle cx="65" cy="14" r="4" fill="rgba(220,220,220,.07)"/><rect x="10" y="56" width="11" height="10" rx="1.5" fill="rgba(255,220,80,.15)"/><rect x="26" y="54" width="16" height="12" rx="1.5" fill="rgba(56,189,248,.12)"/><rect x="46" y="56" width="11" height="10" rx="1.5" fill="rgba(255,220,80,.12)"/></svg>`,
+  skyscraper:`<svg viewBox="0 0 80 80" fill="none"><rect x="6" y="30" width="18" height="40" rx="2" fill="rgba(245,158,11,.13)" stroke="rgba(245,158,11,.28)" stroke-width="1"/><rect x="54" y="22" width="20" height="48" rx="2" fill="rgba(245,158,11,.15)" stroke="rgba(245,158,11,.32)" stroke-width="1.5"/><rect x="28" y="8" width="24" height="62" rx="3" fill="rgba(245,158,11,.22)" stroke="rgba(245,158,11,.55)" stroke-width="2"/><line x1="40" y1="8" x2="40" y2="2" stroke="rgba(245,158,11,.75)" stroke-width="2.5" stroke-linecap="round"/><circle cx="40" cy="2" r="2.5" fill="rgba(245,158,11,.95)"/><rect x="31" y="14" width="8" height="5" rx="1" fill="rgba(255,220,80,.38)"/><rect x="41" y="14" width="8" height="5" rx="1" fill="rgba(255,255,255,.18)"/><rect x="31" y="23" width="8" height="5" rx="1" fill="rgba(255,255,255,.15)"/><rect x="41" y="23" width="8" height="5" rx="1" fill="rgba(255,220,80,.3)"/><rect x="31" y="32" width="8" height="5" rx="1" fill="rgba(255,220,80,.22)"/><rect x="41" y="32" width="8" height="5" rx="1" fill="rgba(255,255,255,.15)"/><rect x="31" y="41" width="8" height="5" rx="1" fill="rgba(255,255,255,.12)"/><rect x="41" y="41" width="8" height="5" rx="1" fill="rgba(255,220,80,.18)"/><rect x="58" y="28" width="8" height="5" rx="1" fill="rgba(255,220,80,.2)"/><rect x="58" y="37" width="8" height="5" rx="1" fill="rgba(255,255,255,.12)"/></svg>`,
+  mall:`<svg viewBox="0 0 80 80" fill="none"><rect x="4" y="46" width="72" height="24" rx="3" fill="rgba(251,146,60,.2)" stroke="rgba(251,146,60,.45)" stroke-width="1.5"/><path d="M18 46 Q40 28 62 46" fill="rgba(251,146,60,.28)" stroke="rgba(251,146,60,.45)" stroke-width="1.5"/><rect x="28" y="46" width="24" height="24" rx="1" fill="rgba(56,189,248,.14)" stroke="rgba(56,189,248,.25)" stroke-width="1"/><rect x="8" y="52" width="18" height="16" rx="2" fill="rgba(255,255,255,.06)"/><rect x="54" y="52" width="18" height="16" rx="2" fill="rgba(255,255,255,.06)"/><rect x="22" y="36" width="36" height="10" rx="5" fill="rgba(251,146,60,.42)" stroke="rgba(251,146,60,.5)" stroke-width="1"/><rect x="32" y="54" width="6" height="12" rx="1" fill="rgba(56,189,248,.2)"/><rect x="42" y="54" width="6" height="12" rx="1" fill="rgba(56,189,248,.18)"/></svg>`,
+  hotel:`<svg viewBox="0 0 80 80" fill="none"><rect x="22" y="18" width="36" height="52" rx="3" fill="rgba(245,158,11,.2)" stroke="rgba(245,158,11,.48)" stroke-width="1.5"/><rect x="28" y="10" width="24" height="10" rx="2" fill="rgba(245,158,11,.35)" stroke="rgba(245,158,11,.55)" stroke-width="1.5"/><line x1="40" y1="10" x2="40" y2="5" stroke="rgba(245,158,11,.7)" stroke-width="2" stroke-linecap="round"/><rect x="26" y="24" width="9" height="7" rx="1.5" fill="rgba(255,220,80,.32)"/><rect x="39" y="24" width="9" height="7" rx="1.5" fill="rgba(255,255,255,.18)"/><rect x="26" y="35" width="9" height="7" rx="1.5" fill="rgba(255,255,255,.15)"/><rect x="39" y="35" width="9" height="7" rx="1.5" fill="rgba(255,220,80,.26)"/><rect x="26" y="46" width="9" height="7" rx="1.5" fill="rgba(255,220,80,.2)"/><rect x="39" y="46" width="9" height="7" rx="1.5" fill="rgba(255,255,255,.15)"/><path d="M28 70 L52 70 L55 62 L25 62Z" fill="rgba(245,158,11,.3)"/><rect x="34" y="58" width="12" height="12" rx="1" fill="rgba(245,158,11,.22)"/></svg>`,
+};
+
+/* ── News headlines ───────────────────────────────────────── */
+const RE_NEWS = [
+  {icon:'📈', text:'NASDAQ hits all-time high — tech office demand surges in urban areas', cls:'pos'},
+  {icon:'🏗️', text:'Fed holds rates steady — mortgage applications rise 12% this month', cls:'neu'},
+  {icon:'🏠', text:'Housing starts up 8% nationally — Village & Town demand outlook positive', cls:'pos'},
+  {icon:'⚠️', text:'Commercial vacancy rates climb as hybrid-work trend accelerates', cls:'neg'},
+  {icon:'💰', text:'REITs outperform S&P 500 this quarter on strong rental yield data', cls:'pos'},
+  {icon:'🔑', text:'Mixed-use zoning approved in Urban districts — development rush expected', cls:'neu'},
+  {icon:'📉', text:'Inflation data: property maintenance costs up 15% year-over-year', cls:'neg'},
+  {icon:'🌆', text:'Megacity luxury hotel sector reports 94% occupancy — highest since 2019', cls:'pos'},
+  {icon:'🏭', text:'Manufacturing reshoring drives industrial demand — factory sites at premium', cls:'pos'},
+  {icon:'📊', text:'Global commercial real estate transactions reach $1.2T — confidence high', cls:'pos'},
+  {icon:'🚇', text:'Transit infrastructure investment to boost property values near new stations', cls:'pos'},
+  {icon:'💸', text:'Capital gains tax review may impact property investment strategies Q4', cls:'neg'},
+];
 
 /* ── Improvements ─────────────────────────────────────────── */
 const IMPROVEMENTS = [
@@ -267,14 +295,17 @@ function processIncome() {
     incomeTotal += earned;
     taxTotal    += dailyTax * daysSince;
     p.totalEarned = (p.totalEarned || 0) + earned;
-    // Appreciation
     const appRate = (AREAS[p.area].popGrowth * 0.0001) * (demand / 80);
     p.currentValue = Math.round((p.currentValue || p.purchasePrice) * (1 + appRate * daysSince));
   });
   re.totalEarned   = (re.totalEarned  || 0) + incomeTotal;
   re.totalTaxPaid  = (re.totalTaxPaid || 0) + taxTotal;
   re.lastSyncDay   = day;
-  if (incomeTotal > 0) { addCash(incomeTotal); re.pendingIncome = (re.pendingIncome || 0) + incomeTotal; }
+  if (incomeTotal > 0) {
+    addCash(incomeTotal);
+    re.pendingIncome = (re.pendingIncome || 0) + incomeTotal;
+    showIncomeFloat(incomeTotal);
+  }
   saveRE(re);
 }
 
@@ -343,124 +374,125 @@ function genName(type, seed) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   NEWS TICKER
+───────────────────────────────────────────────────────────── */
+function renderNewsTicker() {
+  const inner = document.getElementById('ticker-inner');
+  if (!inner) return;
+  const items = [...RE_NEWS, ...RE_NEWS];
+  inner.innerHTML = items.map(n =>
+    `<span class="ticker-item ${n.cls}">${n.icon} ${n.text}</span>`
+  ).join('');
+}
+
+/* ─────────────────────────────────────────────────────────────
    RENDER OVERVIEW
 ───────────────────────────────────────────────────────────── */
 function renderOverview() {
   const sh  = loadSH();
   const re  = loadRE();
-
-  const cash       = sh.cash        || 0;
-  const reVal      = re.properties.reduce((s, p) => s + (p.currentValue || p.purchasePrice || 0), 0);
-  const stockVal   = sh.stockValue  || 0;
-  const netWorth   = cash + reVal + stockVal;
-  const netDay     = re.properties.reduce((s, p) => s + (p.netIncomeDay || 0), 0);
-  const positions  = sh.stockPositions || [];
-
+  const cash      = sh.cash        || 0;
+  const reVal     = re.properties.reduce((s, p) => s + (p.currentValue || p.purchasePrice || 0), 0);
+  const stockVal  = sh.stockValue  || 0;
+  const netWorth  = cash + reVal + stockVal;
+  const netDay    = re.properties.reduce((s, p) => s + (p.netIncomeDay || 0), 0);
+  const positions = sh.stockPositions || [];
   const wrap = document.getElementById('overview-wrap');
   let html = '';
 
-  // ── Combined net worth hero ──
   html += `
     <div class="nw-hero">
       <div class="nw-hero-label">Combined Net Worth</div>
-      <div class="nw-hero-value">${fmtK(netWorth)}</div>
-      <div class="nw-hero-breakdown">
-        <div class="nw-breakdown-item">
-          <span class="nw-bd-lbl">Cash</span>
-          <span class="nw-bd-val c-blue">${fmtK(cash)}</span>
+      <div class="nw-hero-amount">${fmtK(netWorth)}</div>
+      <div class="nw-breakdown">
+        <div class="nw-part">
+          <span class="nw-part-lbl">Cash</span>
+          <span class="nw-part-val c-blue">${fmtK(cash)}</span>
         </div>
-        <div class="nw-breakdown-item">
-          <span class="nw-bd-lbl">Real Estate</span>
-          <span class="nw-bd-val c-orange">${fmtK(reVal)}</span>
+        <div class="nw-part">
+          <span class="nw-part-lbl">Real Estate</span>
+          <span class="nw-part-val c-orange">${fmtK(reVal)}</span>
         </div>
-        <div class="nw-breakdown-item">
-          <span class="nw-bd-lbl">Stocks</span>
-          <span class="nw-bd-val c-green">${fmtK(stockVal)}</span>
+        <div class="nw-part">
+          <span class="nw-part-lbl">Stocks</span>
+          <span class="nw-part-val c-green">${fmtK(stockVal)}</span>
         </div>
-        <div class="nw-breakdown-item">
-          <span class="nw-bd-lbl">RE Income/Day</span>
-          <span class="nw-bd-val c-gold">${fmtF(netDay)}</span>
+        <div class="nw-part">
+          <span class="nw-part-lbl">RE Income/Day</span>
+          <span class="nw-part-val c-gold">${fmtF(netDay)}</span>
         </div>
-      </div>
-    </div>
-  `;
-
-  // ── Stock Portfolio section ──
-  html += `<div class="ov-section">
-    <div class="ov-section-head">
-      <span class="ov-section-title">Stock Portfolio</span>
-      <span class="ov-section-badge" style="color:var(--up)">${fmtK(stockVal)}</span>
-    </div>
-    <div class="ov-section-body">`;
-
-  if (positions.length === 0) {
-    if (stockVal === 0 && !sh.cash) {
-      html += `<div class="ov-placeholder"><strong>No Stock Data Available</strong>Open the Stock Market game and come back to see your combined portfolio here.</div>`;
-    } else {
-      html += `<div class="ov-placeholder"><strong>No Open Positions</strong>You have no stock holdings right now. Start trading in the Stock Market game to see positions here.</div>`;
-    }
-  } else {
-    positions.forEach(pos => {
-      const pnlCls = pos.pnl >= 0 ? 'up' : 'dn';
-      html += `
-        <div class="stock-row">
-          <span class="stock-ticker">${pos.t}</span>
-          <span class="stock-shares">${pos.shares.toLocaleString()} shares</span>
-          <span class="stock-val">${fmtK(pos.val)}</span>
-          <span class="stock-pnl ${pnlCls}">${fmtPnl(pos.pnl)}</span>
-        </div>`;
-    });
-  }
-
-  html += `</div></div>`;
-
-  // ── Real Estate section ──
-  const propCount = re.properties.length;
-  const totalEarned = re.totalEarned || 0;
-
-  html += `<div class="ov-section">
-    <div class="ov-section-head">
-      <span class="ov-section-title">Real Estate Portfolio</span>
-      <span class="ov-section-badge" style="color:var(--re)">${propCount} propert${propCount === 1 ? 'y' : 'ies'}</span>
-    </div>
-    <div class="ov-section-body">`;
-
-  if (propCount === 0) {
-    html += `<div class="ov-placeholder"><strong>No Properties Yet</strong>Visit the Marketplace tab to acquire your first property and start earning passive income.</div>`;
-  } else {
-    html += `<div class="re-ov-grid">
-      <div class="re-ov-item">
-        <div class="re-ov-lbl">Portfolio Value</div>
-        <div class="re-ov-val" style="color:var(--re)">${fmtK(reVal)}</div>
-      </div>
-      <div class="re-ov-item">
-        <div class="re-ov-lbl">Income / Day</div>
-        <div class="re-ov-val" style="color:var(--gd)">${fmtF(netDay)}</div>
-      </div>
-      <div class="re-ov-item">
-        <div class="re-ov-lbl">Total Earned</div>
-        <div class="re-ov-val" style="color:var(--up)">${fmtK(totalEarned)}</div>
       </div>
     </div>`;
 
-    // Show top 3 properties
-    const topProps = re.properties.slice().sort((a,b) => (b.currentValue||0)-(a.currentValue||0)).slice(0,3);
-    topProps.forEach(p => {
-      const ar = AREAS[p.area];
-      const pt = PTYPES[p.type];
-      const pnl = (p.currentValue || p.purchasePrice) - p.purchasePrice;
-      const pnlCls = pnl >= 0 ? 'up' : 'dn';
-      html += `
-        <div class="stock-row">
-          <span class="stock-ticker" style="color:${ar.accent};width:28px">${pt.icon}</span>
-          <span class="stock-shares" style="flex:1">${p.name} <span style="color:${ar.accent};font-size:9px">${ar.label}</span></span>
-          <span class="stock-val">${fmtK(p.currentValue||p.purchasePrice)}</span>
-          <span class="stock-pnl ${pnlCls}">${fmtPnl(pnl)}</span>
-        </div>`;
-    });
-  }
+  // Stock Portfolio section
+  html += `<div class="ov-section">
+    <div class="ov-sec-head">
+      <span class="ov-sec-title">Stock Portfolio</span>
+      <span class="ov-sec-total c-green">${fmtK(stockVal)}</span>
+    </div>`;
 
-  html += `</div></div>`;
+  if (positions.length === 0) {
+    if (stockVal === 0 && !sh.cash) {
+      html += `<div class="ov-no-data"><span>📊</span>No Stock Data Available<br><small>Open the Stock Market game and return to see your combined portfolio here.</small></div>`;
+    } else {
+      html += `<div class="ov-no-data"><span>📋</span>No Open Positions<br><small>You have no stock holdings right now.</small></div>`;
+    }
+  } else {
+    html += `<div class="stock-rows">`;
+    positions.forEach(pos => {
+      const pnlCls = pos.pnl >= 0 ? 'pos' : 'neg';
+      html += `<div class="stock-row">
+        <span class="sr-ticker">${pos.t}</span>
+        <span class="sr-shares">${pos.shares.toLocaleString()} shares</span>
+        <span class="sr-val">${fmtK(pos.val)}</span>
+        <span class="sr-pnl ${pnlCls}">${fmtPnl(pos.pnl)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // Real Estate Portfolio section
+  const propCount = re.properties.length;
+  html += `<div class="ov-section">
+    <div class="ov-sec-head">
+      <span class="ov-sec-title">Real Estate Portfolio</span>
+      <span class="ov-sec-total c-orange">${propCount} propert${propCount===1?'y':'ies'}</span>
+    </div>`;
+
+  if (propCount === 0) {
+    html += `<div class="ov-no-data"><span>🏗️</span>No Properties Yet<br><small>Visit the Marketplace tab to acquire your first property.</small></div>`;
+  } else {
+    html += `<div class="ov-re-grid">
+      <div class="ov-re-cell">
+        <div class="ov-re-cell-lbl">Portfolio Value</div>
+        <div class="ov-re-cell-val c-orange">${fmtK(reVal)}</div>
+      </div>
+      <div class="ov-re-cell">
+        <div class="ov-re-cell-lbl">Income / Day</div>
+        <div class="ov-re-cell-val c-gold">${fmtF(netDay)}</div>
+      </div>
+      <div class="ov-re-cell">
+        <div class="ov-re-cell-lbl">Total Earned</div>
+        <div class="ov-re-cell-val c-green">${fmtK(re.totalEarned || 0)}</div>
+      </div>
+    </div>`;
+
+    const topProps = re.properties.slice().sort((a,b) => (b.currentValue||0)-(a.currentValue||0)).slice(0,3);
+    html += `<div class="stock-rows">`;
+    topProps.forEach(p => {
+      const ar = AREAS[p.area], pt = PTYPES[p.type];
+      const pnl = (p.currentValue || p.purchasePrice) - p.purchasePrice;
+      html += `<div class="stock-row">
+        <span class="sr-ticker" style="color:${ar.accent};background:rgba(255,255,255,.04)">${pt.icon}</span>
+        <span class="sr-shares" style="flex:1">${p.name} <span style="color:${ar.accent};font-size:9px;margin-left:4px">${ar.label}</span></span>
+        <span class="sr-val">${fmtK(p.currentValue||p.purchasePrice)}</span>
+        <span class="sr-pnl ${pnl>=0?'pos':'neg'}">${fmtPnl(pnl)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
 
   wrap.innerHTML = html;
 }
@@ -473,30 +505,27 @@ function renderMarket() {
   const container = document.getElementById('market-inner');
   container.innerHTML = '';
 
-  // ── Filter bar ──
   const filterBar = document.createElement('div');
-  filterBar.className = 'filter-bar';
+  filterBar.className = 'filter-wrap';
   filterBar.innerHTML = `
     <div class="filter-row">
-      <span class="filter-lbl">Area</span>
+      <span class="filter-label">Area</span>
       ${['all','village','town','urban','megacity'].map(a =>
         `<button class="fpill${filterArea===a?' active':''}" data-fa="${a}">
-          ${a==='all' ? 'All' : AREAS[a].emoji+' '+AREAS[a].label}
+          ${a==='all' ? 'All Areas' : AREAS[a].emoji+' '+AREAS[a].label}
         </button>`
       ).join('')}
     </div>
     <div class="filter-row">
-      <span class="filter-lbl">Type</span>
+      <span class="filter-label">Type</span>
       ${['all','land','house','apartment','shop','office','factory'].map(t =>
         `<button class="fpill${filterType===t?' active':''}" data-ft="${t}">
-          ${t==='all' ? 'All' : PTYPES[t]?.icon+' '+PTYPES[t]?.label}
+          ${t==='all' ? 'All Types' : PTYPES[t]?.icon+' '+PTYPES[t]?.label}
         </button>`
       ).join('')}
-    </div>
-  `;
+    </div>`;
   container.appendChild(filterBar);
 
-  // ── Area sections ──
   Object.keys(AREAS).forEach(area => {
     if (filterArea !== 'all' && filterArea !== area) return;
     const ar = AREAS[area];
@@ -506,81 +535,76 @@ function renderMarket() {
 
     const section = document.createElement('div');
     section.className = 'area-section';
-    section.style.cssText = `border-color:${ar.border}`;
+    section.style.borderColor = ar.border;
 
-    const demandColor = demand >= 80 ? 'var(--up)' : demand >= 60 ? 'var(--gd)' : 'var(--dn)';
+    const demandColor = demand >= 80 ? 'var(--emerald)' : demand >= 60 ? 'var(--gold2)' : 'var(--red)';
 
     section.innerHTML = `
       <div class="area-header" style="background:${ar.grad};border-bottom:1px solid ${ar.border}">
-        <div class="area-header-left">
-          <span class="area-emoji">${ar.emoji}</span>
+        <div class="area-left">
+          <div class="area-icon-wrap">${ar.emoji}</div>
           <div>
             <div class="area-name" style="color:${ar.accent}">${ar.label}</div>
             <div class="area-sub">Tax ${(ar.taxRate*100).toFixed(1)}%/yr · Growth +${ar.popGrowth}%/yr</div>
           </div>
         </div>
         <div class="area-demand-wrap">
-          <span class="demand-label">Market Demand</span>
-          <div class="demand-bar-wrap"><div class="demand-bar" style="width:${demand}%;background:${demandColor}"></div></div>
+          <span class="demand-lbl">Market Demand</span>
+          <div class="demand-track"><div class="demand-fill" style="width:${demand}%;background:${demandColor}"></div></div>
           <span class="demand-pct" style="color:${demandColor}">${Math.round(demand)}%</span>
         </div>
       </div>
-      <div class="area-listings" id="listings-${area}"></div>
-    `;
+      <div class="listings-grid" id="listings-${area}"></div>`;
     container.appendChild(section);
 
     const grid = section.querySelector(`#listings-${area}`);
     areaListings.forEach(l => {
       const pt = PTYPES[l.type];
       const canAfford = cash >= l.price;
-      const yieldCls = l.netYield >= 6 ? 'yield-hi' : l.netYield >= 4 ? 'yield-mid' : 'yield-lo';
+      const yieldBadgeCls = l.netYield >= 6 ? 'great' : l.netYield >= 4 ? 'good' : 'low';
+      const svgHtml = (PROP_SVG[l.type] || '').replace('<svg ', '<svg class="lc-hero-svg" ');
 
       const card = document.createElement('div');
       card.className = 'listing-card';
       card.innerHTML = `
         <div class="lc-hero" style="background:${AREAS[l.area].grad}">
-          <span class="lc-hero-emoji">${pt.icon}</span>
-          <span class="lc-type-badge" style="color:${ar.accent}">${pt.label}</span>
-          <div class="lc-yield-wrap">
-            <span class="lc-yield-val ${yieldCls}">${l.netYield}%</span>
-            <span class="lc-yield-lbl ${yieldCls}">yield</span>
-          </div>
+          ${svgHtml}
+          <span class="lc-yield-badge ${yieldBadgeCls}">${l.netYield}% yield</span>
+          <span class="lc-type-chip">${pt.label}</span>
         </div>
         <div class="lc-body">
           <div class="lc-name">${l.name}</div>
           <div class="lc-loc">📍 ${l.location} · ${l.size} m²</div>
           <div class="lc-stats">
-            <div class="lcs-item">
-              <div class="lcs-lbl">Income/Day</div>
-              <div class="lcs-val g">${fmtF(l.netDay)}</div>
+            <div class="lc-stat">
+              <div class="lc-stat-lbl">Income/Day</div>
+              <div class="lc-stat-val g">${fmtF(l.netDay)}</div>
             </div>
-            <div class="lcs-item">
-              <div class="lcs-lbl">Occupancy</div>
-              <div class="lcs-val">${l.occupancy}%</div>
+            <div class="lc-stat">
+              <div class="lc-stat-lbl">Occupancy</div>
+              <div class="lc-stat-val">${l.occupancy}%</div>
             </div>
-            <div class="lcs-item">
-              <div class="lcs-lbl">Gross Yield</div>
-              <div class="lcs-val">${l.grossYield}%</div>
+            <div class="lc-stat">
+              <div class="lc-stat-lbl">Gross Yield</div>
+              <div class="lc-stat-val">${l.grossYield}%</div>
             </div>
-            <div class="lcs-item">
-              <div class="lcs-lbl">Tax/yr</div>
-              <div class="lcs-val r">${fmtK(l.price * AREAS[l.area].taxRate)}</div>
+            <div class="lc-stat">
+              <div class="lc-stat-lbl">Tax/yr</div>
+              <div class="lc-stat-val r">${fmtK(l.price * AREAS[l.area].taxRate)}</div>
             </div>
           </div>
           <div class="lc-foot">
             <span class="lc-price">${fmtK(l.price)}</span>
-            <button class="btn-purchase${canAfford ? '' : ' disabled'}" data-lid="${l.id}" ${canAfford ? '' : 'disabled'}>
+            <button class="btn-purchase${canAfford ? '' : ' disabled'}" ${canAfford ? '' : 'disabled'}>
               ${canAfford ? 'Purchase' : 'Need '+fmtK(l.price-cash)+' more'}
             </button>
           </div>
-        </div>
-      `;
+        </div>`;
       card.querySelector('.btn-purchase').addEventListener('click', () => buyListing(l));
       grid.appendChild(card);
     });
   });
 
-  // Wire filter buttons
   container.querySelectorAll('[data-fa]').forEach(b => b.onclick = () => { filterArea = b.dataset.fa; renderMarket(); });
   container.querySelectorAll('[data-ft]').forEach(b => b.onclick = () => { filterType = b.dataset.ft; renderMarket(); });
 }
@@ -590,39 +614,35 @@ function renderMarket() {
 ───────────────────────────────────────────────────────────── */
 function renderMyEstate() {
   const re   = loadRE();
-  const cash = getCash();
   const inv    = re.properties.reduce((s, p) => s + p.purchasePrice, 0);
   const val    = re.properties.reduce((s, p) => s + (p.currentValue || p.purchasePrice), 0);
   const netDay = re.properties.reduce((s, p) => s + (p.netIncomeDay || 0), 0);
   const taxDay = re.properties.reduce((s, p) => s + (p.currentValue || p.purchasePrice) * AREAS[p.area].taxRate / 365, 0);
 
-  // Primary summary bar
   document.getElementById('estate-summary-wrap').innerHTML = `
-    <div class="estate-summary" style="margin-bottom:10px">
-      <div class="es-card">
+    <div class="estate-summary">
+      <div class="es-card c1">
         <div class="es-lbl">Portfolio Value</div>
-        <div class="es-val c-orange">${fmtK(val)}</div>
-        <div class="es-sub ${val>=inv?'up':'dn'}">${val>=inv?'▲':'▼'} ${Math.abs(((val-inv)/Math.max(inv,1)*100)).toFixed(1)}%</div>
+        <div class="es-val">${fmtK(val)}</div>
+        <div class="es-sub ${val>=inv?'c-green':'c-red'}">${val>=inv?'▲':'▼'} ${Math.abs(((val-inv)/Math.max(inv,1)*100)).toFixed(1)}% from cost</div>
       </div>
-      <div class="es-card">
+      <div class="es-card c2">
         <div class="es-lbl">Income / Day</div>
-        <div class="es-val c-green">${fmtF(netDay)}</div>
-        <div class="es-sub" style="color:var(--dn)">Tax ${fmtF(taxDay)}/day</div>
+        <div class="es-val">${fmtF(netDay)}</div>
+        <div class="es-sub" style="color:var(--red)">Tax ${fmtF(taxDay)}/day</div>
       </div>
-      <div class="es-card">
+      <div class="es-card c3">
         <div class="es-lbl">Total Earned</div>
-        <div class="es-val c-gold">${fmtK(re.totalEarned || 0)}</div>
+        <div class="es-val">${fmtK(re.totalEarned || 0)}</div>
         <div class="es-sub" style="color:var(--txt2)">${re.properties.length} propert${re.properties.length===1?'y':'ies'}</div>
       </div>
-    </div>
-  `;
+    </div>`;
 
-  // Property list
   const list = document.getElementById('props-list');
   if (!re.properties.length) {
     list.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">🏗️</div>
+        <span class="empty-icon">🏗️</span>
         <div class="empty-title">No Properties Yet</div>
         <div class="empty-sub">Visit the Marketplace tab to acquire your first property and start earning passive income.</div>
       </div>`;
@@ -631,55 +651,54 @@ function renderMyEstate() {
 
   list.innerHTML = '';
   re.properties.slice().reverse().forEach(p => {
-    const ar   = AREAS[p.area];
-    const pt   = PTYPES[p.type];
-    const demand  = areaDemand[p.area] || 70;
-    const curVal  = p.currentValue || p.purchasePrice;
-    const pnl     = curVal - p.purchasePrice;
-    const pnlPct  = (pnl / p.purchasePrice * 100).toFixed(1);
-    const taxDay  = curVal * ar.taxRate / 365;
-
-    const card = document.createElement('div');
-    card.className = 'my-prop-card';
+    const ar  = AREAS[p.area];
+    const pt  = PTYPES[p.type];
+    const demand = areaDemand[p.area] || 70;
+    const curVal = p.currentValue || p.purchasePrice;
+    const pnl    = curVal - p.purchasePrice;
+    const pnlPct = (pnl / p.purchasePrice * 100).toFixed(1);
+    const taxDay = curVal * ar.taxRate / 365;
+    const svgHtml = PROP_SVG[p.type] || '';
 
     const impChips = (p.improvements || []).map(i => {
       const imp = IMPROVEMENTS.find(x => x.id === i);
       return imp ? `<span class="impr-chip">${imp.icon} ${imp.name}</span>` : '';
     }).join('');
 
+    const card = document.createElement('div');
+    card.className = 'prop-card';
     card.innerHTML = `
-      <div class="mpc-header" style="background:${ar.grad}">
-        <div class="mpc-header-left">
-          <span class="mpc-icon">${pt.icon}</span>
-          <div class="mpc-info">
-            <div class="mpc-name">${p.name}</div>
-            <div class="mpc-loc">📍 ${p.location} · <span style="color:${ar.accent}">${ar.emoji} ${ar.label}</span></div>
-          </div>
+      <div class="pc-header" style="background:${ar.grad}">
+        <div class="pc-hero-icon" style="background:rgba(255,255,255,.05);border-color:${ar.border}">
+          ${svgHtml}
         </div>
-        <div class="mpc-value-box">
-          <div class="mpc-value">${fmtK(curVal)}</div>
-          <div class="mpc-pnl ${pnl>=0?'up':'dn'}">${pnl>=0?'▲':'▼'} ${Math.abs(pnlPct)}%</div>
+        <div class="pc-info">
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-loc">📍 ${p.location} · <span style="color:${ar.accent}">${ar.emoji} ${ar.label}</span></div>
+        </div>
+        <div class="pc-value-col">
+          <div class="pc-value">${fmtK(curVal)}</div>
+          <div class="pc-pnl ${pnl>=0?'pos':'neg'}">${pnl>=0?'▲':'▼'} ${Math.abs(pnlPct)}%</div>
         </div>
       </div>
-      <div class="mpc-body">
-        <div class="mpc-stats">
-          <div class="mpc-s"><div class="mpc-s-lbl">Income/Day</div><div class="mpc-s-val g">${fmtF(p.netIncomeDay||0)}</div></div>
-          <div class="mpc-s"><div class="mpc-s-lbl">Tax/Day</div><div class="mpc-s-val r">${fmtF(taxDay)}</div></div>
-          <div class="mpc-s"><div class="mpc-s-lbl">Demand</div><div class="mpc-s-val">${Math.round(demand)}%</div></div>
-          <div class="mpc-s"><div class="mpc-s-lbl">Total Earned</div><div class="mpc-s-val g">${fmtK(p.totalEarned||0)}</div></div>
-          <div class="mpc-s"><div class="mpc-s-lbl">Upgrades</div><div class="mpc-s-val">${(p.improvements||[]).length}</div></div>
-          <div class="mpc-s"><div class="mpc-s-lbl">Size</div><div class="mpc-s-val">${p.size} m²</div></div>
+      <div class="pc-body">
+        <div class="pc-stats">
+          <div class="pc-stat"><div class="pc-stat-lbl">Income/Day</div><div class="pc-stat-val g">${fmtF(p.netIncomeDay||0)}</div></div>
+          <div class="pc-stat"><div class="pc-stat-lbl">Tax/Day</div><div class="pc-stat-val r">${fmtF(taxDay)}</div></div>
+          <div class="pc-stat"><div class="pc-stat-lbl">Demand</div><div class="pc-stat-val">${Math.round(demand)}%</div></div>
+          <div class="pc-stat"><div class="pc-stat-lbl">Total Earned</div><div class="pc-stat-val g">${fmtK(p.totalEarned||0)}</div></div>
+          <div class="pc-stat"><div class="pc-stat-lbl">Upgrades</div><div class="pc-stat-val">${(p.improvements||[]).length}</div></div>
+          <div class="pc-stat"><div class="pc-stat-lbl">Size</div><div class="pc-stat-val">${p.size} m²</div></div>
         </div>
         ${impChips ? `<div class="impr-chips">${impChips}</div>` : ''}
-        <div class="mpc-actions">
+        <div class="pc-actions">
           ${p.type==='land' ? `<button class="btn-action btn-build" onclick="openBuildModal('${p.id}')">🏗️ Build</button>` : ''}
           <button class="btn-action btn-improve" onclick="openImproveModal('${p.id}')">⬆️ Upgrade</button>
           <button class="btn-action btn-lease" onclick="toggleLease('${p.id}')">${p.isLeased ? '📋 Leased' : '🤝 Lease'}</button>
           <button class="btn-action btn-sell" onclick="sellProperty('${p.id}')">Sell</button>
         </div>
-        ${p.isLeased ? `<div class="lease-info">📋 <strong>Leased:</strong> ${p.tenant||'Commercial Tenant'} · ${p.leaseType||'Long-term'} · ${fmtF(p.leaseRent||p.netIncomeDay||0)}/day guaranteed</div>` : ''}
-      </div>
-    `;
+        ${p.isLeased ? `<div class="lease-banner">📋 <strong>${p.tenant||'Commercial Tenant'}</strong> · ${p.leaseType||'Long-term'} · ${fmtF(p.leaseRent||p.netIncomeDay||0)}/day guaranteed</div>` : ''}
+      </div>`;
     list.appendChild(card);
   });
 }
@@ -692,23 +711,22 @@ function renderInsights() {
   const container = document.getElementById('insights-wrap');
 
   container.innerHTML = `
-    <!-- Demand meters -->
-    <div class="ins-section">
-      <div class="ins-section-head">
-        <span class="ins-section-title">Area Demand Index</span>
+    <div class="insight-card">
+      <div class="insight-card-head">
+        <span class="insight-card-title">📊 Area Demand Index</span>
       </div>
-      <div class="ins-section-body">
-        <div class="demand-grid">
+      <div class="insight-card-body">
+        <div class="demand-meters">
           ${Object.keys(AREAS).map(a => {
             const ar = AREAS[a];
             const d  = Math.round(areaDemand[a] || 70);
-            const col = d >= 80 ? 'var(--up)' : d >= 60 ? 'var(--gd)' : 'var(--dn)';
-            return `<div class="demand-card" style="border-color:${ar.border}">
-              <div class="dc-emoji">${ar.emoji}</div>
-              <div class="dc-name" style="color:${ar.accent}">${ar.label}</div>
-              <div class="dc-pct" style="color:${col}">${d}%</div>
-              <div class="dc-bar-wrap"><div class="dc-bar" style="width:${d}%;background:${col}"></div></div>
-              <div class="dc-meta">
+            const col = d >= 80 ? 'var(--emerald)' : d >= 60 ? 'var(--gold2)' : 'var(--red)';
+            return `<div class="dm-card" style="border-color:${ar.border}">
+              <span class="dm-icon">${ar.emoji}</span>
+              <div class="dm-name" style="color:${ar.accent}">${ar.label}</div>
+              <div class="dm-pct" style="color:${col}">${d}%</div>
+              <div class="dm-track"><div class="dm-fill" style="width:${d}%;background:${col}"></div></div>
+              <div class="dm-meta">
                 <div>Tax rate: ${(ar.taxRate*100).toFixed(1)}%/yr</div>
                 <div>Pop growth: +${ar.popGrowth}%/yr</div>
               </div>
@@ -718,33 +736,33 @@ function renderInsights() {
       </div>
     </div>
 
-    <!-- Market events -->
-    <div class="ins-section">
-      <div class="ins-section-head">
-        <span class="ins-section-title">Market Events</span>
+    <div class="insight-card">
+      <div class="insight-card-head">
+        <span class="insight-card-title">📰 Market Events</span>
       </div>
-      <div class="ins-section-body">
+      <div class="insight-card-body">
         <div class="events-list">
-          ${events.map(e => `
-            <div class="event-item ${e.type}">
-              <span class="event-icon">${e.icon}</span>
-              <div class="event-body">
-                <div class="event-title">${e.title}</div>
-                <div class="event-desc">${e.desc}</div>
+          ${events.map(e => {
+            const cls = e.type==='positive'?'pos': e.type==='negative'?'neg':'neu';
+            return `<div class="event-row ${cls}">
+              <span class="ev-icon">${e.icon}</span>
+              <div style="flex:1">
+                <div class="ev-title">${e.title}</div>
+                <div class="ev-desc">${e.desc}</div>
               </div>
-              <span class="event-tag">${e.effect}</span>
-            </div>`).join('')}
+              <span class="ev-tag">${e.effect}</span>
+            </div>`;
+          }).join('')}
         </div>
       </div>
     </div>
 
-    <!-- Price index -->
-    <div class="ins-section">
-      <div class="ins-section-head">
-        <span class="ins-section-title">Price Index by Area</span>
+    <div class="insight-card">
+      <div class="insight-card-head">
+        <span class="insight-card-title">💹 Price Index by Area</span>
       </div>
-      <div class="ins-section-body">
-        <div class="price-table">
+      <div class="insight-card-body">
+        <div class="price-tbl">
           <div class="pt-row pt-head">
             <span>Area</span><span>Land</span><span>Residential</span><span>Commercial</span><span>Industrial</span>
           </div>
@@ -755,13 +773,12 @@ function renderInsights() {
               <span>${fmtK(calcPrice('land', a, 100))}</span>
               <span>${fmtK(calcPrice('house', a, 200))}</span>
               <span>${fmtK(calcPrice('shop', a, 300))}</span>
-              <span>${PTYPES.factory.areas.includes(a) ? fmtK(calcPrice('factory', a, 400)) : 'N/A'}</span>
+              <span>${PTYPES.factory.areas.includes(a) ? fmtK(calcPrice('factory', a, 400)) : '—'}</span>
             </div>`;
           }).join('')}
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 function generateMarketEvents() {
@@ -785,8 +802,9 @@ function generateMarketEvents() {
 ───────────────────────────────────────────────────────────── */
 function buyListing(l) {
   const cash = getCash();
-  if (cash < l.price) { toast('Insufficient cash — earn more from stock trading!', '#f85149'); return; }
+  if (cash < l.price) { toast('Insufficient cash — earn more from stock trading!', 'var(--red)'); return; }
   playSound('buy');
+  showPurchaseEffect();
   const pt = PTYPES[l.type];
   const demand = areaDemand[l.area] || 70;
   const occFactor = Math.min(1, (demand / 100) * 1.05);
@@ -811,7 +829,7 @@ function buyListing(l) {
   re.pendingDebits = (re.pendingDebits || 0) + l.price;
   saveRE(re); deductCash(l.price);
   updateTopBar(); renderMarket();
-  toast(`${l.name} purchased for ${fmtK(l.price)}!`, '#238636');
+  toast(`${l.name} purchased for ${fmtK(l.price)}!`, 'var(--emerald)');
   setTimeout(() => switchTab('myestate'), 600);
 }
 
@@ -832,13 +850,13 @@ function openBuildModal(propId) {
       <button class="modal-close" onclick="closeModal('build-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="build-options">
+      <div class="build-opts">
         ${options.map(opt => {
           const pt       = PTYPES[opt.type];
           const buildCost = Math.round(p.currentValue * opt.baseM);
           const newValue  = Math.round(p.currentValue * (1 + opt.baseM * 0.4));
           const canAfford = cash >= buildCost;
-          return `<div class="build-option ${canAfford ? '' : 'unaffordable'}">
+          return `<div class="build-opt ${canAfford ? '' : 'unaffordable'}">
             <div class="bo-icon">${pt.icon}</div>
             <div class="bo-info">
               <div class="bo-name">${opt.label}</div>
@@ -851,14 +869,13 @@ function openBuildModal(propId) {
           </div>`;
         }).join('')}
       </div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('build-modal').classList.remove('hidden');
 }
 
 function buildOn(propId, type, cost, newValue) {
   const cash = getCash();
-  if (cash < cost) { toast('Insufficient cash', '#f85149'); return; }
+  if (cash < cost) { toast('Insufficient cash', 'var(--red)'); return; }
   const re = loadRE();
   const p  = re.properties.find(x => x.id === propId); if (!p) return;
   const pt = PTYPES[type];
@@ -874,7 +891,8 @@ function buildOn(propId, type, cost, newValue) {
   saveRE(re); deductCash(cost);
   closeModal('build-modal'); renderMyEstate(); updateTopBar();
   playSound('build');
-  toast(`${PTYPES[type].label} built! Value increased to ${fmtK(newValue)}`, '#1f6feb');
+  showPurchaseEffect();
+  toast(`${PTYPES[type].label} built! Value increased to ${fmtK(newValue)}`, 'var(--sky)');
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -897,10 +915,10 @@ function openImproveModal(propId) {
     <div class="modal-body">
       ${owned.length ? `
         <div class="owned-imprs">
-          <div class="oi-title">Installed Improvements</div>
-          <div class="oi-tags">${owned.map(id => {
+          <div class="oi-label">Installed Improvements</div>
+          <div class="oi-chips">${owned.map(id => {
             const i = IMPROVEMENTS.find(x => x.id === id);
-            return i ? `<span class="oi-tag">${i.icon} ${i.name}</span>` : '';
+            return i ? `<span class="oi-chip">${i.icon} ${i.name}</span>` : '';
           }).join('')}</div>
         </div>` : ''}
       <div class="improve-grid">
@@ -919,15 +937,14 @@ function openImproveModal(propId) {
           </div>`;
         }).join('') : `<div class="empty-state" style="padding:24px;grid-column:1/-1">All improvements installed! 🎉</div>`}
       </div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('prop-modal').classList.remove('hidden');
 }
 
 function addImprovement(propId, impId) {
   const cash = getCash();
   const imp  = IMPROVEMENTS.find(i => i.id === impId); if (!imp) return;
-  if (cash < imp.cost) { toast('Insufficient cash', '#f85149'); return; }
+  if (cash < imp.cost) { toast('Insufficient cash', 'var(--red)'); return; }
   const re = loadRE();
   const p  = re.properties.find(x => x.id === propId); if (!p) return;
   if (!p.improvements) p.improvements = [];
@@ -936,10 +953,10 @@ function addImprovement(propId, impId) {
   p.netIncomeDay = +(((p.netIncomeDay || 0) * (1 + imp.incPct))).toFixed(4);
   saveRE(re); deductCash(imp.cost);
   closeModal('prop-modal');
-  openImproveModal(propId); // reopen updated
+  openImproveModal(propId);
   renderMyEstate(); updateTopBar();
   playSound('improve');
-  toast(`${imp.icon} ${imp.name} added! Property value +${(imp.valuePct*100).toFixed(0)}%`, '#1f6feb');
+  toast(`${imp.icon} ${imp.name} added! Value +${(imp.valuePct*100).toFixed(0)}%`, 'var(--sky)');
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -955,10 +972,11 @@ function toggleLease(propId) {
     p.tenant    = tenants[Math.floor(Math.random() * tenants.length)];
     p.leaseType = leaseTypes[Math.floor(Math.random() * leaseTypes.length)];
     p.leaseRent = +((p.netIncomeDay || 0) * 1.05).toFixed(4);
-    toast(`Lease signed with ${p.tenant}!`, '#238636');
+    playSound('lease');
+    toast(`Lease signed with ${p.tenant}!`, 'var(--emerald)');
   } else {
     p.isLeased = false; p.tenant = null; p.leaseRent = 0;
-    toast('Lease terminated', '#f85149');
+    toast('Lease terminated', 'var(--red)');
   }
   saveRE(re); renderMyEstate();
 }
@@ -978,7 +996,7 @@ function sellProperty(propId) {
   saveRE(re); addCash(proceeds);
   renderMyEstate(); updateTopBar();
   playSound('sell');
-  toast(`Sold for ${fmtK(salePrice)} · Net ${fmtK(proceeds)} after ${fmtK(tax)} CGT`, '#1f6feb');
+  toast(`Sold for ${fmtK(salePrice)} · Net ${fmtK(proceeds)} after ${fmtK(tax)} CGT`, 'var(--sky)');
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -1007,11 +1025,10 @@ function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
-
-  if (tab === 'overview')  { renderOverview(); }
-  if (tab === 'market')    { renderMarket(); }
+  if (tab === 'overview')  renderOverview();
+  if (tab === 'market')    renderMarket();
   if (tab === 'myestate')  { processIncome(); renderMyEstate(); }
-  if (tab === 'insights')  { renderInsights(); }
+  if (tab === 'insights')  renderInsights();
 }
 document.querySelectorAll('.nav-tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 
@@ -1027,7 +1044,7 @@ document.querySelectorAll('.modal-overlay').forEach(o => o.onclick = e => { if (
 function toast(msg, col) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.background = col || '#238636';
+  t.style.background = col || 'var(--emerald)';
   t.style.color = '#fff';
   t.classList.add('show');
   clearTimeout(t._timer);
@@ -1035,44 +1052,130 @@ function toast(msg, col) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   VISUAL EFFECTS
+───────────────────────────────────────────────────────────── */
+function showPurchaseEffect() {
+  const el = document.createElement('div');
+  el.className = 'purchase-flash';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
+function showIncomeFloat(amount) {
+  if (amount < 0.01) return;
+  const el = document.createElement('div');
+  el.className = 'income-float';
+  el.textContent = '+' + fmtK(amount);
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2100);
+}
+
+/* ─────────────────────────────────────────────────────────────
    SOUNDS (Web Audio API)
 ───────────────────────────────────────────────────────────── */
 let _ac = null;
-function getAC() { if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)(); return _ac; }
+function getAC() {
+  if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
+  return _ac;
+}
+
 function playSound(type) {
   try {
     const ac = getAC();
+
     if (type === 'buy') {
-      [[440,.1],[550,.18],[660,.28]].forEach(([f,t]) => {
+      // Ascending major arpeggio + cash register ding
+      [[261.6,.0],[329.6,.12],[392.0,.25],[523.3,.38],[659.3,.52]].forEach(([f,t]) => {
         const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination); o.type = 'triangle'; o.frequency.value = f;
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'triangle'; o.frequency.value = f;
         const st = ac.currentTime + t;
-        g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(.18, st+.02); g.gain.exponentialRampToValueAtTime(.001, st+.35);
-        o.start(st); o.stop(st+.4);
+        g.gain.setValueAtTime(0, st);
+        g.gain.linearRampToValueAtTime(.16, st+.025);
+        g.gain.exponentialRampToValueAtTime(.001, st+.7);
+        o.start(st); o.stop(st+.8);
       });
+      // Cash register ding
+      const od = ac.createOscillator(), gd = ac.createGain();
+      od.connect(gd); gd.connect(ac.destination);
+      od.type = 'sine';
+      od.frequency.setValueAtTime(2800, ac.currentTime+.6);
+      od.frequency.exponentialRampToValueAtTime(1400, ac.currentTime+.8);
+      gd.gain.setValueAtTime(0, ac.currentTime+.6);
+      gd.gain.linearRampToValueAtTime(.28, ac.currentTime+.61);
+      gd.gain.exponentialRampToValueAtTime(.001, ac.currentTime+.85);
+      od.start(ac.currentTime+.6); od.stop(ac.currentTime+.9);
+
     } else if (type === 'build') {
-      [220,330,440,330,440,550].forEach((f,i) => {
+      // Construction thuds
+      [0, .09, .18].forEach(t => {
         const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination); o.type = 'square'; o.frequency.value = f;
-        const st = ac.currentTime + i*.08;
-        g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(.10, st+.01); g.gain.exponentialRampToValueAtTime(.001, st+.2);
-        o.start(st); o.stop(st+.2);
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'square'; o.frequency.value = 80 + Math.random()*40;
+        const st = ac.currentTime + t;
+        g.gain.setValueAtTime(.22, st);
+        g.gain.exponentialRampToValueAtTime(.001, st+.13);
+        o.start(st); o.stop(st+.15);
       });
-    } else if (type === 'improve') {
-      [523,659,784,1047].forEach((f,i) => {
+      // Triumphant fanfare
+      [[261.6,.42],[329.6,.42],[392.0,.42],[523.3,.48]].forEach(([f,t]) => {
         const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination); o.type = 'triangle'; o.frequency.value = f;
-        const st = ac.currentTime + i*.12;
-        g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(.15, st+.02); g.gain.exponentialRampToValueAtTime(.001, st+.5);
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'triangle'; o.frequency.value = f;
+        const st = ac.currentTime + t;
+        g.gain.setValueAtTime(0, st);
+        g.gain.linearRampToValueAtTime(.13, st+.04);
+        g.gain.exponentialRampToValueAtTime(.001, st+.9);
+        o.start(st); o.stop(st+1);
+      });
+
+    } else if (type === 'improve') {
+      // Sparkle cascade
+      [784, 988, 1175, 1397, 1568, 2093].forEach((f,i) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'sine'; o.frequency.value = f;
+        const st = ac.currentTime + i*.09;
+        g.gain.setValueAtTime(0, st);
+        g.gain.linearRampToValueAtTime(.14, st+.02);
+        g.gain.exponentialRampToValueAtTime(.001, st+.45);
         o.start(st); o.stop(st+.5);
       });
+
     } else if (type === 'sell') {
-      [660,550,440].forEach((f,i) => {
+      // Descending tones
+      [523.3, 392.0, 329.6, 261.6].forEach((f,i) => {
         const o = ac.createOscillator(), g = ac.createGain();
-        o.connect(g); g.connect(ac.destination); o.type = 'sawtooth'; o.frequency.value = f;
-        const st = ac.currentTime + i*.1;
-        g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(.12, st+.01); g.gain.exponentialRampToValueAtTime(.001, st+.3);
-        o.start(st); o.stop(st+.3);
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'sawtooth'; o.frequency.value = f;
+        const st = ac.currentTime + i*.12;
+        g.gain.setValueAtTime(0, st);
+        g.gain.linearRampToValueAtTime(.1, st+.01);
+        g.gain.exponentialRampToValueAtTime(.001, st+.35);
+        o.start(st); o.stop(st+.4);
+      });
+      // Cash ding
+      const od = ac.createOscillator(), gd = ac.createGain();
+      od.connect(gd); gd.connect(ac.destination);
+      od.type = 'sine';
+      od.frequency.setValueAtTime(1600, ac.currentTime+.52);
+      od.frequency.exponentialRampToValueAtTime(800, ac.currentTime+.72);
+      gd.gain.setValueAtTime(0, ac.currentTime+.52);
+      gd.gain.linearRampToValueAtTime(.22, ac.currentTime+.53);
+      gd.gain.exponentialRampToValueAtTime(.001, ac.currentTime+.78);
+      od.start(ac.currentTime+.52); od.stop(ac.currentTime+.82);
+
+    } else if (type === 'lease') {
+      // Soft contract chord
+      [261.6, 329.6, 392.0].forEach((f,i) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.connect(g); g.connect(ac.destination);
+        o.type = 'sine'; o.frequency.value = f;
+        const st = ac.currentTime + i*.07;
+        g.gain.setValueAtTime(0, st);
+        g.gain.linearRampToValueAtTime(.1, st+.05);
+        g.gain.exponentialRampToValueAtTime(.001, st+.65);
+        o.start(st); o.stop(st+.7);
       });
     }
   } catch(e) {}
@@ -1085,9 +1188,9 @@ initDemand();
 processIncome();
 genListings();
 updateTopBar();
+renderNewsTicker();
 renderOverview();
 
-// Refresh demand and listings every 2 min
 setInterval(() => {
   tickDemand(); genListings(); updateTopBar();
   if (currentTab === 'overview')  renderOverview();
@@ -1095,7 +1198,6 @@ setInterval(() => {
   if (currentTab === 'insights')  renderInsights();
 }, 120000);
 
-// Process income every 30s
 setInterval(() => {
   processIncome(); updateTopBar();
   if (currentTab === 'myestate') renderMyEstate();
