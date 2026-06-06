@@ -6,6 +6,9 @@
 <title>NASDAQ Stock Trader</title>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="style.css">
 <meta name="theme-color" content="#161b22">
 <meta name="mobile-web-app-capable" content="yes">
@@ -32,7 +35,8 @@ html[data-theme="light"]{
   --shadow:0 4px 16px rgba(0,0,0,0.15);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg1);color:var(--txt1);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;height:100vh;overflow:hidden;display:flex;flex-direction:column;transition:background .2s,color .2s;}
+:focus-visible{outline:2px solid #58a6ff;outline-offset:2px;border-radius:4px;}
+body{background:var(--bg1);color:var(--txt1);font-family:'Inter','Segoe UI',system-ui,sans-serif;min-height:100vh;height:100vh;overflow:hidden;display:flex;flex-direction:column;transition:background .2s,color .2s;}
 
 /* ── Header ── */
 header{display:none;}
@@ -43,9 +47,10 @@ header h1{font-size:17px;font-weight:700;color:#58a6ff;white-space:nowrap;}
 .hud-value{font-size:15px;font-weight:700;}
 .hud-value.up{color:#3fb950;}.hud-value.down{color:#f85149;}.hud-value.neutral{color:#e6edf3;}
 .header-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-.btn-hdr{border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
-.btn-hdr.purple{background:#6e40c9;}.btn-hdr.purple:hover{background:#8957e5;}
-.btn-hdr.teal{background:#0f6b5e;}.btn-hdr.teal:hover{background:#1a8f7d;}
+.btn-hdr{border:none;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:transform .13s,box-shadow .13s,background .13s;}
+.btn-hdr:active{transform:scale(.95);}
+.btn-hdr.purple{background:#6e40c9;}.btn-hdr.purple:hover{background:#8957e5;box-shadow:0 4px 14px rgba(110,64,201,.4);}
+.btn-hdr.teal{background:#0f6b5e;}.btn-hdr.teal:hover{background:#1a8f7d;box-shadow:0 4px 14px rgba(15,107,94,.4);}
 .btn-hdr.dark{background:#21262d;border:1px solid #30363d;}.btn-hdr.dark:hover{border-color:#58a6ff;}
 .player-name{font-size:12px;color:#8b949e;cursor:pointer;white-space:nowrap;}
 .player-name span{color:#58a6ff;font-weight:600;}
@@ -215,12 +220,16 @@ html[data-theme="light"] .tf-btn.active{background:var(--up);border-color:var(--
 .order-form input{width:100%;background:#0d1117;border:1px solid #30363d;color:#e6edf3;padding:7px 10px;border-radius:6px;font-size:13px;outline:none;}
 .order-form input:focus{border-color:#58a6ff;}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.btn-buy,.btn-sell{padding:9px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;width:100%;}
-.btn-buy{background:#238636;color:#fff;}.btn-buy:hover{background:#2ea043;}
-.btn-sell{background:#da3633;color:#fff;}.btn-sell:hover{background:#f85149;}
+.btn-buy,.btn-sell{padding:9px;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:transform .14s cubic-bezier(.22,.61,.36,1),box-shadow .14s,background .14s;}
+.btn-buy{background:#238636;color:#fff;}.btn-buy:hover{background:#2ea043;box-shadow:0 4px 16px rgba(35,134,54,.4);transform:translateY(-1px);}
+.btn-buy:active{transform:scale(.97);}
+.btn-sell{background:#da3633;color:#fff;}.btn-sell:hover{background:#f85149;box-shadow:0 4px 16px rgba(248,81,73,.4);transform:translateY(-1px);}
+.btn-sell:active{transform:scale(.97);}
+button:disabled,.btn-buy:disabled,.btn-sell:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
 /* Positions */
 .positions-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;}
-.position-row{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+.position-row{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;transition:border-color .15s,background .15s;}
+.position-row:hover{border-color:#58a6ff44;background:#111827;}
 .position-ticker{font-weight:700;font-size:13px;}.position-detail{color:#8b949e;font-size:10px;}
 .position-pnl{font-weight:700;text-align:right;}
 .position-pnl.up{color:#3fb950;}.position-pnl.down{color:#f85149;}
@@ -272,8 +281,9 @@ html[data-theme="light"] .tf-btn.active{background:var(--up);border-color:var(--
 .modal.wide{width:min(960px,98vw);}
 .modal-head{padding:14px 20px;border-bottom:1px solid #30363d;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
 .modal-head h2{font-size:15px;font-weight:700;}
-.modal-close{background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer;line-height:1;}
-.modal-close:hover{color:#e6edf3;}
+.modal-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#8b949e;font-size:18px;cursor:pointer;line-height:1;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s,color .15s,transform .12s;}
+.modal-close:hover{color:#e6edf3;background:rgba(255,255,255,.12);transform:scale(1.08);}
+.modal-close:active{transform:scale(.94);}
 .modal-body{padding:16px 20px;overflow-y:auto;flex:1;}
 
 /* ── Leaderboard ── */

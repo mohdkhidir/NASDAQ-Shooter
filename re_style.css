@@ -55,6 +55,8 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 14px; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+button:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
 
 body {
   background: var(--bg1);
@@ -181,7 +183,7 @@ button { cursor: pointer; font-family: inherit; }
   font-size: 10px; font-weight: 600;
   padding-left: 24px;
 }
-.ticker-inner:hover { animation-play-state: paused; }
+.ticker-inner:hover { animation-play-state: paused; opacity: .75; transition: opacity .3s; }
 .ticker-item { display: flex; align-items: center; gap: 6px; opacity: .85; }
 .ticker-item.pos { color: var(--emerald); }
 .ticker-item.neg { color: var(--red); }
@@ -427,13 +429,15 @@ button { cursor: pointer; font-family: inherit; }
   border-radius: 14px;
   overflow: hidden;
   display: flex; flex-direction: column;
-  transition: border-color .2s, transform .2s, box-shadow .2s;
+  transition: border-color .22s cubic-bezier(.22,.61,.36,1),
+              transform .22s cubic-bezier(.22,.61,.36,1),
+              box-shadow .22s cubic-bezier(.22,.61,.36,1);
   position: relative;
 }
 .listing-card:hover {
   border-color: var(--bdr3);
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 0 1px var(--bdr3);
+  box-shadow: 0 6px 16px rgba(0,0,0,.2), 0 12px 40px rgba(0,0,0,.35), 0 0 0 1px var(--bdr3);
 }
 
 /* Card hero — building illustration */
@@ -508,7 +512,7 @@ button { cursor: pointer; font-family: inherit; }
 .btn-purchase:active:not(:disabled) { transform: scale(.97); }
 .btn-purchase:disabled {
   background: var(--bg4); color: var(--txt3); cursor: not-allowed;
-  box-shadow: none; font-size: 9px; padding: 8px 10px;
+  box-shadow: none; font-size: 9px; padding: 8px 10px; opacity: .5;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -543,9 +547,11 @@ button { cursor: pointer; font-family: inherit; }
 .prop-card {
   background: var(--bg2); border: 1px solid var(--bdr);
   border-radius: 16px; overflow: hidden;
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color .22s cubic-bezier(.22,.61,.36,1),
+              box-shadow .22s cubic-bezier(.22,.61,.36,1),
+              transform .22s cubic-bezier(.22,.61,.36,1);
 }
-.prop-card:hover { border-color: var(--bdr2); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
+.prop-card:hover { border-color: var(--bdr2); box-shadow: 0 4px 12px rgba(0,0,0,.2), 0 8px 32px rgba(0,0,0,.3); transform: translateY(-2px); }
 
 .pc-header {
   display: flex; align-items: center; gap: 14px;
@@ -598,10 +604,12 @@ button { cursor: pointer; font-family: inherit; }
   transition: all .14s;
   -webkit-tap-highlight-color: transparent;
 }
-.btn-build   { background: rgba(16,185,129,.1);  color: var(--emerald); border-color: rgba(16,185,129,.25); }
-.btn-build:hover   { background: var(--emerald); color: #000; }
-.btn-improve { background: rgba(56,189,248,.1);   color: var(--sky);     border-color: rgba(56,189,248,.25); }
-.btn-improve:hover { background: var(--sky); color: #000; }
+.btn-build   { background: rgba(16,185,129,.1);  color: var(--emerald); border-color: rgba(16,185,129,.25); transition: all .15s cubic-bezier(.22,.61,.36,1); }
+.btn-build:hover   { background: var(--emerald); color: #000; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16,185,129,.3); }
+.btn-build:active  { transform: scale(.97); }
+.btn-improve { background: rgba(56,189,248,.1);   color: var(--sky);     border-color: rgba(56,189,248,.25); transition: all .15s cubic-bezier(.22,.61,.36,1); }
+.btn-improve:hover { background: var(--sky); color: #000; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(56,189,248,.3); }
+.btn-improve:active { transform: scale(.97); }
 .btn-lease   { background: rgba(167,139,250,.1);  color: var(--violet);  border-color: rgba(167,139,250,.25); }
 .btn-lease:hover   { background: var(--violet); color: #000; }
 .btn-sell    { background: rgba(244,63,94,.1);    color: var(--red);     border-color: rgba(244,63,94,.25); }
