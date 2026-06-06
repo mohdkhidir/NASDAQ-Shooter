@@ -542,8 +542,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .chart-price{font-size:17px;}
   .chart-change{font-size:10px;padding:1px 5px;}
 
-  /* Chart canvas: compact height (important overrides any JS inline style) */
-  #chart{height:150px !important;}
+  /* Chart canvas: taller on mobile for better readability */
+  #chart{height:220px !important;}
 
   /* Speed / timeframe bar: scroll horizontally, no wrap */
   .speed-bar{
@@ -595,15 +595,15 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .positions-list{max-height:100px;}
   .log-list{max-height:60px;}
 
-  /* ── Status bar: no-wrap, scroll if needed ── */
-  .net-worth-bar{
-    flex-shrink:0;padding:4px 8px;gap:8px;
-    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
-  }
-  .net-worth-bar::-webkit-scrollbar{display:none;}
-  .net-worth-bar .label,.net-worth-bar .val{font-size:10px;white-space:nowrap;flex-shrink:0;}
+  /* ── Hide old desktop status bar on mobile ── */
+  .net-worth-bar{display:none !important;}
+  /* ── Hide search panel checkbox row (saves vertical space) ── */
+  .sp-ctrl-bar{display:none !important;}
+  /* ── Mobile HUD strip ── */
+  .mob-hud{display:flex;}
+  /* ── Mobile bottom nav ── */
+  .mob-nav{display:flex;}
   #bar-ach{display:none;}
-  .btn-submit-score{font-size:10px;padding:3px 8px;flex-shrink:0;margin-left:auto;}
 
   /* Portfolio dashboard modal: smaller grid */
   .pf-grid{grid-template-columns:1fr 1fr;}
@@ -613,7 +613,7 @@ html[data-theme="light"] .toast-title{color:var(--up);}
 
 /* ── Extra-small phones (≤360px) ────────── */
 @media(max-width:360px){
-  #chart{height:130px;}
+  #chart{height:180px !important;}
   .sb-tabs{gap:0;}
   .ftt{padding:4px 6px;font-size:10px;}
 }
@@ -1321,6 +1321,28 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
       <div class="pattern-legend" id="pattern-legend" style="display:none"></div>
     </div>
     <canvas id="chart" height="300" style="cursor:crosshair"></canvas>
+    <!-- Mobile HUD strip: 4 stat cards, desktop hidden, mobile flex -->
+    <div class="mob-hud" id="mob-hud">
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">NET WORTH</div>
+        <div class="mob-hud-val" id="mob-net">$10,000</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">CASH</div>
+        <div class="mob-hud-val mob-blue" id="mob-cash">$10,000</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">P&amp;L</div>
+        <div class="mob-hud-val" id="mob-pnl">+$0</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">DAY</div>
+        <div class="mob-hud-val mob-gold" id="mob-day">1</div>
+      </div>
+    </div>
     <div id="info-panel" class="info-panel"></div>
     <div id="heatmap-panel"><iframe id="heatmap-iframe" src="nasdaq_heatmap.html" style="width:100%;height:100%;border:none;background:#0d1117;" frameborder="0"></iframe></div>
     <div class="speed-bar">
@@ -1497,6 +1519,31 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <button class="btn-submit-score" id="btn-submit">💾 Save</button>
   <button id="btn-logout" style="background:#2d1a1a;color:#f85149;border:1px solid #6e2b2b;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px">🚪 Logout</button>
 </div>
+
+<!-- Mobile bottom action nav — desktop hidden, mobile flex -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-btn" onclick="openPortfolio()">
+    <span class="mob-nav-ico">📊</span>
+    <span class="mob-nav-lbl">Portfolio</span>
+  </button>
+  <button class="mob-nav-btn" onclick="openLB()">
+    <span class="mob-nav-ico">🏆</span>
+    <span class="mob-nav-lbl">Ranks</span>
+  </button>
+  <button class="mob-nav-btn" onclick="openRealEstate()">
+    <span class="mob-nav-ico">🏢</span>
+    <span class="mob-nav-lbl">R.Estate</span>
+    <span id="mob-re-badge" class="mob-nav-badge" style="display:none"></span>
+  </button>
+  <button class="mob-nav-btn" onclick="submitScore()">
+    <span class="mob-nav-ico">💾</span>
+    <span class="mob-nav-lbl">Save</span>
+  </button>
+  <button class="mob-nav-btn mob-nav-danger" onclick="logoutGame()">
+    <span class="mob-nav-ico">🚪</span>
+    <span class="mob-nav-lbl">Logout</span>
+  </button>
+</nav>
 
 <div class="tooltip" id="tooltip"></div>
 
@@ -5573,6 +5620,12 @@ function collectREIncome(){
 }
 // ─────────────────────────────────────────────────────────────────
 
+function fmtK(v){
+  const a=Math.abs(v),s=v<0?'-':'';
+  if(a>=1e6) return s+'$'+(a/1e6).toFixed(1)+'M';
+  if(a>=1e4) return s+'$'+(a/1000).toFixed(1)+'K';
+  return s+'$'+a.toFixed(0);
+}
 function renderHUD(){
   const pv=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);
   const net=netWorth(), sc=state.startCash||INITIAL_CASH, pnl=net-sc;
@@ -5581,6 +5634,15 @@ function renderHUD(){
   ne.textContent=fmt(net);ne.className='hud-value '+(net>=sc?'up':'down');
   const pe=document.getElementById('hud-pnl');
   pe.textContent=(pnl>=0?'+':'')+fmt(pnl);pe.className='hud-value '+(pnl>=0?'up':'down');
+  // ── Mobile HUD strip ──────────────────────────────────────
+  const mn=document.getElementById('mob-net');
+  if(mn){mn.textContent=fmtK(net);mn.className='mob-hud-val '+(net>=sc?'mob-up':'mob-dn');}
+  const mc=document.getElementById('mob-cash');
+  if(mc) mc.textContent=fmtK(state.cash);
+  const mp=document.getElementById('mob-pnl');
+  if(mp){mp.textContent=(pnl>=0?'+':'')+fmtK(pnl);mp.className='mob-hud-val '+(pnl>=0?'mob-up':'mob-dn');}
+  const md=document.getElementById('mob-day');
+  if(md) md.textContent=state.day;
 }
 
 function renderChart(){
