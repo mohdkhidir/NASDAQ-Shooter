@@ -5594,6 +5594,9 @@ function syncSharedState(){
     const sh=JSON.parse(localStorage.getItem(SH_KEY)||'{}');
     sh.cash=state.cash; sh.day=state.day; sh.playerName=playerName;
     sh.rePropertyValue=state.rePropertyValue||0;
+    sh.stockValue=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);
+    sh.netWorth=netWorth();
+    sh.stockPositions=Object.entries(state.positions).filter(([t,p])=>p.shares>0).slice(0,10).map(([t,p])=>({t,shares:p.shares,val:+(p.shares*state.prices[t]).toFixed(2),pnl:+((state.prices[t]-p.avgCost)*p.shares).toFixed(2)}));
     localStorage.setItem(SH_KEY,JSON.stringify(sh));
   }catch(e){}
 }
