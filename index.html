@@ -1495,6 +1495,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <button id="btn-realestate" onclick="openRealEstate()" style="background:#28180a;color:#f0883e;border:1px solid #6a3a1a;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px">🏢 Real Estate<span id="re-value-badge" style="display:none;background:rgba(240,136,62,.2);padding:0 5px;border-radius:8px;font-size:10px;margin-left:2px"></span></button>
   <button id="theme-toggle" style="background:none;border:1px solid #30363d;color:#8b949e;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:13px">🌙</button>
   <button class="btn-submit-score" id="btn-submit">💾 Save</button>
+  <button id="btn-logout" style="background:#2d1a1a;color:#f85149;border:1px solid #6e2b2b;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px">🚪 Logout</button>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
@@ -9296,6 +9297,27 @@ document.getElementById('btn-restart-game').onclick=()=>{
   initNameOverlay();
 };
 document.getElementById('btn-save-go-score').onclick=()=>{submitScore();};
+
+// ── Logout ───────────────────────────────────────────────────
+function logoutGame(){
+  if(state.gameOver||!playerName) return;
+  const confirmed=confirm(`Save and logout, ${playerName}?\n\nYour progress will be saved and you'll return to the main menu.`);
+  if(!confirmed) return;
+  saveGame();
+  clearTimeout(tickTimer);
+  state.gameOver=false;
+  showToast('💾','Progress saved — see you next time, '+playerName+'!','buy');
+  setTimeout(()=>{
+    document.getElementById('name-overlay').classList.remove('hidden');
+    initNameOverlay();
+  },900);
+}
+document.getElementById('btn-logout').onclick=logoutGame;
+
+// Auto-save on page close / refresh
+window.addEventListener('beforeunload',()=>{
+  if(playerName&&!state.gameOver) saveGame();
+});
 
 // ── Theme toggle ─────────────────────────────────────────────
 (function(){
