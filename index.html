@@ -7162,6 +7162,40 @@ function playSound(type){
         g.gain.exponentialRampToValueAtTime(0.001,st+h.dur);
         o.start(st);o.stop(st+h.dur+0.05);
       });
+    }else if(type==='uiHover'){
+      // Soft UI tick — subtle mouse-over feedback
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.type='sine';o.frequency.setValueAtTime(900,ac.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1100,ac.currentTime+0.04);
+      g.gain.setValueAtTime(0,ac.currentTime);
+      g.gain.linearRampToValueAtTime(0.06,ac.currentTime+0.008);
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.06);
+      o.start(ac.currentTime);o.stop(ac.currentTime+0.07);
+    }else if(type==='uiSelect'){
+      // Satisfying pick / selection click
+      [[500,0],[700,0.04],[900,0.08]].forEach(([f,d])=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.type='triangle';o.frequency.value=f;
+        const t=ac.currentTime+d;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.12,t+0.01);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+        o.start(t);o.stop(t+0.14);
+      });
+    }else if(type==='uiContinue'){
+      // Warm rising chord — "welcome back" feeling
+      [330,415,523,659].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.type='triangle';o.frequency.value=f;
+        const t=ac.currentTime+i*0.08;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.13,t+0.015);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.45);
+        o.start(t);o.stop(t+0.5);
+      });
     }
   }catch(e){}
 }
@@ -8993,16 +9027,155 @@ function startGame(name,diffLevel){
     alert('Startup error: '+e.message+'\n\nSee console for details.');
   }
 }
-// ── Name overlay init (anime/comic style) ─────────────────────
+// ── Login canvas: aurora + color rays + candlesticks ──────────
+function startLoginCanvas(canvas){
+  if(canvas._raf){cancelAnimationFrame(canvas._raf);canvas._raf=null;}
+  const ctx=canvas.getContext('2d');
+  let W=0,H=0,T=0;
+  const resize=()=>{W=canvas.width=canvas.offsetWidth||window.innerWidth;H=canvas.height=canvas.offsetHeight||window.innerHeight;};
+  resize();
+  const _ro=new ResizeObserver(resize);_ro.observe(canvas.parentElement);
+
+  // Color rays — 8 beams rotating from center, each a different hue
+  const RAYS=[0,45,90,135,180,225,270,315].map((deg,i)=>({
+    baseAngle:deg*(Math.PI/180), speed:.0004+i*.00015,
+    hue:i*45, width:1.5+i*.4,
+  }));
+
+  // Candlesticks — 18 drifting upward
+  const CANDLES=Array.from({length:18},(_,i)=>({
+    x:Math.random()*1200, y:Math.random()*900,
+    vx:-.15+Math.random()*.1, vy:-.25-.3*Math.random(),
+    bull:Math.random()>.42,
+    bh:14+Math.random()*22, wk:5+Math.random()*10,
+    bw:5+Math.random()*5, alpha:0,
+  }));
+
+  // Grid offset
+  let goff=0;
+
+  function frame(){
+    T++;goff=(goff+.35)%44;
+    ctx.clearRect(0,0,W,H);
+
+    // ── Deep aurora background ──────────────────────────────
+    const bg=ctx.createRadialGradient(W*.5,H*.65,0,W*.5,H*.5,Math.hypot(W,H)*.75);
+    bg.addColorStop(0,'#16003a');bg.addColorStop(.5,'#0a0018');bg.addColorStop(1,'#03000a');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+    // shifting aurora blob
+    const hShift=(T*.4)%360;
+    const aur=ctx.createRadialGradient(
+      W*.5+Math.sin(T*.006)*W*.22, H*.35+Math.cos(T*.004)*H*.12, 0,
+      W*.5, H*.45, W*.65);
+    aur.addColorStop(0,`hsla(${hShift},75%,38%,.10)`);
+    aur.addColorStop(.55,`hsla(${(hShift+80)%360},65%,28%,.05)`);
+    aur.addColorStop(1,'transparent');
+    ctx.fillStyle=aur;ctx.fillRect(0,0,W,H);
+
+    // ── Scrolling grid ──────────────────────────────────────
+    ctx.strokeStyle='rgba(58,134,255,.04)';ctx.lineWidth=1;
+    const gs=44;
+    for(let x=goff;x<W+gs;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=goff;y<H+gs;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // ── Color rays ─────────────────────────────────────────
+    ctx.save();ctx.translate(W/2,H/2);
+    RAYS.forEach((r,i)=>{
+      r.baseAngle+=r.speed;
+      const hue=(r.hue+T*.25)%360;
+      const alpha=.04+Math.abs(Math.sin(T*.018+i))*.07;
+      ctx.save();ctx.rotate(r.baseAngle);
+      const rg=ctx.createLinearGradient(0,0,Math.max(W,H)*1.1,0);
+      rg.addColorStop(0,`hsla(${hue},90%,60%,${alpha*2})`);
+      rg.addColorStop(.3,`hsla(${hue},90%,55%,${alpha})`);
+      rg.addColorStop(1,'transparent');
+      ctx.strokeStyle=rg;ctx.lineWidth=r.width*(1+Math.sin(T*.025+i)*.4);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.max(W,H)*1.2,0);ctx.stroke();
+      // mirror ray
+      ctx.rotate(Math.PI);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.max(W,H)*1.2,0);ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // ── Candlestick bars ────────────────────────────────────
+    CANDLES.forEach(c=>{
+      c.x+=c.vx;c.y+=c.vy;
+      if(c.y<-80||c.x<-60||c.x>W+60){
+        c.x=Math.random()*W;c.y=H+50+Math.random()*80;
+        c.bull=Math.random()>.42;c.alpha=0;
+      }
+      c.alpha=Math.min(.35,c.alpha+.004);
+      const col=c.bull?'#3fb950':'#f85149';
+      ctx.globalAlpha=c.alpha;
+      ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(c.x,c.y-c.bh/2-c.wk);ctx.lineTo(c.x,c.y+c.bh/2+c.wk);ctx.stroke();
+      ctx.fillRect(c.x-c.bw/2,c.y-c.bh/2,c.bw,c.bh);
+    });
+    ctx.globalAlpha=1;
+
+    const ov=document.getElementById('name-overlay');
+    if(ov&&!ov.classList.contains('hidden'))canvas._raf=requestAnimationFrame(frame);
+    else{_ro.disconnect();canvas._raf=null;}
+  }
+  canvas._raf=requestAnimationFrame(frame);
+}
+
+// ── Floating ticker chips ──────────────────────────────────────
+function spawnLoginTickers(layer){
+  if(layer._tickers)return;
+  layer._tickers=true;
+  const STOCKS=[
+    ['AAPL','+2.3%','bull'],['NVDA','+5.1%','bull'],['TSLA','-1.8%','bear'],
+    ['MSFT','+0.9%','bull'],['META','+3.2%','bull'],['AMZN','-0.7%','bear'],
+    ['GOOGL','+1.4%','bull'],['AMD','+4.2%','bull'],['NFLX','-2.1%','bear'],
+    ['COIN','+7.4%','bull'],['PLTR','+1.9%','bull'],['SNAP','-3.1%','bear'],
+  ];
+  STOCKS.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className=`ns-tick-chip ${s[2]}`;
+    el.textContent=`${s[0]} ${s[1]}`;
+    const topPct=5+Math.random()*22;
+    const dur=10+Math.random()*16;
+    const delay=i*(dur/STOCKS.length*1000);
+    el.style.cssText=`top:${topPct}%;animation-duration:${dur}s;animation-delay:-${delay}ms;`;
+    layer.appendChild(el);
+  });
+}
+
+// ── Name overlay init ──────────────────────────────────────────
 function initNameOverlay(){
   const wrap=document.getElementById('ns-wrap'); if(!wrap)return;
+  const overlay=document.getElementById('name-overlay');
+
+  // Canvas background
+  let bgCanvas=document.getElementById('ns-bg-canvas');
+  if(!bgCanvas){
+    bgCanvas=document.createElement('canvas');
+    bgCanvas.id='ns-bg-canvas';
+    overlay.insertBefore(bgCanvas,overlay.firstChild);
+  }
+  startLoginCanvas(bgCanvas);
+
+  // Ticker chip layer
+  let tickerLayer=document.getElementById('ns-ticker-layer');
+  if(!tickerLayer){
+    tickerLayer=document.createElement('div');
+    tickerLayer.id='ns-ticker-layer';
+    tickerLayer.className='ns-ticker-layer';
+    overlay.insertBefore(tickerLayer,overlay.children[1]||overlay.firstChild);
+  }
+  spawnLoginTickers(tickerLayer);
+
   // Particles
   const pts=document.getElementById('ns-particles');
   if(pts&&!pts.childElementCount){
-    for(let i=0;i<14;i++){
+    for(let i=0;i<16;i++){
       const p=document.createElement('div'); p.className='ns-particle';
       const sz=2+Math.random()*4;
-      p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${7+Math.random()*9}s;animation-delay:${Math.random()*7}s;`;
+      const hue=200+Math.random()*160;
+      p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:hsl(${hue},80%,65%);animation-duration:${8+Math.random()*10}s;animation-delay:-${Math.random()*8}s;`;
       pts.appendChild(p);
     }
   }
@@ -9049,18 +9222,38 @@ function initNameOverlay(){
       </div>
     </div>
     <button class="ns-start-btn" id="name-start"${save?'style="display:none"':''}>START TRADING</button>`;
-  // Wire difficulty cards
+  // Wire difficulty cards with hover + select sounds
   wrap.querySelectorAll('.ns-diff-card').forEach(c=>{
+    c.addEventListener('mouseenter',()=>playSound('uiHover'));
+    c.addEventListener('touchstart',()=>playSound('uiHover'),{passive:true});
     c.onclick=()=>{
+      playSound('uiSelect');
       selectedDiff=parseInt(c.dataset.d);
       wrap.querySelectorAll('.ns-diff-card').forEach(x=>x.classList.toggle('sel',x===c));
     };
   });
-  // Wire start
+  // Avatar hover sounds
+  wrap.querySelectorAll('.ns-avi-btn').forEach(b=>{
+    b.addEventListener('mouseenter',()=>playSound('uiHover'));
+    b.addEventListener('touchstart',()=>playSound('uiHover'),{passive:true});
+  });
+  // Start button hover
   const sb=document.getElementById('name-start');
-  if(sb) sb.onclick=()=>nsStart();
+  if(sb){
+    sb.addEventListener('mouseenter',()=>playSound('uiHover'));
+    sb.onclick=()=>nsStart();
+  }
+  // Continue button hover
+  const cb=wrap.querySelector('.ns-btn-cont');
+  if(cb){
+    cb.addEventListener('mouseenter',()=>playSound('uiHover'));
+    cb.addEventListener('click',()=>playSound('uiContinue'),{capture:true});
+  }
   const ni=document.getElementById('name-input');
-  if(ni) ni.addEventListener('keydown',e=>{if(e.key==='Enter')nsStart();});
+  if(ni){
+    ni.addEventListener('focus',()=>playSound('uiHover'));
+    ni.addEventListener('keydown',e=>{if(e.key==='Enter')nsStart();});
+  }
 }
 function nsStart(){
   const nm=(document.getElementById('name-input')?.value||'').trim();
@@ -9072,6 +9265,7 @@ function nsFlash(){
   document.body.appendChild(f); setTimeout(()=>f.remove(),600);
 }
 function pickAvatar(id){
+  playSound('uiSelect');
   selectedAvatar=id;
   document.querySelectorAll('.ns-avi-btn').forEach(b=>b.classList.toggle('picked',b.dataset.avid===id));
 }
@@ -9082,7 +9276,7 @@ function showNewGameForm(){
 }
 function continueGame(){
   const sv=getSave(); if(!sv)return;
-  nsFlash(); playSound('gameStart');
+  nsFlash(); playSound('uiContinue'); setTimeout(()=>playSound('gameStart'),400);
   setTimeout(()=>{
     playerName=sv.name; selectedAvatar=sv.avatar||'dragon';
     state.cash=sv.cash; state.positions=sv.positions||{};
