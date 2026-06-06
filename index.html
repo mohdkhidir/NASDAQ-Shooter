@@ -542,8 +542,8 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .chart-price{font-size:17px;}
   .chart-change{font-size:10px;padding:1px 5px;}
 
-  /* Chart canvas: compact height (important overrides any JS inline style) */
-  #chart{height:150px !important;}
+  /* Chart canvas: taller on mobile for better readability */
+  #chart{height:220px !important;}
 
   /* Speed / timeframe bar: scroll horizontally, no wrap */
   .speed-bar{
@@ -595,15 +595,15 @@ html[data-theme="light"] .toast-title{color:var(--up);}
   .positions-list{max-height:100px;}
   .log-list{max-height:60px;}
 
-  /* ── Status bar: no-wrap, scroll if needed ── */
-  .net-worth-bar{
-    flex-shrink:0;padding:4px 8px;gap:8px;
-    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
-  }
-  .net-worth-bar::-webkit-scrollbar{display:none;}
-  .net-worth-bar .label,.net-worth-bar .val{font-size:10px;white-space:nowrap;flex-shrink:0;}
+  /* ── Hide old desktop status bar on mobile ── */
+  .net-worth-bar{display:none !important;}
+  /* ── Hide search panel checkbox row (saves vertical space) ── */
+  .sp-ctrl-bar{display:none !important;}
+  /* ── Mobile HUD strip ── */
+  .mob-hud{display:flex;}
+  /* ── Mobile bottom nav ── */
+  .mob-nav{display:flex;}
   #bar-ach{display:none;}
-  .btn-submit-score{font-size:10px;padding:3px 8px;flex-shrink:0;margin-left:auto;}
 
   /* Portfolio dashboard modal: smaller grid */
   .pf-grid{grid-template-columns:1fr 1fr;}
@@ -613,7 +613,7 @@ html[data-theme="light"] .toast-title{color:var(--up);}
 
 /* ── Extra-small phones (≤360px) ────────── */
 @media(max-width:360px){
-  #chart{height:130px;}
+  #chart{height:180px !important;}
   .sb-tabs{gap:0;}
   .ftt{padding:4px 6px;font-size:10px;}
 }
@@ -1028,6 +1028,38 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
 <div class="modal-overlay" id="name-overlay">
   <div class="ns-bg-lines"></div>
   <div class="ns-bg-particles" id="ns-particles"></div>
+  <div class="ns-static-logo">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="160" height="160">
+      <rect width="200" height="200" rx="36" fill="#0d1117"/>
+      <rect width="200" height="200" rx="36" fill="#1a2744" opacity="0.7"/>
+      <line x1="0" y1="67" x2="200" y2="67" stroke="#1e3050" stroke-width="1.2"/>
+      <line x1="0" y1="133" x2="200" y2="133" stroke="#1e3050" stroke-width="1.2"/>
+      <line x1="67" y1="0" x2="67" y2="200" stroke="#1e3050" stroke-width="1.2"/>
+      <line x1="133" y1="0" x2="133" y2="200" stroke="#1e3050" stroke-width="1.2"/>
+      <polygon points="18,162 50,136 80,144 108,110 136,82 162,50 178,30 178,178 18,178" fill="#3fb950" opacity="0.12"/>
+      <line x1="36" y1="118" x2="36" y2="158" stroke="#f85149" stroke-width="2" opacity="0.7"/>
+      <rect x="28" y="124" width="16" height="26" rx="3" fill="#f85149" opacity="0.85"/>
+      <line x1="64" y1="104" x2="64" y2="148" stroke="#f85149" stroke-width="2" opacity="0.7"/>
+      <rect x="56" y="110" width="16" height="28" rx="3" fill="#f85149" opacity="0.85"/>
+      <line x1="92" y1="88" x2="92" y2="134" stroke="#3fb950" stroke-width="2" opacity="0.7"/>
+      <rect x="84" y="94" width="16" height="30" rx="3" fill="#3fb950" opacity="0.9"/>
+      <line x1="120" y1="64" x2="120" y2="114" stroke="#3fb950" stroke-width="2" opacity="0.7"/>
+      <rect x="112" y="70" width="16" height="34" rx="3" fill="#3fb950" opacity="0.9"/>
+      <polyline points="18,162 50,136 80,144 108,110 136,82 162,50 178,30"
+        fill="none" stroke="#3fb950" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="18,162 50,136 80,144 108,110 136,82 162,50 178,30"
+        fill="none" stroke="#56d364" stroke-width="2.5" opacity="0.45"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="170" cy="36" r="22" fill="none" stroke="#3fb950" stroke-width="3.5"/>
+      <circle cx="170" cy="36" r="11" fill="none" stroke="#3fb950" stroke-width="2" opacity="0.55"/>
+      <circle cx="170" cy="36" r="5" fill="#3fb950"/>
+      <line x1="170" y1="8"  x2="170" y2="20" stroke="#3fb950" stroke-width="3"/>
+      <line x1="170" y1="52" x2="170" y2="64" stroke="#3fb950" stroke-width="3"/>
+      <line x1="142" y1="36" x2="154" y2="36" stroke="#3fb950" stroke-width="3"/>
+    </svg>
+    <div class="ns-static-logo-name">NASDAQ SHOOTER</div>
+  </div>
   <div class="ns-wrap" id="ns-wrap"></div>
 </div>
 
@@ -1321,6 +1353,28 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
       <div class="pattern-legend" id="pattern-legend" style="display:none"></div>
     </div>
     <canvas id="chart" height="300" style="cursor:crosshair"></canvas>
+    <!-- Mobile HUD strip: 4 stat cards, desktop hidden, mobile flex -->
+    <div class="mob-hud" id="mob-hud">
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">NET WORTH</div>
+        <div class="mob-hud-val" id="mob-net">$10,000</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">CASH</div>
+        <div class="mob-hud-val mob-blue" id="mob-cash">$10,000</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">P&amp;L</div>
+        <div class="mob-hud-val" id="mob-pnl">+$0</div>
+      </div>
+      <div class="mob-hud-sep"></div>
+      <div class="mob-hud-card">
+        <div class="mob-hud-lbl">DAY</div>
+        <div class="mob-hud-val mob-gold" id="mob-day">1</div>
+      </div>
+    </div>
     <div id="info-panel" class="info-panel"></div>
     <div id="heatmap-panel"><iframe id="heatmap-iframe" src="nasdaq_heatmap.html" style="width:100%;height:100%;border:none;background:#0d1117;" frameborder="0"></iframe></div>
     <div class="speed-bar">
@@ -1495,7 +1549,38 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <button id="btn-realestate" onclick="openRealEstate()" style="background:#28180a;color:#f0883e;border:1px solid #6a3a1a;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px">🏢 Real Estate<span id="re-value-badge" style="display:none;background:rgba(240,136,62,.2);padding:0 5px;border-radius:8px;font-size:10px;margin-left:2px"></span></button>
   <button id="theme-toggle" style="background:none;border:1px solid #30363d;color:#8b949e;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:13px">🌙</button>
   <button class="btn-submit-score" id="btn-submit">💾 Save</button>
+  <button id="btn-logout" style="background:#2d1a1a;color:#f85149;border:1px solid #6e2b2b;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px">🚪 Logout</button>
 </div>
+
+<!-- Mobile bottom action nav — desktop hidden, mobile flex -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-btn mob-neon-blue" onclick="openPortfolio()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
+    <span class="mob-nav-ico">📊</span>
+    <span class="mob-nav-lbl">Portfolio</span>
+  </button>
+  <button class="mob-nav-btn mob-neon-gold" onclick="openLB()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
+    <span class="mob-nav-ico">🏆</span>
+    <span class="mob-nav-lbl">Ranks</span>
+  </button>
+  <button class="mob-nav-btn mob-neon-green" onclick="openRealEstate()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
+    <span class="mob-nav-ico">🏢</span>
+    <span class="mob-nav-lbl">R.Estate</span>
+    <span id="mob-re-badge" class="mob-nav-badge" style="display:none"></span>
+  </button>
+  <button class="mob-nav-btn mob-neon-teal" onclick="submitScore()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
+    <span class="mob-nav-ico">💾</span>
+    <span class="mob-nav-lbl">Save</span>
+  </button>
+  <button class="mob-nav-btn mob-nav-danger mob-neon-red" onclick="logoutGame()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
+    <span class="mob-nav-ico">🚪</span>
+    <span class="mob-nav-lbl">Logout</span>
+  </button>
+</nav>
 
 <div class="tooltip" id="tooltip"></div>
 
@@ -5514,6 +5599,9 @@ function syncSharedState(){
     const sh=JSON.parse(localStorage.getItem(SH_KEY)||'{}');
     sh.cash=state.cash; sh.day=state.day; sh.playerName=playerName;
     sh.rePropertyValue=state.rePropertyValue||0;
+    sh.stockValue=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);
+    sh.netWorth=netWorth();
+    sh.stockPositions=Object.entries(state.positions).filter(([t,p])=>p.shares>0).slice(0,10).map(([t,p])=>({t,shares:p.shares,val:+(p.shares*state.prices[t]).toFixed(2),pnl:+((state.prices[t]-p.avgCost)*p.shares).toFixed(2)}));
     localStorage.setItem(SH_KEY,JSON.stringify(sh));
   }catch(e){}
 }
@@ -5572,6 +5660,12 @@ function collectREIncome(){
 }
 // ─────────────────────────────────────────────────────────────────
 
+function fmtK(v){
+  const a=Math.abs(v),s=v<0?'-':'';
+  if(a>=1e6) return s+'$'+(a/1e6).toFixed(1)+'M';
+  if(a>=1e4) return s+'$'+(a/1000).toFixed(1)+'K';
+  return s+'$'+a.toFixed(0);
+}
 function renderHUD(){
   const pv=Object.entries(state.positions).reduce((s,[t,p])=>s+p.shares*state.prices[t],0);
   const net=netWorth(), sc=state.startCash||INITIAL_CASH, pnl=net-sc;
@@ -5580,6 +5674,15 @@ function renderHUD(){
   ne.textContent=fmt(net);ne.className='hud-value '+(net>=sc?'up':'down');
   const pe=document.getElementById('hud-pnl');
   pe.textContent=(pnl>=0?'+':'')+fmt(pnl);pe.className='hud-value '+(pnl>=0?'up':'down');
+  // ── Mobile HUD strip ──────────────────────────────────────
+  const mn=document.getElementById('mob-net');
+  if(mn){mn.textContent=fmtK(net);mn.className='mob-hud-val '+(net>=sc?'mob-up':'mob-dn');}
+  const mc=document.getElementById('mob-cash');
+  if(mc) mc.textContent=fmtK(state.cash);
+  const mp=document.getElementById('mob-pnl');
+  if(mp){mp.textContent=(pnl>=0?'+':'')+fmtK(pnl);mp.className='mob-hud-val '+(pnl>=0?'mob-up':'mob-dn');}
+  const md=document.getElementById('mob-day');
+  if(md) md.textContent=state.day;
 }
 
 function renderChart(){
@@ -7161,8 +7264,157 @@ function playSound(type){
         g.gain.exponentialRampToValueAtTime(0.001,st+h.dur);
         o.start(st);o.stop(st+h.dur+0.05);
       });
+    }else if(type==='uiHover'){
+      // Soft UI tick — subtle mouse-over feedback
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);
+      o.type='sine';o.frequency.setValueAtTime(900,ac.currentTime);
+      o.frequency.exponentialRampToValueAtTime(1100,ac.currentTime+0.04);
+      g.gain.setValueAtTime(0,ac.currentTime);
+      g.gain.linearRampToValueAtTime(0.06,ac.currentTime+0.008);
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.06);
+      o.start(ac.currentTime);o.stop(ac.currentTime+0.07);
+    }else if(type==='uiSelect'){
+      // Satisfying pick / selection click
+      [[500,0],[700,0.04],[900,0.08]].forEach(([f,d])=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.type='triangle';o.frequency.value=f;
+        const t=ac.currentTime+d;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.12,t+0.01);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+        o.start(t);o.stop(t+0.14);
+      });
+    }else if(type==='uiContinue'){
+      // Warm rising chord — "welcome back" feeling
+      [330,415,523,659].forEach((f,i)=>{
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.connect(g);g.connect(ac.destination);
+        o.type='triangle';o.frequency.value=f;
+        const t=ac.currentTime+i*0.08;
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.13,t+0.015);
+        g.gain.exponentialRampToValueAtTime(0.001,t+0.45);
+        o.start(t);o.stop(t+0.5);
+      });
     }
   }catch(e){}
+}
+
+// ── Login Ambient Music ───────────────────────────────────────
+let _lmGain=null,_lmLoop=false,_lmMuted=false;
+function startLoginMusic(){
+  if(_lmLoop)return;
+  try{
+    const ac=getAC();
+    if(ac.state==='suspended')ac.resume().catch(()=>{});
+    _lmGain=ac.createGain();
+    _lmGain.gain.setValueAtTime(0,ac.currentTime);
+    _lmGain.gain.linearRampToValueAtTime(_lmMuted?0:0.14,ac.currentTime+2);
+    _lmGain.connect(ac.destination);
+    _lmLoop=true;
+    _lmSchedule(ac,ac.currentTime+0.05);
+  }catch(e){}
+}
+function stopLoginMusic(){
+  _lmLoop=false;
+  if(_lmGain){
+    try{const ac=getAC();_lmGain.gain.setValueAtTime(_lmGain.gain.value,ac.currentTime);_lmGain.gain.linearRampToValueAtTime(0,ac.currentTime+0.7);}catch(e){}
+    setTimeout(()=>{_lmGain=null;},900);
+  }
+}
+function toggleLoginMusicMute(){
+  _lmMuted=!_lmMuted;
+  const btn=document.getElementById('ns-mute-btn');
+  if(btn)btn.textContent=_lmMuted?'🔇':'🔊';
+  if(_lmGain){
+    try{const ac=getAC();_lmGain.gain.setValueAtTime(_lmGain.gain.value,ac.currentTime);_lmGain.gain.linearRampToValueAtTime(_lmMuted?0:0.14,ac.currentTime+0.3);}catch(e){}
+  }
+}
+function _lmSchedule(ac,start){
+  if(!_lmLoop||!_lmGain)return;
+  const bpm=84,beat=60/bpm,bar=beat*4,loop=bar*4;
+  // Bass — Am drone with movement: A2→C3→G2→A2 across 4 bars
+  [[110,0,bar-0.1],[130.8,bar,bar*0.5-0.08],[98,bar*1.5,bar*0.5-0.08],
+   [110,bar*2,bar-0.1],[130.8,bar*3,bar-0.1]].forEach(([f,t,d])=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=280;lp.Q.value=0.9;
+    o.connect(lp);lp.connect(g);g.connect(_lmGain);
+    o.type='sawtooth';o.frequency.value=f;
+    const ts=start+t;
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.5,ts+0.09);
+    g.gain.setValueAtTime(0.5,ts+d-0.14);g.gain.linearRampToValueAtTime(0,ts+d);
+    o.start(ts);o.stop(ts+d+0.05);
+  });
+  // Pad 1 — Am7 swell (A3 C4 E4 G4)
+  [220,261.6,329.6,392].forEach(f=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.065,start+0.9);
+    g.gain.setValueAtTime(0.065,start+bar*2-0.4);g.gain.linearRampToValueAtTime(0,start+bar*2);
+    o.start(start);o.stop(start+bar*2+0.1);
+  });
+  // Pad 2 — Cmaj7 resolve (C4 E4 G4 B4)
+  [261.6,329.6,392,493.9].forEach(f=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar*2;
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.055,ts+0.9);
+    g.gain.setValueAtTime(0.055,ts+bar*2-0.4);g.gain.linearRampToValueAtTime(0,ts+bar*2);
+    o.start(ts);o.stop(ts+bar*2+0.1);
+  });
+  // Arp 1 — Am pentatonic ascending + descending, bar 1 (8th notes)
+  [440,523.3,659.3,784,880,784,659.3,523.3].forEach((f,i)=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar+i*(beat*0.5);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.05,ts+0.012);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+beat*0.42);
+    o.start(ts);o.stop(ts+beat*0.5);
+  });
+  // Arp 2 — higher octave Cmaj run, bar 3
+  [523.3,659.3,784,880,1046.5,880,784,659.3].forEach((f,i)=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar*3+i*(beat*0.5);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.042,ts+0.012);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+beat*0.42);
+    o.start(ts);o.stop(ts+beat*0.5);
+  });
+  // Sub kick on each bar downbeat
+  for(let bi=0;bi<4;bi++){
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='sine';
+    const ts=start+bar*bi;
+    o.frequency.setValueAtTime(88,ts);o.frequency.exponentialRampToValueAtTime(26,ts+0.15);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.28,ts+0.006);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+0.19);
+    o.start(ts);o.stop(ts+0.22);
+  }
+  // Hi-hat noise on every half-beat
+  for(let hi=0;hi<8;hi++){
+    if(!_lmLoop)return;
+    try{
+      const buf=ac.createBuffer(1,Math.floor(ac.sampleRate*0.04),ac.sampleRate);
+      const dat=buf.getChannelData(0);
+      for(let j=0;j<dat.length;j++)dat[j]=(Math.random()*2-1);
+      const src=ac.createBufferSource(),g=ac.createGain(),hp=ac.createBiquadFilter();
+      hp.type='highpass';hp.frequency.value=8000;
+      src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(_lmGain);
+      const ts=start+hi*(beat*0.5);
+      g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.038,ts+0.002);
+      g.gain.exponentialRampToValueAtTime(0.001,ts+0.034);
+      src.start(ts);
+    }catch(e){}
+  }
+  setTimeout(()=>_lmSchedule(ac,start+loop),(loop-0.25)*1000);
 }
 
 // ── Filter helpers ────────────────────────────────────────────
@@ -8992,16 +9244,155 @@ function startGame(name,diffLevel){
     alert('Startup error: '+e.message+'\n\nSee console for details.');
   }
 }
-// ── Name overlay init (anime/comic style) ─────────────────────
+// ── Login canvas: aurora + color rays + candlesticks ──────────
+function startLoginCanvas(canvas){
+  if(canvas._raf){cancelAnimationFrame(canvas._raf);canvas._raf=null;}
+  const ctx=canvas.getContext('2d');
+  let W=0,H=0,T=0;
+  const resize=()=>{W=canvas.width=canvas.offsetWidth||window.innerWidth;H=canvas.height=canvas.offsetHeight||window.innerHeight;};
+  resize();
+  const _ro=new ResizeObserver(resize);_ro.observe(canvas.parentElement);
+
+  // Color rays — 8 beams rotating from center, each a different hue
+  const RAYS=[0,45,90,135,180,225,270,315].map((deg,i)=>({
+    baseAngle:deg*(Math.PI/180), speed:.0004+i*.00015,
+    hue:i*45, width:1.5+i*.4,
+  }));
+
+  // Candlesticks — 18 drifting upward
+  const CANDLES=Array.from({length:18},(_,i)=>({
+    x:Math.random()*1200, y:Math.random()*900,
+    vx:-.15+Math.random()*.1, vy:-.25-.3*Math.random(),
+    bull:Math.random()>.42,
+    bh:14+Math.random()*22, wk:5+Math.random()*10,
+    bw:5+Math.random()*5, alpha:0,
+  }));
+
+  // Grid offset
+  let goff=0;
+
+  function frame(){
+    T++;goff=(goff+.35)%44;
+    ctx.clearRect(0,0,W,H);
+
+    // ── Deep aurora background ──────────────────────────────
+    const bg=ctx.createRadialGradient(W*.5,H*.65,0,W*.5,H*.5,Math.hypot(W,H)*.75);
+    bg.addColorStop(0,'#16003a');bg.addColorStop(.5,'#0a0018');bg.addColorStop(1,'#03000a');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+    // shifting aurora blob
+    const hShift=(T*.4)%360;
+    const aur=ctx.createRadialGradient(
+      W*.5+Math.sin(T*.006)*W*.22, H*.35+Math.cos(T*.004)*H*.12, 0,
+      W*.5, H*.45, W*.65);
+    aur.addColorStop(0,`hsla(${hShift},75%,38%,.10)`);
+    aur.addColorStop(.55,`hsla(${(hShift+80)%360},65%,28%,.05)`);
+    aur.addColorStop(1,'transparent');
+    ctx.fillStyle=aur;ctx.fillRect(0,0,W,H);
+
+    // ── Scrolling grid ──────────────────────────────────────
+    ctx.strokeStyle='rgba(58,134,255,.04)';ctx.lineWidth=1;
+    const gs=44;
+    for(let x=goff;x<W+gs;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=goff;y<H+gs;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // ── Color rays ─────────────────────────────────────────
+    ctx.save();ctx.translate(W/2,H/2);
+    RAYS.forEach((r,i)=>{
+      r.baseAngle+=r.speed;
+      const hue=(r.hue+T*.25)%360;
+      const alpha=.04+Math.abs(Math.sin(T*.018+i))*.07;
+      ctx.save();ctx.rotate(r.baseAngle);
+      const rg=ctx.createLinearGradient(0,0,Math.max(W,H)*1.1,0);
+      rg.addColorStop(0,`hsla(${hue},90%,60%,${alpha*2})`);
+      rg.addColorStop(.3,`hsla(${hue},90%,55%,${alpha})`);
+      rg.addColorStop(1,'transparent');
+      ctx.strokeStyle=rg;ctx.lineWidth=r.width*(1+Math.sin(T*.025+i)*.4);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.max(W,H)*1.2,0);ctx.stroke();
+      // mirror ray
+      ctx.rotate(Math.PI);
+      ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.max(W,H)*1.2,0);ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    // ── Candlestick bars ────────────────────────────────────
+    CANDLES.forEach(c=>{
+      c.x+=c.vx;c.y+=c.vy;
+      if(c.y<-80||c.x<-60||c.x>W+60){
+        c.x=Math.random()*W;c.y=H+50+Math.random()*80;
+        c.bull=Math.random()>.42;c.alpha=0;
+      }
+      c.alpha=Math.min(.35,c.alpha+.004);
+      const col=c.bull?'#3fb950':'#f85149';
+      ctx.globalAlpha=c.alpha;
+      ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(c.x,c.y-c.bh/2-c.wk);ctx.lineTo(c.x,c.y+c.bh/2+c.wk);ctx.stroke();
+      ctx.fillRect(c.x-c.bw/2,c.y-c.bh/2,c.bw,c.bh);
+    });
+    ctx.globalAlpha=1;
+
+    const ov=document.getElementById('name-overlay');
+    if(ov&&!ov.classList.contains('hidden'))canvas._raf=requestAnimationFrame(frame);
+    else{_ro.disconnect();canvas._raf=null;}
+  }
+  canvas._raf=requestAnimationFrame(frame);
+}
+
+// ── Floating ticker chips ──────────────────────────────────────
+function spawnLoginTickers(layer){
+  if(layer._tickers)return;
+  layer._tickers=true;
+  const STOCKS=[
+    ['AAPL','+2.3%','bull'],['NVDA','+5.1%','bull'],['TSLA','-1.8%','bear'],
+    ['MSFT','+0.9%','bull'],['META','+3.2%','bull'],['AMZN','-0.7%','bear'],
+    ['GOOGL','+1.4%','bull'],['AMD','+4.2%','bull'],['NFLX','-2.1%','bear'],
+    ['COIN','+7.4%','bull'],['PLTR','+1.9%','bull'],['SNAP','-3.1%','bear'],
+  ];
+  STOCKS.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className=`ns-tick-chip ${s[2]}`;
+    el.textContent=`${s[0]} ${s[1]}`;
+    const topPct=5+Math.random()*22;
+    const dur=10+Math.random()*16;
+    const delay=i*(dur/STOCKS.length*1000);
+    el.style.cssText=`top:${topPct}%;animation-duration:${dur}s;animation-delay:-${delay}ms;`;
+    layer.appendChild(el);
+  });
+}
+
+// ── Name overlay init ──────────────────────────────────────────
 function initNameOverlay(){
   const wrap=document.getElementById('ns-wrap'); if(!wrap)return;
+  const overlay=document.getElementById('name-overlay');
+
+  // Canvas background
+  let bgCanvas=document.getElementById('ns-bg-canvas');
+  if(!bgCanvas){
+    bgCanvas=document.createElement('canvas');
+    bgCanvas.id='ns-bg-canvas';
+    overlay.insertBefore(bgCanvas,overlay.firstChild);
+  }
+  startLoginCanvas(bgCanvas);
+
+  // Ticker chip layer
+  let tickerLayer=document.getElementById('ns-ticker-layer');
+  if(!tickerLayer){
+    tickerLayer=document.createElement('div');
+    tickerLayer.id='ns-ticker-layer';
+    tickerLayer.className='ns-ticker-layer';
+    overlay.insertBefore(tickerLayer,overlay.children[1]||overlay.firstChild);
+  }
+  spawnLoginTickers(tickerLayer);
+
   // Particles
   const pts=document.getElementById('ns-particles');
   if(pts&&!pts.childElementCount){
-    for(let i=0;i<14;i++){
+    for(let i=0;i<16;i++){
       const p=document.createElement('div'); p.className='ns-particle';
       const sz=2+Math.random()*4;
-      p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;animation-duration:${7+Math.random()*9}s;animation-delay:${Math.random()*7}s;`;
+      const hue=200+Math.random()*160;
+      p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:hsl(${hue},80%,65%);animation-duration:${8+Math.random()*10}s;animation-delay:-${Math.random()*8}s;`;
       pts.appendChild(p);
     }
   }
@@ -9024,7 +9415,7 @@ function initNameOverlay(){
         <div class="ns-cont-stats">Day <strong>${save.day}</strong> &middot; <span class="ns-cont-nw">${fmt(save.cash)}</span> cash</div>
       </div>
       <div class="ns-cont-btns">
-        <button class="ns-btn-cont" onclick="continueGame()">CONTINUE</button>
+        <button class="ns-btn-cont" onclick="continueGame()"><span class="ns-cont-knob"></span>CONTINUE</button>
         <button class="ns-btn-newgame" onclick="showNewGameForm()">New Game</button>
       </div>
     </div>`:'';
@@ -9033,6 +9424,7 @@ function initNameOverlay(){
       <div class="ns-badge">MARKET SIMULATION 2025</div>
       <div class="ns-title-main">NASDAQ<br>TRADER</div>
       <div class="ns-title-sub">MARKET WARS · SEASON IV</div>
+      <button class="ns-mute-btn" id="ns-mute-btn" onclick="toggleLoginMusicMute()" title="Toggle music">🔊</button>
     </div>
     ${contHTML}
     <div class="ns-form" id="ns-form"${save?'style="display:none"':''}>
@@ -9048,22 +9440,53 @@ function initNameOverlay(){
       </div>
     </div>
     <button class="ns-start-btn" id="name-start"${save?'style="display:none"':''}>START TRADING</button>`;
-  // Wire difficulty cards
+  // Wire difficulty cards with hover + select sounds
   wrap.querySelectorAll('.ns-diff-card').forEach(c=>{
+    c.addEventListener('mouseenter',()=>playSound('uiHover'));
+    c.addEventListener('touchstart',()=>playSound('uiHover'),{passive:true});
     c.onclick=()=>{
+      playSound('uiSelect');
       selectedDiff=parseInt(c.dataset.d);
       wrap.querySelectorAll('.ns-diff-card').forEach(x=>x.classList.toggle('sel',x===c));
     };
   });
-  // Wire start
+  // Avatar hover sounds
+  wrap.querySelectorAll('.ns-avi-btn').forEach(b=>{
+    b.addEventListener('mouseenter',()=>playSound('uiHover'));
+    b.addEventListener('touchstart',()=>playSound('uiHover'),{passive:true});
+  });
+  // Start button hover
   const sb=document.getElementById('name-start');
-  if(sb) sb.onclick=()=>nsStart();
+  if(sb){
+    sb.addEventListener('mouseenter',()=>playSound('uiHover'));
+    sb.onclick=()=>nsStart();
+  }
+  // Continue button hover
+  const cb=wrap.querySelector('.ns-btn-cont');
+  if(cb){
+    cb.addEventListener('mouseenter',()=>playSound('uiHover'));
+    cb.addEventListener('click',()=>playSound('uiContinue'),{capture:true});
+  }
   const ni=document.getElementById('name-input');
-  if(ni) ni.addEventListener('keydown',e=>{if(e.key==='Enter')nsStart();});
+  if(ni){
+    ni.addEventListener('focus',()=>playSound('uiHover'));
+    ni.addEventListener('keydown',e=>{if(e.key==='Enter')nsStart();});
+  }
+  // Start ambient music — immediately if AC already unlocked, else on first interaction
+  if(_ac&&_ac.state==='running'){
+    startLoginMusic();
+  } else {
+    const _lmUnlock=()=>startLoginMusic();
+    overlay.addEventListener('pointerdown',_lmUnlock,{once:true});
+    overlay.addEventListener('keydown',_lmUnlock,{once:true});
+  }
+  // Sync mute button state
+  const muteBtn=document.getElementById('ns-mute-btn');
+  if(muteBtn) muteBtn.textContent=_lmMuted?'🔇':'🔊';
 }
 function nsStart(){
   const nm=(document.getElementById('name-input')?.value||'').trim();
-  nsFlash(); playSound('gameStart');
+  nsFlash(); stopLoginMusic(); playSound('gameStart');
   setTimeout(()=>startGame(nm,selectedDiff),280);
 }
 function nsFlash(){
@@ -9071,6 +9494,7 @@ function nsFlash(){
   document.body.appendChild(f); setTimeout(()=>f.remove(),600);
 }
 function pickAvatar(id){
+  playSound('uiSelect');
   selectedAvatar=id;
   document.querySelectorAll('.ns-avi-btn').forEach(b=>b.classList.toggle('picked',b.dataset.avid===id));
 }
@@ -9081,7 +9505,7 @@ function showNewGameForm(){
 }
 function continueGame(){
   const sv=getSave(); if(!sv)return;
-  nsFlash(); playSound('gameStart');
+  nsFlash(); stopLoginMusic(); playSound('uiContinue'); setTimeout(()=>playSound('gameStart'),400);
   setTimeout(()=>{
     playerName=sv.name; selectedAvatar=sv.avatar||'dragon';
     state.cash=sv.cash; state.positions=sv.positions||{};
@@ -9296,6 +9720,27 @@ document.getElementById('btn-restart-game').onclick=()=>{
   initNameOverlay();
 };
 document.getElementById('btn-save-go-score').onclick=()=>{submitScore();};
+
+// ── Logout ───────────────────────────────────────────────────
+function logoutGame(){
+  if(state.gameOver||!playerName) return;
+  const confirmed=confirm(`Save and logout, ${playerName}?\n\nYour progress will be saved and you'll return to the main menu.`);
+  if(!confirmed) return;
+  saveGame();
+  clearTimeout(tickTimer);
+  state.gameOver=false;
+  showToast('💾','Progress saved — see you next time, '+playerName+'!','buy');
+  setTimeout(()=>{
+    document.getElementById('name-overlay').classList.remove('hidden');
+    initNameOverlay();
+  },900);
+}
+document.getElementById('btn-logout').onclick=logoutGame;
+
+// Auto-save on page close / refresh
+window.addEventListener('beforeunload',()=>{
+  if(playerName&&!state.gameOver) saveGame();
+});
 
 // ── Theme toggle ─────────────────────────────────────────────
 (function(){
