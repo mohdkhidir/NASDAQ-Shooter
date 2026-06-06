@@ -115,6 +115,69 @@
   line-height: 1.4;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   NEON TOGGLE SWITCH — mob-nav + Continue button
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Per-button neon color variables */
+.mob-neon-blue  { --mnc:#58a6ff; --mnc-s:rgba(88,166,255,.55); --mnc-d:rgba(88,166,255,.18); }
+.mob-neon-gold  { --mnc:#ffd700; --mnc-s:rgba(255,215,0,.55);  --mnc-d:rgba(255,215,0,.18); }
+.mob-neon-green { --mnc:#3fb950; --mnc-s:rgba(63,185,80,.55);  --mnc-d:rgba(63,185,80,.18); }
+.mob-neon-teal  { --mnc:#39d353; --mnc-s:rgba(57,211,83,.55);  --mnc-d:rgba(57,211,83,.18); }
+.mob-neon-red   { --mnc:#f85149; --mnc-s:rgba(248,81,73,.55);  --mnc-d:rgba(248,81,73,.18); }
+
+/* Mini neon switch pill — above the icon */
+.mob-sw {
+  display: block;
+  width: 32px; height: 14px; border-radius: 7px;
+  background: rgba(0,0,0,.45);
+  border: 1.5px solid var(--mnc-d, rgba(255,255,255,.1));
+  position: relative; overflow: hidden;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,.5);
+  transition: border-color .2s, box-shadow .25s;
+  flex-shrink: 0;
+}
+/* Knob */
+.mob-sw-k {
+  display: block;
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 10px; height: 10px; border-radius: 5px;
+  background: var(--mnc, rgba(255,255,255,.35));
+  box-shadow: 0 0 5px var(--mnc, transparent);
+  transition: transform .22s cubic-bezier(.175,.885,.32,1.275), box-shadow .22s;
+}
+/* Press: knob snaps right + outer neon fires */
+.mob-nav-btn:active .mob-sw {
+  border-color: var(--mnc, rgba(255,255,255,.5));
+  box-shadow: 0 0 10px var(--mnc-s, transparent), 0 0 22px var(--mnc-d, transparent), inset 0 1px 4px rgba(0,0,0,.5);
+}
+.mob-nav-btn:active .mob-sw-k {
+  transform: translateX(16px);
+  box-shadow: 0 0 16px var(--mnc, transparent), 0 0 32px var(--mnc, transparent);
+}
+.mob-nav-btn:active .mob-nav-ico {
+  filter: drop-shadow(0 0 10px var(--mnc, rgba(255,255,255,.4)));
+}
+/* Active tab: knob stays "on", label glows */
+.mob-nav-btn.mob-nav-active { border-top-color: var(--mnc, var(--bl, #58a6ff)); }
+.mob-nav-btn.mob-nav-active .mob-sw {
+  border-color: var(--mnc, rgba(255,255,255,.5));
+  animation: mob-sw-glow 2.5s ease-in-out infinite;
+}
+.mob-nav-btn.mob-nav-active .mob-sw-k {
+  transform: translateX(16px);
+  box-shadow: 0 0 12px var(--mnc, transparent), 0 0 24px var(--mnc, transparent);
+}
+.mob-nav-btn.mob-nav-active .mob-nav-lbl { color: var(--mnc, var(--bl, #58a6ff)); }
+.mob-nav-btn.mob-nav-active .mob-nav-ico {
+  filter: drop-shadow(0 0 7px var(--mnc, rgba(255,255,255,.4)));
+}
+@keyframes mob-sw-glow {
+  0%,100% { box-shadow: 0 0 5px var(--mnc-s); }
+  50%      { box-shadow: 0 0 14px var(--mnc-s), 0 0 28px var(--mnc-d); }
+}
+
 /* light-theme overrides */
 html[data-theme="light"] .mob-hud { background: var(--bg2); border-color: var(--bdr); }
 html[data-theme="light"] .mob-nav { background: var(--bg2); border-color: var(--bdr); }
@@ -361,30 +424,65 @@ html[data-theme="light"] .mob-nav { background: var(--bg2); border-color: var(--
 .ns-cont-nw { color: #3fb950; font-weight: 700; }
 .ns-cont-btns { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
 
+/* Continue button — neon toggle switch pill */
 .ns-btn-cont {
-  background: linear-gradient(135deg, #8338ec, #3a86ff);
-  border: none; color: #fff;
+  display: inline-flex; align-items: center; gap: 12px;
+  background: rgba(6,0,20,.75);
+  border: 2px solid #8338ec; color: #fff;
   font-family: 'Rajdhani', sans-serif;
   font-size: 13px; font-weight: 700;
   letter-spacing: .14em; text-transform: uppercase;
-  padding: 12px 28px; border-radius: 12px; cursor: pointer;
-  box-shadow: 0 4px 24px rgba(131,56,236,.55);
-  transition: all .2s;
+  padding: 10px 24px 10px 12px; border-radius: 50px; cursor: pointer;
+  box-shadow:
+    0 0 12px rgba(131,56,236,.65),
+    0 0 32px rgba(131,56,236,.25),
+    0 0 60px rgba(131,56,236,.1),
+    inset 0 0 18px rgba(131,56,236,.08);
+  transition: all .22s;
   animation: cont-btn-pulse 2.5s ease-in-out infinite;
   position: relative; overflow: hidden;
 }
-.ns-btn-cont::before {
+/* Neon knob inside the pill */
+.ns-cont-knob {
+  display: block; flex-shrink: 0;
+  width: 38px; height: 20px; border-radius: 10px;
+  background: rgba(0,0,0,.45);
+  border: 1.5px solid rgba(131,56,236,.55);
+  position: relative;
+  box-shadow: 0 0 8px rgba(131,56,236,.5), inset 0 0 6px rgba(0,0,0,.45);
+  transition: box-shadow .22s;
+}
+.ns-cont-knob::after {
   content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-  border-radius: inherit;
+  position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px; border-radius: 7px;
+  background: #8338ec;
+  box-shadow: 0 0 10px #8338ec, 0 0 24px rgba(131,56,236,.7);
+  transition: transform .26s cubic-bezier(.175,.885,.32,1.275), box-shadow .26s;
 }
-@keyframes cont-btn-pulse {
-  0%,100% { box-shadow: 0 4px 24px rgba(131,56,236,.55); }
-  50%     { box-shadow: 0 6px 36px rgba(131,56,236,.8), 0 0 0 4px rgba(131,56,236,.15); }
+.ns-btn-cont:hover .ns-cont-knob::after {
+  transform: translateX(18px);
+  box-shadow: 0 0 18px #8338ec, 0 0 40px rgba(131,56,236,.9);
 }
-.ns-btn-cont:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 44px rgba(131,56,236,.85); }
+.ns-btn-cont:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 0 20px rgba(131,56,236,.9),
+    0 0 50px rgba(131,56,236,.45),
+    0 0 80px rgba(131,56,236,.2),
+    inset 0 0 28px rgba(131,56,236,.12);
+}
 .ns-btn-cont:active { transform: scale(.97); }
+@keyframes cont-btn-pulse {
+  0%,100% {
+    box-shadow: 0 0 12px rgba(131,56,236,.65), 0 0 32px rgba(131,56,236,.25),
+                0 0 60px rgba(131,56,236,.1), inset 0 0 18px rgba(131,56,236,.08);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(131,56,236,.9), 0 0 55px rgba(131,56,236,.45),
+                0 0 90px rgba(131,56,236,.2), inset 0 0 28px rgba(131,56,236,.12);
+  }
+}
 
 .ns-btn-newgame {
   font-family: 'Rajdhani', sans-serif;

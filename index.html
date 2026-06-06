@@ -1554,24 +1554,29 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
 
 <!-- Mobile bottom action nav — desktop hidden, mobile flex -->
 <nav class="mob-nav" id="mob-nav">
-  <button class="mob-nav-btn" onclick="openPortfolio()">
+  <button class="mob-nav-btn mob-neon-blue" onclick="openPortfolio()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
     <span class="mob-nav-ico">📊</span>
     <span class="mob-nav-lbl">Portfolio</span>
   </button>
-  <button class="mob-nav-btn" onclick="openLB()">
+  <button class="mob-nav-btn mob-neon-gold" onclick="openLB()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
     <span class="mob-nav-ico">🏆</span>
     <span class="mob-nav-lbl">Ranks</span>
   </button>
-  <button class="mob-nav-btn" onclick="openRealEstate()">
+  <button class="mob-nav-btn mob-neon-green" onclick="openRealEstate()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
     <span class="mob-nav-ico">🏢</span>
     <span class="mob-nav-lbl">R.Estate</span>
     <span id="mob-re-badge" class="mob-nav-badge" style="display:none"></span>
   </button>
-  <button class="mob-nav-btn" onclick="submitScore()">
+  <button class="mob-nav-btn mob-neon-teal" onclick="submitScore()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
     <span class="mob-nav-ico">💾</span>
     <span class="mob-nav-lbl">Save</span>
   </button>
-  <button class="mob-nav-btn mob-nav-danger" onclick="logoutGame()">
+  <button class="mob-nav-btn mob-nav-danger mob-neon-red" onclick="logoutGame()">
+    <span class="mob-sw"><span class="mob-sw-k"></span></span>
     <span class="mob-nav-ico">🚪</span>
     <span class="mob-nav-lbl">Logout</span>
   </button>
@@ -9410,7 +9415,7 @@ function initNameOverlay(){
         <div class="ns-cont-stats">Day <strong>${save.day}</strong> &middot; <span class="ns-cont-nw">${fmt(save.cash)}</span> cash</div>
       </div>
       <div class="ns-cont-btns">
-        <button class="ns-btn-cont" onclick="continueGame()">CONTINUE</button>
+        <button class="ns-btn-cont" onclick="continueGame()"><span class="ns-cont-knob"></span>CONTINUE</button>
         <button class="ns-btn-newgame" onclick="showNewGameForm()">New Game</button>
       </div>
     </div>`:'';
