@@ -61,14 +61,14 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 .ranks span{height:64px}
 .files{display:flex;padding-left:20px}
 .files span{width:64px}
-#board{display:grid;grid-template-columns:repeat(8,64px);grid-template-rows:repeat(8,64px);border:2px solid #30363d;border-radius:3px;overflow:hidden;user-select:none}
+#board{display:grid;grid-template-columns:repeat(8,64px);grid-template-rows:repeat(8,64px);border:2px solid #4a7c3f;border-radius:3px;overflow:hidden;user-select:none}
 .sq{width:64px;height:64px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
-.sq.lt{background:#f0d9b5}.sq.dk{background:#b58863}
+.sq.lt{background:#eeeed2}.sq.dk{background:#769656}
 .sq.sel{background:#f6f669!important}
-.sq.lm::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.22);pointer-events:none}
-.sq.lc::after{content:'';position:absolute;inset:0;border:4px solid rgba(0,0,0,.22);pointer-events:none}
-.sq.mv{background:rgba(155,199,0,.38)!important}
-.sq.chk{background:#c84b4b!important}
+.sq.lm::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.25);pointer-events:none}
+.sq.lc::after{content:'';position:absolute;inset:0;border:4px solid rgba(0,0,0,.25);pointer-events:none}
+.sq.mv.lt{background:#cdd26a!important}.sq.mv.dk{background:#aaa23a!important}
+.sq.chk{background:#ff0000!important}
 .piece{font-size:42px;line-height:1;pointer-events:none}
 
 /* game status */
@@ -134,7 +134,7 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 .spec-badge{background:#bc8cff22;border:1px solid #bc8cff44;color:#bc8cff;border-radius:6px;padding:4px 10px;font-size:.8rem;text-align:center;width:100%;max-width:540px}
 
 @media(max-width:620px){
-  #board{grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px)}
+  #board{grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);border-color:#4a7c3f}
   .sq{width:44px;height:44px}.piece{font-size:29px}
   .sq.lm::after{width:15px;height:15px}
   .ranks span{height:44px}.files span{width:44px}
