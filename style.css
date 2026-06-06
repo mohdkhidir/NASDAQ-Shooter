@@ -665,69 +665,6 @@ html[data-theme="light"] .mob-nav { background: var(--bg2); border-color: var(--
   to   { opacity: 0;  transform: scale(1.6); }
 }
 
-/* ── Mobile compact — start screen fits one screen height ──── */
-@media(max-width:600px){
-  /* Hide the large logo block — saves ~120px */
-  .ns-static-logo { display: none; }
-
-  /* Tighten the title section */
-  .ns-title { padding: 10px 12px 4px; }
-  .ns-badge  { margin-bottom: 8px; padding: 4px 14px; font-size: 8px; }
-  .ns-title-main {
-    font-size: clamp(28px, 9vw, 38px);
-    margin-bottom: 6px;
-  }
-  .ns-title-sub { font-size: 10px; letter-spacing: .22em; }
-  .ns-mute-btn  { top: 8px; }
-
-  /* Reduce wrap gap and padding */
-  .ns-wrap { gap: 8px; padding-bottom: 12px; }
-
-  /* Continue card — tighter */
-  .ns-cont-card { padding: 14px 16px; margin: 0 10px; gap: 12px; }
-  .ns-cont-avi  { font-size: 36px; }
-  .ns-cont-name { font-size: 16px; }
-  .ns-cont-btns { gap: 6px; }
-
-  /* Form: side-by-side panels on mobile to save vertical space */
-  .ns-form { grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 10px; }
-  .ns-panel { padding: 12px 12px; border-radius: 14px; }
-  .ns-panel-lbl { margin-bottom: 8px; font-size: 8px; }
-
-  /* Avatar grid: smaller buttons, tighter grid */
-  .ns-avi-grid { grid-template-columns: repeat(6,1fr); gap: 5px; margin-bottom: 8px; }
-  .ns-avi-btn  { border-radius: 10px; font-size: clamp(13px,2vw,17px); }
-  .ns-avi-nm   { display: none; }
-
-  /* Name input */
-  .ns-name-inp { padding: 10px 12px; font-size: 14px; border-radius: 10px; }
-
-  /* Difficulty cards: compact */
-  .ns-diff-grid { gap: 6px; }
-  .ns-diff-card { padding: 9px 10px; border-radius: 12px; }
-  .ns-diff-emo  { font-size: 16px; margin-bottom: 3px; }
-  .ns-diff-name { font-size: 11px; }
-  .ns-diff-cash { font-size: 10px; }
-  .ns-diff-desc { font-size: 8px; }
-  .ns-diff-loan { font-size: 7px; }
-
-  /* Start button — always reachable */
-  .ns-start-btn {
-    margin: 4px 10px 0;
-    padding: 14px 20px;
-    font-size: 13px;
-    letter-spacing: .16em;
-    border-radius: 14px;
-  }
-}
-
-/* Extra-small screens (SE, Galaxy A series) */
-@media(max-width:380px){
-  .ns-form { grid-template-columns: 1fr; }
-  .ns-title-main { font-size: 26px; }
-  .ns-avi-grid { grid-template-columns: repeat(5,1fr); }
-}
-
 /* ── Light theme overrides ──────────────────────────────────── */
 html[data-theme="light"] #name-overlay {
   background: radial-gradient(ellipse at 50% 40%, #1a0050, #08002a, #04001a) !important;
