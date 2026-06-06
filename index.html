@@ -7262,6 +7262,121 @@ function playSound(type){
   }catch(e){}
 }
 
+// ── Login Ambient Music ───────────────────────────────────────
+let _lmGain=null,_lmLoop=false,_lmMuted=false;
+function startLoginMusic(){
+  if(_lmLoop)return;
+  try{
+    const ac=getAC();
+    if(ac.state==='suspended')ac.resume().catch(()=>{});
+    _lmGain=ac.createGain();
+    _lmGain.gain.setValueAtTime(0,ac.currentTime);
+    _lmGain.gain.linearRampToValueAtTime(_lmMuted?0:0.14,ac.currentTime+2);
+    _lmGain.connect(ac.destination);
+    _lmLoop=true;
+    _lmSchedule(ac,ac.currentTime+0.05);
+  }catch(e){}
+}
+function stopLoginMusic(){
+  _lmLoop=false;
+  if(_lmGain){
+    try{const ac=getAC();_lmGain.gain.setValueAtTime(_lmGain.gain.value,ac.currentTime);_lmGain.gain.linearRampToValueAtTime(0,ac.currentTime+0.7);}catch(e){}
+    setTimeout(()=>{_lmGain=null;},900);
+  }
+}
+function toggleLoginMusicMute(){
+  _lmMuted=!_lmMuted;
+  const btn=document.getElementById('ns-mute-btn');
+  if(btn)btn.textContent=_lmMuted?'🔇':'🔊';
+  if(_lmGain){
+    try{const ac=getAC();_lmGain.gain.setValueAtTime(_lmGain.gain.value,ac.currentTime);_lmGain.gain.linearRampToValueAtTime(_lmMuted?0:0.14,ac.currentTime+0.3);}catch(e){}
+  }
+}
+function _lmSchedule(ac,start){
+  if(!_lmLoop||!_lmGain)return;
+  const bpm=84,beat=60/bpm,bar=beat*4,loop=bar*4;
+  // Bass — Am drone with movement: A2→C3→G2→A2 across 4 bars
+  [[110,0,bar-0.1],[130.8,bar,bar*0.5-0.08],[98,bar*1.5,bar*0.5-0.08],
+   [110,bar*2,bar-0.1],[130.8,bar*3,bar-0.1]].forEach(([f,t,d])=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain(),lp=ac.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=280;lp.Q.value=0.9;
+    o.connect(lp);lp.connect(g);g.connect(_lmGain);
+    o.type='sawtooth';o.frequency.value=f;
+    const ts=start+t;
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.5,ts+0.09);
+    g.gain.setValueAtTime(0.5,ts+d-0.14);g.gain.linearRampToValueAtTime(0,ts+d);
+    o.start(ts);o.stop(ts+d+0.05);
+  });
+  // Pad 1 — Am7 swell (A3 C4 E4 G4)
+  [220,261.6,329.6,392].forEach(f=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(0,start);g.gain.linearRampToValueAtTime(0.065,start+0.9);
+    g.gain.setValueAtTime(0.065,start+bar*2-0.4);g.gain.linearRampToValueAtTime(0,start+bar*2);
+    o.start(start);o.stop(start+bar*2+0.1);
+  });
+  // Pad 2 — Cmaj7 resolve (C4 E4 G4 B4)
+  [261.6,329.6,392,493.9].forEach(f=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar*2;
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.055,ts+0.9);
+    g.gain.setValueAtTime(0.055,ts+bar*2-0.4);g.gain.linearRampToValueAtTime(0,ts+bar*2);
+    o.start(ts);o.stop(ts+bar*2+0.1);
+  });
+  // Arp 1 — Am pentatonic ascending + descending, bar 1 (8th notes)
+  [440,523.3,659.3,784,880,784,659.3,523.3].forEach((f,i)=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar+i*(beat*0.5);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.05,ts+0.012);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+beat*0.42);
+    o.start(ts);o.stop(ts+beat*0.5);
+  });
+  // Arp 2 — higher octave Cmaj run, bar 3
+  [523.3,659.3,784,880,1046.5,880,784,659.3].forEach((f,i)=>{
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='triangle';o.frequency.value=f;
+    const ts=start+bar*3+i*(beat*0.5);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.042,ts+0.012);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+beat*0.42);
+    o.start(ts);o.stop(ts+beat*0.5);
+  });
+  // Sub kick on each bar downbeat
+  for(let bi=0;bi<4;bi++){
+    if(!_lmLoop)return;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(_lmGain);o.type='sine';
+    const ts=start+bar*bi;
+    o.frequency.setValueAtTime(88,ts);o.frequency.exponentialRampToValueAtTime(26,ts+0.15);
+    g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.28,ts+0.006);
+    g.gain.exponentialRampToValueAtTime(0.001,ts+0.19);
+    o.start(ts);o.stop(ts+0.22);
+  }
+  // Hi-hat noise on every half-beat
+  for(let hi=0;hi<8;hi++){
+    if(!_lmLoop)return;
+    try{
+      const buf=ac.createBuffer(1,Math.floor(ac.sampleRate*0.04),ac.sampleRate);
+      const dat=buf.getChannelData(0);
+      for(let j=0;j<dat.length;j++)dat[j]=(Math.random()*2-1);
+      const src=ac.createBufferSource(),g=ac.createGain(),hp=ac.createBiquadFilter();
+      hp.type='highpass';hp.frequency.value=8000;
+      src.buffer=buf;src.connect(hp);hp.connect(g);g.connect(_lmGain);
+      const ts=start+hi*(beat*0.5);
+      g.gain.setValueAtTime(0,ts);g.gain.linearRampToValueAtTime(0.038,ts+0.002);
+      g.gain.exponentialRampToValueAtTime(0.001,ts+0.034);
+      src.start(ts);
+    }catch(e){}
+  }
+  setTimeout(()=>_lmSchedule(ac,start+loop),(loop-0.25)*1000);
+}
+
 // ── Filter helpers ────────────────────────────────────────────
 // Category filter pills (curated — no ETF clutter)
 const SECTOR_ORDER=['Tech','Finance','Health','Energy','Consumer','Industrl','Comms','Utility','Realty','Materls','Crypto'];
@@ -9266,9 +9381,62 @@ function initNameOverlay(){
     </div>`:'';
   wrap.innerHTML=`
     <div class="ns-title">
+      <div class="ns-logo-mark">
+        <svg class="ns-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="lm-bg" cx="40%" cy="35%" r="75%">
+              <stop offset="0%" stop-color="#1c2a3a"/>
+              <stop offset="100%" stop-color="#0d1117"/>
+            </radialGradient>
+            <linearGradient id="lm-area" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3fb950" stop-opacity="0.32"/>
+              <stop offset="100%" stop-color="#3fb950" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="lm-line" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#58a6ff"/>
+              <stop offset="60%" stop-color="#3fb950"/>
+              <stop offset="100%" stop-color="#56d364"/>
+            </linearGradient>
+            <filter id="lm-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="lm-clip"><rect width="120" height="120" rx="24" ry="24"/></clipPath>
+          </defs>
+          <rect width="120" height="120" rx="24" fill="url(#lm-bg)"/>
+          <g clip-path="url(#lm-clip)" stroke="#1e2d3d" stroke-width="0.7" opacity="0.8">
+            <line x1="0" y1="40" x2="120" y2="40"/>
+            <line x1="0" y1="70" x2="120" y2="70"/>
+            <line x1="40" y1="0" x2="40" y2="120"/>
+            <line x1="80" y1="0" x2="80" y2="120"/>
+          </g>
+          <polygon clip-path="url(#lm-clip)"
+            points="12,96 30,82 46,87 62,68 78,52 96,32 106,22 106,108 12,108"
+            fill="url(#lm-area)"/>
+          <!-- Candlesticks -->
+          <line x1="20" y1="75" x2="20" y2="102" stroke="#f85149" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
+          <rect x="16" y="79" width="8" height="18" rx="1.5" fill="#f85149" opacity="0.7" clip-path="url(#lm-clip)"/>
+          <line x1="34" y1="68" x2="34" y2="94" stroke="#3fb950" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
+          <rect x="30" y="72" width="8" height="16" rx="1.5" fill="#3fb950" opacity="0.7" clip-path="url(#lm-clip)"/>
+          <line x1="48" y1="56" x2="48" y2="84" stroke="#3fb950" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
+          <rect x="44" y="60" width="8" height="18" rx="1.5" fill="#3fb950" opacity="0.7" clip-path="url(#lm-clip)"/>
+          <!-- Chart line -->
+          <polyline clip-path="url(#lm-clip)"
+            points="12,96 30,82 46,87 62,68 78,52 96,32 106,22"
+            fill="none" stroke="url(#lm-line)" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round" filter="url(#lm-glow)"/>
+          <!-- Crosshair at peak -->
+          <circle cx="98" cy="24" r="9" fill="none" stroke="#3fb950" stroke-width="1.8" opacity="0.9" clip-path="url(#lm-clip)"/>
+          <circle cx="98" cy="24" r="3" fill="#3fb950" filter="url(#lm-glow)" clip-path="url(#lm-clip)"/>
+          <line x1="98" y1="11" x2="98" y2="18" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
+          <line x1="98" y1="30" x2="98" y2="37" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
+          <line x1="81" y1="24" x2="88" y2="24" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
+        </svg>
+      </div>
       <div class="ns-badge">MARKET SIMULATION 2025</div>
       <div class="ns-title-main">NASDAQ<br>TRADER</div>
       <div class="ns-title-sub">MARKET WARS · SEASON IV</div>
+      <button class="ns-mute-btn" id="ns-mute-btn" onclick="toggleLoginMusicMute()" title="Toggle music">🔊</button>
     </div>
     ${contHTML}
     <div class="ns-form" id="ns-form"${save?'style="display:none"':''}>
@@ -9316,10 +9484,21 @@ function initNameOverlay(){
     ni.addEventListener('focus',()=>playSound('uiHover'));
     ni.addEventListener('keydown',e=>{if(e.key==='Enter')nsStart();});
   }
+  // Start ambient music — immediately if AC already unlocked, else on first interaction
+  if(_ac&&_ac.state==='running'){
+    startLoginMusic();
+  } else {
+    const _lmUnlock=()=>startLoginMusic();
+    overlay.addEventListener('pointerdown',_lmUnlock,{once:true});
+    overlay.addEventListener('keydown',_lmUnlock,{once:true});
+  }
+  // Sync mute button state
+  const muteBtn=document.getElementById('ns-mute-btn');
+  if(muteBtn) muteBtn.textContent=_lmMuted?'🔇':'🔊';
 }
 function nsStart(){
   const nm=(document.getElementById('name-input')?.value||'').trim();
-  nsFlash(); playSound('gameStart');
+  nsFlash(); stopLoginMusic(); playSound('gameStart');
   setTimeout(()=>startGame(nm,selectedDiff),280);
 }
 function nsFlash(){
@@ -9338,7 +9517,7 @@ function showNewGameForm(){
 }
 function continueGame(){
   const sv=getSave(); if(!sv)return;
-  nsFlash(); playSound('uiContinue'); setTimeout(()=>playSound('gameStart'),400);
+  nsFlash(); stopLoginMusic(); playSound('uiContinue'); setTimeout(()=>playSound('gameStart'),400);
   setTimeout(()=>{
     playerName=sv.name; selectedAvatar=sv.avatar||'dragon';
     state.cash=sv.cash; state.positions=sv.positions||{};
