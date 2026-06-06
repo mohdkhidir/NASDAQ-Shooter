@@ -9383,54 +9383,33 @@ function initNameOverlay(){
     <div class="ns-title">
       <div class="ns-logo-mark">
         <svg class="ns-logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="lm-bg" cx="40%" cy="35%" r="75%">
-              <stop offset="0%" stop-color="#1c2a3a"/>
-              <stop offset="100%" stop-color="#0d1117"/>
-            </radialGradient>
-            <linearGradient id="lm-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#3fb950" stop-opacity="0.32"/>
-              <stop offset="100%" stop-color="#3fb950" stop-opacity="0"/>
-            </linearGradient>
-            <linearGradient id="lm-line" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#58a6ff"/>
-              <stop offset="60%" stop-color="#3fb950"/>
-              <stop offset="100%" stop-color="#56d364"/>
-            </linearGradient>
-            <filter id="lm-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="2.5" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <clipPath id="lm-clip"><rect width="120" height="120" rx="24" ry="24"/></clipPath>
-          </defs>
-          <rect width="120" height="120" rx="24" fill="url(#lm-bg)"/>
-          <g clip-path="url(#lm-clip)" stroke="#1e2d3d" stroke-width="0.7" opacity="0.8">
-            <line x1="0" y1="40" x2="120" y2="40"/>
-            <line x1="0" y1="70" x2="120" y2="70"/>
-            <line x1="40" y1="0" x2="40" y2="120"/>
-            <line x1="80" y1="0" x2="80" y2="120"/>
-          </g>
-          <polygon clip-path="url(#lm-clip)"
-            points="12,96 30,82 46,87 62,68 78,52 96,32 106,22 106,108 12,108"
-            fill="url(#lm-area)"/>
-          <!-- Candlesticks -->
-          <line x1="20" y1="75" x2="20" y2="102" stroke="#f85149" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
-          <rect x="16" y="79" width="8" height="18" rx="1.5" fill="#f85149" opacity="0.7" clip-path="url(#lm-clip)"/>
-          <line x1="34" y1="68" x2="34" y2="94" stroke="#3fb950" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
-          <rect x="30" y="72" width="8" height="16" rx="1.5" fill="#3fb950" opacity="0.7" clip-path="url(#lm-clip)"/>
-          <line x1="48" y1="56" x2="48" y2="84" stroke="#3fb950" stroke-width="1" opacity="0.5" clip-path="url(#lm-clip)"/>
-          <rect x="44" y="60" width="8" height="18" rx="1.5" fill="#3fb950" opacity="0.7" clip-path="url(#lm-clip)"/>
-          <!-- Chart line -->
-          <polyline clip-path="url(#lm-clip)"
-            points="12,96 30,82 46,87 62,68 78,52 96,32 106,22"
-            fill="none" stroke="url(#lm-line)" stroke-width="4"
-            stroke-linecap="round" stroke-linejoin="round" filter="url(#lm-glow)"/>
-          <!-- Crosshair at peak -->
-          <circle cx="98" cy="24" r="9" fill="none" stroke="#3fb950" stroke-width="1.8" opacity="0.9" clip-path="url(#lm-clip)"/>
-          <circle cx="98" cy="24" r="3" fill="#3fb950" filter="url(#lm-glow)" clip-path="url(#lm-clip)"/>
-          <line x1="98" y1="11" x2="98" y2="18" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
-          <line x1="98" y1="30" x2="98" y2="37" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
-          <line x1="81" y1="24" x2="88" y2="24" stroke="#3fb950" stroke-width="1.8" opacity="0.85" clip-path="url(#lm-clip)"/>
+          <rect width="120" height="120" rx="22" fill="#0d1117"/>
+          <rect width="120" height="120" rx="22" fill="#1c2a3a" opacity="0.6"/>
+          <line x1="0" y1="40" x2="120" y2="40" stroke="#1e2d3d" stroke-width="0.8"/>
+          <line x1="0" y1="70" x2="120" y2="70" stroke="#1e2d3d" stroke-width="0.8"/>
+          <line x1="40" y1="0" x2="40" y2="120" stroke="#1e2d3d" stroke-width="0.8"/>
+          <line x1="80" y1="0" x2="80" y2="120" stroke="#1e2d3d" stroke-width="0.8"/>
+          <polygon points="12,96 30,82 46,87 62,68 78,52 96,32 106,22 106,108 12,108" fill="#3fb950" opacity="0.15"/>
+          <line x1="20" y1="75" x2="20" y2="102" stroke="#f85149" stroke-width="1.2" opacity="0.6"/>
+          <rect x="16" y="80" width="8" height="16" rx="1.5" fill="#f85149" opacity="0.8"/>
+          <line x1="34" y1="64" x2="34" y2="92" stroke="#f85149" stroke-width="1.2" opacity="0.6"/>
+          <rect x="30" y="68" width="8" height="18" rx="1.5" fill="#f85149" opacity="0.8"/>
+          <line x1="48" y1="56" x2="48" y2="84" stroke="#3fb950" stroke-width="1.2" opacity="0.6"/>
+          <rect x="44" y="60" width="8" height="18" rx="1.5" fill="#3fb950" opacity="0.85"/>
+          <line x1="62" y1="44" x2="62" y2="72" stroke="#3fb950" stroke-width="1.2" opacity="0.6"/>
+          <rect x="58" y="48" width="8" height="17" rx="1.5" fill="#3fb950" opacity="0.85"/>
+          <polyline points="12,96 30,82 46,87 62,68 78,52 96,32 106,22"
+            fill="none" stroke="#3fb950" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="12,96 30,82 46,87 62,68 78,52 96,32 106,22"
+            fill="none" stroke="#56d364" stroke-width="1.5" opacity="0.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="98" cy="24" r="11" fill="none" stroke="#3fb950" stroke-width="2.2"/>
+          <circle cx="98" cy="24" r="5.5" fill="none" stroke="#3fb950" stroke-width="1.4" opacity="0.6"/>
+          <circle cx="98" cy="24" r="2.5" fill="#3fb950"/>
+          <line x1="98" y1="9" x2="98" y2="16" stroke="#3fb950" stroke-width="2"/>
+          <line x1="98" y1="32" x2="98" y2="39" stroke="#3fb950" stroke-width="2"/>
+          <line x1="83" y1="24" x2="90" y2="24" stroke="#3fb950" stroke-width="2"/>
         </svg>
       </div>
       <div class="ns-badge">MARKET SIMULATION 2025</div>
