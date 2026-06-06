@@ -61,15 +61,15 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 .ranks span{height:64px}
 .files{display:flex;padding-left:20px}
 .files span{width:64px}
-#board{display:grid;grid-template-columns:repeat(8,64px);grid-template-rows:repeat(8,64px);border:2px solid #4a7c3f;border-radius:3px;overflow:hidden;user-select:none}
+#board{display:grid;grid-template-columns:repeat(8,64px);grid-template-rows:repeat(8,64px);border:2px solid #3a6228;border-radius:3px;overflow:hidden;user-select:none}
 .sq{width:64px;height:64px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
-.sq.lt{background:#eeeed2}.sq.dk{background:#769656}
+.sq.lt{background:#aacf7a}.sq.dk{background:#4a7c35}
 .sq.sel{background:#f6f669!important}
-.sq.lm::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.25);pointer-events:none}
-.sq.lc::after{content:'';position:absolute;inset:0;border:4px solid rgba(0,0,0,.25);pointer-events:none}
-.sq.mv.lt{background:#cdd26a!important}.sq.mv.dk{background:#aaa23a!important}
-.sq.chk{background:#ff0000!important}
-.piece{font-size:42px;line-height:1;pointer-events:none}
+.sq.lm::after{content:'';position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.28);pointer-events:none}
+.sq.lc::after{content:'';position:absolute;inset:0;border:4px solid rgba(0,0,0,.28);pointer-events:none}
+.sq.mv.lt{background:#c8d45a!important}.sq.mv.dk{background:#8aaa28!important}
+.sq.chk{background:#e74c3c!important}
+.piece{width:87%;height:87%;background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:none}
 
 /* game status */
 .gstatus{font-size:.92rem;min-height:24px;text-align:center;width:100%;max-width:540px}
@@ -134,8 +134,8 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 .spec-badge{background:#bc8cff22;border:1px solid #bc8cff44;color:#bc8cff;border-radius:6px;padding:4px 10px;font-size:.8rem;text-align:center;width:100%;max-width:540px}
 
 @media(max-width:620px){
-  #board{grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);border-color:#4a7c3f}
-  .sq{width:44px;height:44px}.piece{font-size:29px}
+  #board{grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);border-color:#3a6228}
+  .sq{width:44px;height:44px}
   .sq.lm::after{width:15px;height:15px}
   .ranks span{height:44px}.files span{width:44px}
   .pinfo,.history,.action-bar,.gstatus,.draw-banner,.spec-badge{max-width:372px}
@@ -298,6 +298,8 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 //  CHESS ENGINE
 // ════════════════════════════════════════════════════════════
 const GLYPHS={white:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},black:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
+const CDN='https://lichess1.org/assets/piece/cburnett/';
+const PIMG={white:{k:'wK',q:'wQ',r:'wR',b:'wB',n:'wN',p:'wP'},black:{k:'bK',q:'bQ',r:'bR',b:'bB',n:'bN',p:'bP'}};
 
 function cloneBoard(b){return b.map(r=>r.map(c=>c?{...c}:null))}
 function findKing(b,color){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]&&b[r][c].type==='k'&&b[r][c].color===color)return[r,c];return null}
@@ -728,7 +730,9 @@ function renderBoard(){
     const piece=G.board[r][c];
     if(piece&&piece.type==='k'&&inCheck(G.board,piece.color))cls+=' chk';
     sq.className=cls;
-    sq.querySelector('.piece').textContent=piece?GLYPHS[piece.color][piece.type]:'';
+    const pel=sq.querySelector('.piece');
+    pel.style.backgroundImage=piece?`url(${CDN}${PIMG[piece.color][piece.type]}.svg)`:'';
+    pel.textContent='';
   });
   // captured
   const cW=G.capW.map(p=>GLYPHS.black[p.type]).join('');
