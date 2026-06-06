@@ -298,7 +298,7 @@ input[type=text]:focus{outline:none;border-color:#58a6ff}
 //  CHESS ENGINE
 // ════════════════════════════════════════════════════════════
 const GLYPHS={white:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'},black:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'}};
-const CDN='https://lichess1.org/assets/piece/cburnett/';
+const CDN='https://cdn.jsdelivr.net/gh/lichess-org/lila/public/piece/cburnett/';
 const PIMG={white:{k:'wK',q:'wQ',r:'wR',b:'wB',n:'wN',p:'wP'},black:{k:'bK',q:'bQ',r:'bR',b:'bB',n:'bN',p:'bP'}};
 
 function cloneBoard(b){return b.map(r=>r.map(c=>c?{...c}:null))}
