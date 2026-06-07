@@ -1,0 +1,26 @@
+{
+  "name": "promo",
+  "version": "1.0.0",
+  "description": "NASDAQ Shooter TikTok promo video",
+  "type": "module",
+  "scripts": {
+    "render": "node render-canvas.mjs",
+    "studio": "npx remotion studio src/Root.tsx"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/bundler": "^4.0.473",
+    "@remotion/renderer": "^4.0.473",
+    "canvas": "^3.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remotion": "^4.0.473"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  }
+}
