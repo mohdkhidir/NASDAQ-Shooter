@@ -1023,6 +1023,236 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════════════════════════
+     AUTH LAYER — Login / Register
+     Shown before anything else; hidden once user authenticates.
+     ══════════════════════════════════════════════════════════════ -->
+<style>
+/* ── Auth overlay ── */
+#auth-overlay{
+  position:fixed;inset:0;z-index:900;
+  background:#0d1117;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+#auth-overlay.hidden{display:none;}
+
+.auth-bg{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.auth-bg-line{
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,#58a6ff18,transparent);
+  animation:authLineScan 8s linear infinite;
+}
+@keyframes authLineScan{0%{top:-2px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+.auth-bg-line:nth-child(2){animation-delay:3s;background:linear-gradient(90deg,transparent,#3fb95018,transparent);}
+.auth-bg-line:nth-child(3){animation-delay:6s;background:linear-gradient(90deg,transparent,#d2a8ff14,transparent);}
+
+.auth-card{
+  position:relative;z-index:1;
+  width:min(420px,94vw);
+  background:#161b22;
+  border:1px solid #30363d;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 24px 64px #0009;
+  animation:authCardIn .35s ease;
+}
+@keyframes authCardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+.auth-logo{
+  background:linear-gradient(135deg,#0d1117 0%,#1a2744 100%);
+  padding:32px 28px 24px;
+  text-align:center;
+  border-bottom:1px solid #30363d;
+}
+.auth-logo-badge{
+  display:inline-block;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:#58a6ff;background:#58a6ff18;border:1px solid #58a6ff44;
+  padding:3px 10px;border-radius:3px;margin-bottom:10px;
+}
+.auth-logo-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.1;}
+.auth-logo-sub{font-size:11px;color:#8b949e;margin-top:5px;letter-spacing:.04em;}
+
+.auth-tabs{
+  display:flex;border-bottom:1px solid #30363d;
+}
+.auth-tab{
+  flex:1;padding:12px;background:none;border:none;
+  color:#8b949e;font-size:13px;font-weight:600;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .15s,border-color .15s;
+}
+.auth-tab:hover{color:#e6edf3;}
+.auth-tab.active{color:#58a6ff;border-bottom-color:#58a6ff;}
+
+.auth-body{padding:24px 28px;}
+
+.auth-field{margin-bottom:16px;}
+.auth-field label{display:block;font-size:11px;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.auth-field input{
+  width:100%;background:#0d1117;border:1px solid #30363d;
+  color:#e6edf3;padding:11px 14px;border-radius:8px;font-size:14px;outline:none;
+  transition:border-color .15s;
+}
+.auth-field input:focus{border-color:#58a6ff;}
+.auth-field input::placeholder{color:#444d56;}
+
+.auth-err{
+  background:#f8514914;border:1px solid #f8514944;color:#f85149;
+  border-radius:7px;padding:9px 12px;font-size:12px;margin-bottom:14px;
+  display:none;
+}
+.auth-err.show{display:block;}
+.auth-ok{
+  background:#3fb95014;border:1px solid #3fb95044;color:#3fb950;
+  border-radius:7px;padding:9px 12px;font-size:12px;margin-bottom:14px;
+  display:none;
+}
+.auth-ok.show{display:block;}
+
+.auth-btn{
+  width:100%;background:#238636;border:none;color:#fff;
+  padding:13px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:background .15s;letter-spacing:.03em;
+}
+.auth-btn:hover{background:#2ea043;}
+.auth-btn:active{transform:scale(.98);}
+
+.auth-divider{
+  display:flex;align-items:center;gap:10px;margin:16px 0;
+  color:#444d56;font-size:11px;
+}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:#30363d;}
+
+.auth-guest-btn{
+  width:100%;background:none;border:1px solid #30363d;color:#8b949e;
+  padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.auth-guest-btn:hover{border-color:#58a6ff;color:#58a6ff;}
+
+.auth-footer{
+  text-align:center;font-size:10px;color:#444d56;
+  padding:0 28px 20px;
+}
+
+/* ── Logout button in net-worth-bar ── */
+#btn-logout{
+  background:#3a1a1a;border:1px solid #6a2a2a;color:#f85149;
+  padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;gap:4px;
+  transition:background .15s,border-color .15s;
+}
+#btn-logout:hover{background:#4a1f1f;border-color:#f85149;}
+
+/* ── Save-before-logout dialog ── */
+#save-logout-overlay{
+  position:fixed;inset:0;background:#000b;z-index:850;
+  display:flex;align-items:center;justify-content:center;
+}
+#save-logout-overlay.hidden{display:none;}
+.slo-card{
+  background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:28px;width:min(360px,92vw);text-align:center;
+  animation:authCardIn .25s ease;
+}
+.slo-icon{font-size:38px;margin-bottom:10px;}
+.slo-title{font-size:17px;font-weight:700;margin-bottom:6px;}
+.slo-sub{font-size:13px;color:#8b949e;margin-bottom:22px;line-height:1.5;}
+.slo-btns{display:flex;flex-direction:column;gap:9px;}
+.slo-btn-save{background:#238636;border:none;color:#fff;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;}
+.slo-btn-save:hover{background:#2ea043;}
+.slo-btn-nosave{background:#3a1a1a;border:1px solid #6a2a2a;color:#f85149;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;}
+.slo-btn-nosave:hover{background:#4a1f1f;}
+.slo-btn-cancel{background:none;border:1px solid #30363d;color:#8b949e;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s;}
+.slo-btn-cancel:hover{border-color:#58a6ff;color:#58a6ff;}
+
+html[data-theme="light"] #auth-overlay{background:#f6f8fa;}
+html[data-theme="light"] .auth-card{background:#fff;border-color:#d0d7de;}
+html[data-theme="light"] .auth-logo{background:linear-gradient(135deg,#eaeef2,#dce7f5);}
+html[data-theme="light"] .auth-field input{background:#f6f8fa;border-color:#d0d7de;color:#1f2328;}
+html[data-theme="light"] .auth-tab{color:#57606a;}
+html[data-theme="light"] .auth-tab.active{color:#0969da;border-bottom-color:#0969da;}
+html[data-theme="light"] .auth-tabs{border-color:#d0d7de;}
+html[data-theme="light"] .auth-body,.auth-footer{color:#1f2328;}
+html[data-theme="light"] .slo-card{background:#fff;border-color:#d0d7de;}
+</style>
+
+<!-- Auth overlay -->
+<div id="auth-overlay">
+  <div class="auth-bg">
+    <div class="auth-bg-line"></div>
+    <div class="auth-bg-line"></div>
+    <div class="auth-bg-line"></div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-badge">Market Simulation 2025</div>
+      <div class="auth-logo-title">NASDAQ<br>TRADER</div>
+      <div class="auth-logo-sub">Market Wars · Season IV</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="auth-tab-login" onclick="authShowTab('login')">Sign In</button>
+      <button class="auth-tab" id="auth-tab-register" onclick="authShowTab('register')">Register</button>
+    </div>
+    <div class="auth-body">
+      <!-- Login form -->
+      <div id="auth-form-login">
+        <div class="auth-err" id="auth-login-err"></div>
+        <div class="auth-ok"  id="auth-login-ok"></div>
+        <div class="auth-field">
+          <label>Username</label>
+          <input type="text" id="auth-login-user" placeholder="Your username" autocomplete="username" maxlength="32">
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="auth-login-pass" placeholder="Your password" autocomplete="current-password" maxlength="64">
+        </div>
+        <button class="auth-btn" onclick="authLogin()">Sign In →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-guest-btn" onclick="authGuest()">Continue as Guest</button>
+      </div>
+      <!-- Register form -->
+      <div id="auth-form-register" style="display:none">
+        <div class="auth-err" id="auth-reg-err"></div>
+        <div class="auth-ok"  id="auth-reg-ok"></div>
+        <div class="auth-field">
+          <label>Username</label>
+          <input type="text" id="auth-reg-user" placeholder="Choose a username" autocomplete="username" maxlength="32">
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <input type="password" id="auth-reg-pass" placeholder="Choose a password (min 6 chars)" autocomplete="new-password" maxlength="64">
+        </div>
+        <div class="auth-field">
+          <label>Confirm Password</label>
+          <input type="password" id="auth-reg-pass2" placeholder="Repeat password" autocomplete="new-password" maxlength="64">
+        </div>
+        <button class="auth-btn" onclick="authRegister()">Create Account →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-guest-btn" onclick="authGuest()">Continue as Guest</button>
+      </div>
+    </div>
+    <div class="auth-footer">Accounts are stored locally on this device.</div>
+  </div>
+</div>
+
+<!-- Save-before-logout dialog -->
+<div id="save-logout-overlay" class="hidden">
+  <div class="slo-card">
+    <div class="slo-icon">💾</div>
+    <div class="slo-title">Save before logging out?</div>
+    <div class="slo-sub">Your current game progress can be saved before you sign out. Unsaved progress will be lost.</div>
+    <div class="slo-btns">
+      <button class="slo-btn-save"   onclick="sloSaveAndLogout()">💾 Save &amp; Logout</button>
+      <button class="slo-btn-nosave" onclick="sloLogoutNoSave()">🚪 Logout without saving</button>
+      <button class="slo-btn-cancel" onclick="sloCancel()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Name/Difficulty modal -->
 <!-- Anime/Comic Start Screen — content built by initNameOverlay() -->
 <div class="modal-overlay" id="name-overlay">
@@ -1549,7 +1779,7 @@ header,.sb-tabs,.net-worth-bar,.speed-bar,.watchlist,.order-form label,.section-
   <button id="btn-realestate" onclick="openRealEstate()" style="background:#28180a;color:#f0883e;border:1px solid #6a3a1a;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px">🏢 Real Estate<span id="re-value-badge" style="display:none;background:rgba(240,136,62,.2);padding:0 5px;border-radius:8px;font-size:10px;margin-left:2px"></span></button>
   <button id="theme-toggle" style="background:none;border:1px solid #30363d;color:#8b949e;padding:3px 7px;border-radius:5px;cursor:pointer;font-size:13px">🌙</button>
   <button class="btn-submit-score" id="btn-submit">💾 Save</button>
-  <button id="btn-logout" style="background:#2d1a1a;color:#f85149;border:1px solid #6e2b2b;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px">🚪 Logout</button>
+  <button id="btn-logout" onclick="promptLogout()" title="Logout">🚪 Logout</button>
 </div>
 
 <!-- Mobile bottom action nav — desktop hidden, mobile flex -->
@@ -9925,6 +10155,163 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
+
+// ══════════════════════════════════════════════════════════════
+// AUTH SYSTEM  (localStorage-backed, no server required)
+// Storage keys:
+//   nq_users        → [{username, passHash, createdAt}]
+//   nq_auth_session → {username, loginTime, isGuest}
+// ══════════════════════════════════════════════════════════════
+const AUTH_USERS_KEY   = 'nq_users';
+const AUTH_SESSION_KEY = 'nq_auth_session';
+
+// ── Simple deterministic hash (djb2) — good enough for local storage ──
+function authHash(str){
+  let h=5381;
+  for(let i=0;i<str.length;i++) h=(((h<<5)+h)^str.charCodeAt(i))>>>0;
+  return h.toString(16);
+}
+
+function authLoadUsers(){
+  try{return JSON.parse(localStorage.getItem(AUTH_USERS_KEY)||'[]');}catch{return[];}
+}
+function authSaveUsers(users){
+  localStorage.setItem(AUTH_USERS_KEY,JSON.stringify(users));
+}
+function authGetSession(){
+  try{return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)||'null');}catch{return null;}
+}
+function authSetSession(username,isGuest=false){
+  localStorage.setItem(AUTH_SESSION_KEY,JSON.stringify({username,isGuest,loginTime:Date.now()}));
+}
+function authClearSession(){
+  localStorage.removeItem(AUTH_SESSION_KEY);
+}
+
+// ── Tab switcher ──
+function authShowTab(tab){
+  document.getElementById('auth-form-login').style.display    = tab==='login'    ?'':'none';
+  document.getElementById('auth-form-register').style.display = tab==='register' ?'':'none';
+  document.getElementById('auth-tab-login').classList.toggle('active',   tab==='login');
+  document.getElementById('auth-tab-register').classList.toggle('active',tab==='register');
+  // clear messages
+  ['auth-login-err','auth-login-ok','auth-reg-err','auth-reg-ok'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.classList.remove('show');el.textContent='';}
+  });
+}
+
+function authShowMsg(id,msg,isErr=true){
+  const el=document.getElementById(id); if(!el)return;
+  el.textContent=msg;
+  el.classList.add('show');
+}
+
+// ── Login ──
+function authLogin(){
+  const user=(document.getElementById('auth-login-user')?.value||'').trim();
+  const pass=(document.getElementById('auth-login-pass')?.value||'');
+  if(!user||!pass){authShowMsg('auth-login-err','Please fill in all fields.');return;}
+  const users=authLoadUsers();
+  const found=users.find(u=>u.username.toLowerCase()===user.toLowerCase());
+  if(!found||found.passHash!==authHash(pass)){
+    authShowMsg('auth-login-err','Incorrect username or password.');return;
+  }
+  authSetSession(found.username,false);
+  authDismiss(found.username);
+}
+
+// ── Register ──
+function authRegister(){
+  const user=(document.getElementById('auth-reg-user')?.value||'').trim();
+  const pass=(document.getElementById('auth-reg-pass')?.value||'');
+  const pass2=(document.getElementById('auth-reg-pass2')?.value||'');
+  if(!user||!pass||!pass2){authShowMsg('auth-reg-err','Please fill in all fields.');return;}
+  if(user.length<3){authShowMsg('auth-reg-err','Username must be at least 3 characters.');return;}
+  if(pass.length<6){authShowMsg('auth-reg-err','Password must be at least 6 characters.');return;}
+  if(pass!==pass2){authShowMsg('auth-reg-err','Passwords do not match.');return;}
+  const users=authLoadUsers();
+  if(users.find(u=>u.username.toLowerCase()===user.toLowerCase())){
+    authShowMsg('auth-reg-err','Username already taken — please choose another.');return;
+  }
+  users.push({username:user,passHash:authHash(pass),createdAt:Date.now()});
+  authSaveUsers(users);
+  authSetSession(user,false);
+  authShowMsg('auth-reg-ok','Account created! Starting game…',false);
+  setTimeout(()=>authDismiss(user),700);
+}
+
+// ── Guest ──
+function authGuest(){
+  authSetSession('Guest',true);
+  authDismiss('Guest');
+}
+
+// ── Dismiss auth overlay and hand off to game start screen ──
+function authDismiss(username){
+  document.getElementById('auth-overlay').classList.add('hidden');
+  // Pre-fill player name in game start screen with the auth username (if not Guest)
+  if(username && username!=='Guest'){
+    const ni=document.getElementById('name-input');
+    if(ni && !ni.value) ni.value=username;
+  }
+  // Update logout button label
+  const logoutBtn=document.getElementById('btn-logout');
+  if(logoutBtn){
+    const session=authGetSession();
+    logoutBtn.innerHTML=session&&!session.isGuest
+      ?`🚪 ${esc(session.username)} · Logout`
+      :`🚪 Logout`;
+  }
+}
+
+// ── Logout flow ──
+function promptLogout(){
+  document.getElementById('save-logout-overlay').classList.remove('hidden');
+}
+function sloCancel(){
+  document.getElementById('save-logout-overlay').classList.add('hidden');
+}
+function sloSaveAndLogout(){
+  saveGame();
+  sloDoLogout();
+}
+function sloLogoutNoSave(){
+  sloDoLogout();
+}
+function sloDoLogout(){
+  clearTimeout(tickTimer);
+  state.gameOver=true;
+  authClearSession();
+  document.getElementById('save-logout-overlay').classList.add('hidden');
+  // Reset auth form fields
+  ['auth-login-user','auth-login-pass','auth-reg-user','auth-reg-pass','auth-reg-pass2'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['auth-login-err','auth-login-ok','auth-reg-err','auth-reg-ok'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.classList.remove('show');el.textContent='';}
+  });
+  authShowTab('login');
+  // Hide game and show auth overlay again
+  document.getElementById('name-overlay').classList.remove('hidden');
+  document.getElementById('auth-overlay').classList.remove('hidden');
+  // Re-init name overlay so it's fresh
+  initNameOverlay();
+}
+
+// ── Keyboard enter support ──
+document.getElementById('auth-login-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')authLogin();});
+document.getElementById('auth-login-user')?.addEventListener('keydown',e=>{if(e.key==='Enter')authLogin();});
+document.getElementById('auth-reg-pass2')?.addEventListener('keydown',e=>{if(e.key==='Enter')authRegister();});
+
+// ── Auto-login if valid session exists ──
+(function authBootstrap(){
+  const session=authGetSession();
+  if(session){
+    // Valid session found — skip auth overlay
+    authDismiss(session.username);
+  }
+  // else: auth overlay stays visible (default)
+})();
 </script>
 </body>
 </html>
